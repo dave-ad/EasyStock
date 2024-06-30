@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+namespace EasyStocks.Infrastructure;
 
-namespace EasyStocks.Infrastructure
+public static class DIRegister
 {
-    internal class DIRegister
+    public static void AddInfrastructure(this IServiceCollection services)
     {
+        services.AddScoped<IEasyStockAppDbContext, EasyStockAppDbContext>();
     }
 }

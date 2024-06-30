@@ -1,7 +1,9 @@
-﻿namespace EasyStocks.Infrastructure
-{
-    public class GlobalUsing
-    {
-
-    }
-}
+﻿global using EasyStocks.Domain.Enitities;
+global using EasyStocks.Domain.ValueObjects;
+global using EasyStocks.Infrastructure.Identity;
+global using EasyStocks.Utils.Enums;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using Microsoft.Extensions.DependencyInjection;

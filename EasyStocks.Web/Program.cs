@@ -1,7 +1,28 @@
+
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<IEasyStockAppDbContext, EasyStockAppDbContext>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Dependency Injections
+builder.Services.AddDbContext<EasyStockAppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection")));
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>()
+    .AddEntityFrameworkStores<EasyStockAppDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = false;
+});
 
 var app = builder.Build();
 
@@ -18,6 +39,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

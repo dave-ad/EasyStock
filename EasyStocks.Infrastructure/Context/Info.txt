@@ -1,0 +1,7 @@
+﻿hardcoding the database connection string directly within the context class approach works, but it is generally not recommended for several reasons:
+
+1. Security: Hardcoding connection strings directly in your code can expose sensitive information, especially if the code is checked into version control systems.
+
+2. Flexibility: Changing the connection string requires modifying and recompiling the code.
+
+3. Environment Configuration: It's difficult to manage different connection strings for different environments (development, staging, production) if they are hardcoded.
