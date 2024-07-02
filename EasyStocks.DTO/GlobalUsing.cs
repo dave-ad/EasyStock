@@ -1,7 +1,2 @@
-﻿namespace EasyStocks.DTO
-{
-    public class Class1
-    {
-
-    }
-}
+﻿global using EasyStocks.DTO.Common;
+global using EasyStocks.Utils.Enums;
