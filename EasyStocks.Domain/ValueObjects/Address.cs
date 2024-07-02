@@ -2,11 +2,11 @@
 
 public record Address
 {
-    public string StreetNo { get; init; }
-    public string StreetName { get; init; }
-    public string City { get; init; }
-    public string State { get; init; }
-    public string ZipCode { get; init; }
+    public string StreetNo { get; }
+    public string StreetName { get; }
+    public string City { get; }
+    public string State { get; }
+    public string ZipCode { get; }
 
     private Address() 
     {

@@ -2,7 +2,5 @@
 
 public interface IEasyStockAppDbContext
 {
-    DbSet<CorporateBroker> CorporateBrokers { get; set; }
-    DbSet<IndividualBroker> IndividualBrokers { get; set; }
-    DbSet<FreelanceBroker> FreelanceBrokers { get; set; }
+    DbSet<Broker> Brokers { get; set; }
 }

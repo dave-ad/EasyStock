@@ -1,6 +1,8 @@
-﻿global using EasyStocks.Domain.Enitities;
+﻿global using EasyStocks.Domain.Core;
+global using EasyStocks.Domain.Entities;
 global using EasyStocks.Domain.ValueObjects;
-global using EasyStocks.Infrastructure.Identity;
+global using EasyStocks.Infrastructure.Config;
+//global using EasyStocks.Infrastructure.Identity;
 global using EasyStocks.Utils.Enums;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
