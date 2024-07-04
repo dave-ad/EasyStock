@@ -4,9 +4,9 @@ public enum AccountStatus
 {
     Pending,
     Active,
-    Suspended,
+    Suspended = -1,
 
-    InActive,
+    InActive = 0,
     Registered,
     Authorized
 }

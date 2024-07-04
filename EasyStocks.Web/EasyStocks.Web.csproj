@@ -7,6 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Controllers\BrokersController1.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Controllers\BrokersController1.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="8.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -15,10 +24,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EasyStocks.DTO\EasyStocks.DTO.csproj" />
     <ProjectReference Include="..\EasyStocks.Infrastructure\EasyStocks.Infrastructure.csproj" />
+    <ProjectReference Include="..\EasyStocks.Service\EasyStocks.Service.csproj" />
   </ItemGroup>
 
 </Project>

@@ -15,7 +15,7 @@ public partial class Broker : Entity
     public Address? CompanyAddress { get; private set; } = Address.Default();
     public CAC? CACRegistrationNumber { get; private set; } = CAC.Default();
     public StockBrokerLicense? StockBrokerLicenseNumber { get; private set; } = StockBrokerLicense.Default();
-    public DateTime? DateCertified { get; private set; }
+    public DateOnly? DateCertified { get; private set; }
     public string? PositionInOrg { get; private set; } = default!;
     public DateOnly? DateOfEmployment { get; private set; }
 
@@ -25,6 +25,6 @@ public partial class Broker : Entity
     // Freelance Brokers
     public string? ProfessionalQualification { get; private set; } = default!;
 
-    public BrokerType? BrokerType { get; private set; } = default!;
-    public AccountStatus? Status { get; private set; }
+    public BrokerType BrokerType { get; private set; }
+    public AccountStatus Status { get; private set; }
 }

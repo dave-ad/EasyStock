@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace EasyStocks.Service;
 
-namespace EasyStocks.Service
+public static class DIRegister
 {
-    internal class DIRegister
+    public static IServiceCollection AddEasyStockServices(this IServiceCollection services)
     {
+        services.AddInfrastructure();
+        services.AddScoped<IBrokerService, BrokerService>();
+        return services;
     }
 }
