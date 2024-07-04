@@ -4,6 +4,7 @@ using EasyStocks.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
 {
     [DbContext(typeof(EasyStockAppDbContext))]
-    partial class EasyStockAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240703211050_UpdateBrokersConfig")]
+    partial class UpdateBrokersConfig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,32 +82,31 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                             b1.Property<string>("City")
                                 .IsRequired()
                                 .HasMaxLength(50)
-                                .HasColumnType("nvarchar(50)")
-                                .HasColumnName("Business_City");
+                                .HasColumnType("nvarchar(50)");
 
                             b1.Property<string>("State")
                                 .IsRequired()
                                 .HasMaxLength(50)
-                                .HasColumnType("nvarchar(50)")
-                                .HasColumnName("Business_State");
+                                .HasColumnType("nvarchar(50)");
 
                             b1.Property<string>("StreetName")
                                 .IsRequired()
+                                .ValueGeneratedOnUpdateSometimes()
                                 .HasMaxLength(100)
                                 .HasColumnType("nvarchar(100)")
-                                .HasColumnName("Business_Street_Name");
+                                .HasColumnName("Street_Name");
 
                             b1.Property<string>("StreetNo")
                                 .IsRequired()
+                                .ValueGeneratedOnUpdateSometimes()
                                 .HasMaxLength(100)
                                 .HasColumnType("nvarchar(100)")
-                                .HasColumnName("Business_Street_Number");
+                                .HasColumnName("Street_Number");
 
                             b1.Property<string>("ZipCode")
                                 .IsRequired()
                                 .HasMaxLength(6)
-                                .HasColumnType("nvarchar(6)")
-                                .HasColumnName("Business_ZipCode");
+                                .HasColumnType("nvarchar(6)");
 
                             b1.HasKey("BrokerId");
 
@@ -122,32 +124,31 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                             b1.Property<string>("City")
                                 .IsRequired()
                                 .HasMaxLength(50)
-                                .HasColumnType("nvarchar(50)")
-                                .HasColumnName("Company_City");
+                                .HasColumnType("nvarchar(50)");
 
                             b1.Property<string>("State")
                                 .IsRequired()
                                 .HasMaxLength(50)
-                                .HasColumnType("nvarchar(50)")
-                                .HasColumnName("Company_State");
+                                .HasColumnType("nvarchar(50)");
 
                             b1.Property<string>("StreetName")
                                 .IsRequired()
+                                .ValueGeneratedOnUpdateSometimes()
                                 .HasMaxLength(100)
                                 .HasColumnType("nvarchar(100)")
-                                .HasColumnName("Company_Street_Name");
+                                .HasColumnName("Street_Name");
 
                             b1.Property<string>("StreetNo")
                                 .IsRequired()
+                                .ValueGeneratedOnUpdateSometimes()
                                 .HasMaxLength(100)
                                 .HasColumnType("nvarchar(100)")
-                                .HasColumnName("Company_Street_Number");
+                                .HasColumnName("Street_Number");
 
                             b1.Property<string>("ZipCode")
                                 .IsRequired()
                                 .HasMaxLength(6)
-                                .HasColumnType("nvarchar(6)")
-                                .HasColumnName("Company_ZipCode");
+                                .HasColumnType("nvarchar(6)");
 
                             b1.HasKey("BrokerId");
 

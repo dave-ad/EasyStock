@@ -11,8 +11,12 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "ThriftSchema");
+
             migrationBuilder.CreateTable(
                 name: "Broker",
+                schema: "ThriftSchema",
                 columns: table => new
                 {
                     BrokerId = table.Column<int>(type: "int", nullable: false)
@@ -46,8 +50,8 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                     BusinessAddress_State = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     BusinessAddress_ZipCode = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: true),
                     ProfessionalQualification = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BrokerType = table.Column<int>(type: "int", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: true),
+                    BrokerType = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<int>(type: "int", nullable: false)
@@ -62,7 +66,8 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Broker");
+                name: "Broker",
+                schema: "ThriftSchema");
         }
     }
 }

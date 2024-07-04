@@ -1,6 +1,6 @@
 ﻿namespace EasyStocks.Infrastructure.Config;
 
-internal class BrokerConfig : IEntityTypeConfiguration<Broker>
+internal class IndividualBrokerConfig : IEntityTypeConfiguration<Broker>
 {
     public void Configure(EntityTypeBuilder<Broker> builder)
     {
@@ -26,68 +26,33 @@ internal class BrokerConfig : IEntityTypeConfiguration<Broker>
             y.Property(z => z.Hash);
         });
 
-        builder.OwnsOne(x => x.CompanyEmail, y =>
-        {
-            y.Property(z => z.Value).HasMaxLength(100).IsRequired();
-            y.Property(z => z.Hash);
-        });
-
-        builder.OwnsOne(x => x.CompanyMobileNumber, y =>
-        {
-            y.Property(z => z.Value).HasMaxLength(11).IsRequired();
-            y.Property(z => z.Hash);
-        });
-
-        builder.OwnsOne(x => x.CompanyAddress, y =>
+        builder.OwnsOne(x => x.BusinessAddress, y =>
         {
             y.Property(z => z.StreetNo).HasMaxLength(100)
-                .HasColumnName("Street_Number")
+                .HasColumnName("Business_Street_Number")
                 .IsRequired();
 
             y.Property(z => z.StreetName).HasMaxLength(100)
-                .HasColumnName("Street_Name")
+                .HasColumnName("Business_Street_Name")
                 .IsRequired();
 
             y.Property(z => z.City).HasMaxLength(50)
+                .HasColumnName("Business_City")
                 .IsRequired();
 
             y.Property(z => z.State).HasMaxLength(50)
+                .HasColumnName("Business_State")
                 .IsRequired();
 
             y.Property(z => z.ZipCode).HasMaxLength(6)
+                .HasColumnName("Business_ZipCode")
                 .IsRequired();
-        });
-
-        builder.OwnsOne(x => x.CACRegistrationNumber, y =>
-        {
-            y.Property(z => z.Value).HasMaxLength(8).IsRequired();
-            y.Property(z => z.Hash);
         });
 
         builder.OwnsOne(x => x.StockBrokerLicenseNumber, y =>
         {
             y.Property(z => z.Value).HasMaxLength(9).IsRequired();
             y.Property(z => z.Hash);
-        });
-
-        builder.OwnsOne(x => x.BusinessAddress, y =>
-        {
-            y.Property(z => z.StreetNo).HasMaxLength(100)
-                .HasColumnName("Street_Number")
-                .IsRequired();
-
-            y.Property(z => z.StreetName).HasMaxLength(100)
-                .HasColumnName("Street_Name")
-                .IsRequired();
-
-            y.Property(z => z.City).HasMaxLength(50)
-                .IsRequired();
-
-            y.Property(z => z.State).HasMaxLength(50)
-                .IsRequired();
-
-            y.Property(z => z.ZipCode).HasMaxLength(6)
-                .IsRequired();
         });
     }
 }

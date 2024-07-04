@@ -1,16 +1,28 @@
-﻿namespace EasyStocks.Infrastructure;
+﻿namespace EasyStocks.Infrastructure.Context;
 
-//public class EasyStockAppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>, IEasyStockAppDbContext
-public class EasyStockAppDbContext : DbContext, IEasyStockAppDbContext
+internal sealed class EasyStockAppDbContext : DbContext, IEasyStockAppDbContext
 {
-    public EasyStockAppDbContext(DbContextOptions<EasyStockAppDbContext> options) : base(options) { }
-    
+    internal const string DEFAULT_SCHEMA = "ThriftSchema";
+    private string? DevConnection = "";
+
+    public EasyStockAppDbContext()
+    {
+        DevConnection = "Server=David\\MSSQLSERVER2022;Database=EasyStockDB;initial catalog=EasyStockDB;Trusted_Connection=True;MultipleActiveResultSets=true;integrated security=True;TrustServerCertificate=True;";
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    => optionsBuilder
+    .UseSqlServer(DevConnection)
+    .EnableSensitiveDataLogging();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(builder);
+        builder.HasDefaultSchema(DEFAULT_SCHEMA);
+        builder.ApplyConfigurationsFromAssembly(typeof(EasyStockAppDbContext).Assembly);
 
-        builder.ApplyConfiguration(new BrokerConfig());
-        //builder.ApplyConfiguration(new ApplicationUserConfig());
+        builder.ApplyConfiguration(new CorporateBrokerConfig());
+        builder.ApplyConfiguration(new IndividualBrokerConfig());
+        builder.ApplyConfiguration(new FreelanceBrokerConfig());
     }
 
     public DbSet<Broker> Brokers { get; set; }
