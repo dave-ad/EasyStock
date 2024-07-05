@@ -20,7 +20,6 @@ public class BrokerController : Controller
     [HttpGet]
     public ActionResult CreateCorporateBroker()
     {
-        //ViewBag.BrokerCreatedMessage = "Account creation Successfully 👍";
         return View();
     }
 

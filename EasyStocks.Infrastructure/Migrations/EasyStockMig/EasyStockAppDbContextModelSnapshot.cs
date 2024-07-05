@@ -46,14 +46,8 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                     b.Property<DateOnly?>("DateCertified")
                         .HasColumnType("date");
 
-                    b.Property<DateOnly?>("DateOfEmployment")
-                        .HasColumnType("date");
-
                     b.Property<int>("Gender")
                         .HasColumnType("int");
-
-                    b.Property<string>("PositionInOrg")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProfessionalQualification")
                         .HasColumnType("nvarchar(max)");
@@ -67,6 +61,43 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                     b.HasKey("BrokerId");
 
                     b.ToTable("Broker", "ThriftSchema");
+                });
+
+            modelBuilder.Entity("EasyStocks.Domain.Entities.User", b =>
+                {
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+
+                    b.Property<int>("BrokerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateOnly>("DateOfEmployment")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Gender")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PositionInOrg")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("BrokerId");
+
+                    b.ToTable("User", "ThriftSchema");
                 });
 
             modelBuilder.Entity("EasyStocks.Domain.Entities.Broker", b =>
@@ -241,27 +272,6 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                                 .HasForeignKey("BrokerId");
                         });
 
-                    b.OwnsOne("EasyStocks.Domain.ValueObjects.CAC", "CACRegistrationNumber", b1 =>
-                        {
-                            b1.Property<int>("BrokerId")
-                                .HasColumnType("int");
-
-                            b1.Property<int>("Hash")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(8)
-                                .HasColumnType("nvarchar(8)");
-
-                            b1.HasKey("BrokerId");
-
-                            b1.ToTable("Broker", "ThriftSchema");
-
-                            b1.WithOwner()
-                                .HasForeignKey("BrokerId");
-                        });
-
                     b.OwnsOne("EasyStocks.Domain.ValueObjects.FullName", "Name", b1 =>
                         {
                             b1.Property<int>("BrokerId")
@@ -290,7 +300,28 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                                 .HasForeignKey("BrokerId");
                         });
 
-                    b.OwnsOne("EasyStocks.Domain.ValueObjects.StockBrokerLicense", "StockBrokerLicenseNumber", b1 =>
+                    b.OwnsOne("EasyStocks.Domain.ValueObjects.CAC", "CACRegistrationNumber", b1 =>
+                        {
+                            b1.Property<int>("BrokerId")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("Hash")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(8)
+                                .HasColumnType("nvarchar(8)");
+
+                            b1.HasKey("BrokerId");
+
+                            b1.ToTable("Broker", "ThriftSchema");
+
+                            b1.WithOwner()
+                                .HasForeignKey("BrokerId");
+                        });
+
+                    b.OwnsOne("EasyStocks.Domain.ValueObjects.StockBrokerLicense", "StockBrokerLicense", b1 =>
                         {
                             b1.Property<int>("BrokerId")
                                 .HasColumnType("int");
@@ -311,7 +342,8 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                                 .HasForeignKey("BrokerId");
                         });
 
-                    b.Navigation("BusinessAddress");
+                    b.Navigation("BusinessAddress")
+                        .IsRequired();
 
                     b.Navigation("CACRegistrationNumber");
 
@@ -330,7 +362,102 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                     b.Navigation("Name")
                         .IsRequired();
 
-                    b.Navigation("StockBrokerLicenseNumber");
+                    b.Navigation("StockBrokerLicense");
+                });
+
+            modelBuilder.Entity("EasyStocks.Domain.Entities.User", b =>
+                {
+                    b.HasOne("EasyStocks.Domain.Entities.Broker", "Broker")
+                        .WithMany("Users")
+                        .HasForeignKey("BrokerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("EasyStocks.Domain.ValueObjects.Email", "Email", b1 =>
+                        {
+                            b1.Property<int>("UserId")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("Hash")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("nvarchar(100)");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("User", "ThriftSchema");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.OwnsOne("EasyStocks.Domain.ValueObjects.MobileNo", "MobileNumber", b1 =>
+                        {
+                            b1.Property<int>("UserId")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("Hash")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(11)
+                                .HasColumnType("nvarchar(11)");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("User", "ThriftSchema");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.OwnsOne("EasyStocks.Domain.ValueObjects.FullName", "Name", b1 =>
+                        {
+                            b1.Property<int>("UserId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("First")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
+                            b1.Property<string>("Last")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
+                            b1.Property<string>("Others")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("User", "ThriftSchema");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.Navigation("Broker");
+
+                    b.Navigation("Email")
+                        .IsRequired();
+
+                    b.Navigation("MobileNumber")
+                        .IsRequired();
+
+                    b.Navigation("Name")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("EasyStocks.Domain.Entities.Broker", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

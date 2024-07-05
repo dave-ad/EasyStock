@@ -1,11 +1,11 @@
 ﻿namespace EasyStocks.Infrastructure.Config;
 
-internal class FreelanceBrokerConfig : IEntityTypeConfiguration<Broker>
+internal class UserConfig : IEntityTypeConfiguration<User>
 {
-    public void Configure(EntityTypeBuilder<Broker> builder)
+    public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.ToTable(nameof(Broker));
-        builder.HasKey(x => x.BrokerId);
+        builder.ToTable(nameof(User));
+        builder.HasKey(x => x.UserId);
 
         builder.OwnsOne(x => x.Name, y =>
         {
@@ -26,10 +26,10 @@ internal class FreelanceBrokerConfig : IEntityTypeConfiguration<Broker>
             y.Property(z => z.Hash);
         });
 
-        builder.OwnsOne(x => x.StockBrokerLicense, y =>
-        {
-            y.Property(z => z.Value).HasMaxLength(9).IsRequired();
-            y.Property(z => z.Hash);
-        });
+        // Configure relationship to Broker
+        builder.HasOne(u => u.Broker) // User has one Broker
+               .WithMany(b => b.Users) // Broker has many Users
+               .HasForeignKey(u => u.BrokerId) // User.BrokerId is the foreign key
+               .IsRequired(); // Relationship is required
     }
 }

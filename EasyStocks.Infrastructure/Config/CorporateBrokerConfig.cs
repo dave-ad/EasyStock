@@ -48,7 +48,7 @@ internal class CorporateBrokerConfig : IEntityTypeConfiguration<Broker>
             y.Property(z => z.Hash);
         });
 
-        builder.OwnsOne(x => x.StockBrokerLicenseNumber, y =>
+        builder.OwnsOne(x => x.StockBrokerLicense, y =>
         {
             y.Property(z => z.Value).HasMaxLength(9).IsRequired();
             y.Property(z => z.Hash);
@@ -72,5 +72,11 @@ internal class CorporateBrokerConfig : IEntityTypeConfiguration<Broker>
             y.Property(z => z.Value).HasMaxLength(11).IsRequired();
             y.Property(z => z.Hash);
         });
+
+        // Configure User navigation property
+        builder.HasMany(b => b.Users)
+             .WithOne(u => u.Broker) // Assuming User has a navigation property back to Broker
+             .HasForeignKey(u => u.BrokerId) // Assuming User has a property named BrokerId
+             .IsRequired();
     }
 }

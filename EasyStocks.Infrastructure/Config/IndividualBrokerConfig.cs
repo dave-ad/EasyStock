@@ -49,7 +49,7 @@ internal class IndividualBrokerConfig : IEntityTypeConfiguration<Broker>
                 .IsRequired();
         });
 
-        builder.OwnsOne(x => x.StockBrokerLicenseNumber, y =>
+        builder.OwnsOne(x => x.StockBrokerLicense, y =>
         {
             y.Property(z => z.Value).HasMaxLength(9).IsRequired();
             y.Property(z => z.Hash);
