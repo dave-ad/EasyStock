@@ -15,9 +15,8 @@ public class User : Entity
     public Broker Broker { get; set; } // Navigation property
 
     private User() { }
-    private User(/*int brokerId,*/ FullName name, Email email, MobileNo mobileNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment)
+    private User(FullName name, Email email, MobileNo mobileNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment)
     {
-        //BrokerId = brokerId;
         Name = name;
         Email = email;
         MobileNumber = mobileNumber;

@@ -1,6 +1,4 @@
-﻿using EasyStocks.Infrastructure.Validator;
-
-namespace EasyStocks.Infrastructure;
+﻿namespace EasyStocks.Infrastructure;
 
 public static class DIRegister
 {

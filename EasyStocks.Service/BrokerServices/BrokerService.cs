@@ -1,8 +1,4 @@
-﻿using EasyStocks.Domain.ValueObjects;
-using EasyStocks.DTO.Requests;
-using Microsoft.EntityFrameworkCore;
-
-namespace EasyStocks.Service.BrokerServices;
+﻿namespace EasyStocks.Service.BrokerServices;
 
 public sealed class BrokerService : IBrokerService
 {
