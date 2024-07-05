@@ -3,10 +3,12 @@
 public partial class Broker : Entity
 {
     public int BrokerId { get; set; }
-    public FullName Name { get; private set; } = FullName.Default();
-    public Email Email { get; private set; } = Email.Default();
-    public MobileNo MobileNumber { get; private set; } = MobileNo.Default();
-    public Gender Gender { get; private set; }
+    //public FullName Name { get; private set; } = FullName.Default();
+    //public Email Email { get; private set; } = Email.Default();
+    //public MobileNo MobileNumber { get; private set; } = MobileNo.Default();
+    //public Gender Gender { get; private set; }
+    public List<User> Users { get; private set; } = default!;
+
 
     // CorporateBroker
     public string? CompanyName { get; private set; } = default!;
@@ -16,7 +18,6 @@ public partial class Broker : Entity
     public CAC? CACRegistrationNumber { get; private set; } = CAC.Default();
     public StockBrokerLicense? StockBrokerLicense { get; private set; } = StockBrokerLicense.Default();
     public DateOnly? DateCertified { get; private set; }
-    public List<User>? Users { get; private set; } = default!;
 
     // Individual Brokers
     public Address BusinessAddress { get; private set; } = Address.Default();
