@@ -6,9 +6,8 @@ global using EasyStocks.DTO.Responses;
 global using EasyStocks.Infrastructure;
 global using EasyStocks.Infrastructure.Validator;
 global using EasyStocks.Service.BrokerServices;
-//global using EasyStocks.Service.Validators;
+global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.DependencyInjection;
 global using System.Net.Mail;
 global using System.Text.RegularExpressions;
 global using System.Transactions;
-

@@ -6,6 +6,7 @@ global using EasyStocks.DTO.Requests;
 global using EasyStocks.DTO.Responses;
 global using EasyStocks.Infrastructure.Config;
 global using EasyStocks.Infrastructure.Context;
+global using EasyStocks.Infrastructure.Validator;
 //global using EasyStocks.Infrastructure.Identity;
 global using EasyStocks.Utils.Enums;
 global using Microsoft.AspNetCore.Identity;

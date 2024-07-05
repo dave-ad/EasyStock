@@ -1,12 +1,7 @@
-﻿using EasyStocks.Domain.ValueObjects;
-using EasyStocks.DTO.Requests;
-using Microsoft.EntityFrameworkCore;
-
-namespace EasyStocks.Service.BrokerServices;
+﻿namespace EasyStocks.Service.BrokerServices;
 
 public sealed class BrokerService : IBrokerService
 {
-    //private readonly IEasyStockAppDbContext _easyStockAppDbContext = easyStockAppDbContext;
     private readonly IEasyStockAppDbContext _easyStockAppDbContext;
     private readonly BrokerValidator _validator;
 
@@ -16,7 +11,6 @@ public sealed class BrokerService : IBrokerService
         _validator = validator ?? throw new ArgumentNullException(nameof(validator));
     }
 
-    //public async Task<ServiceResponse<BrokerIdResponse>> CreateCorporateBroker(CreateCorporateBrokerRequest request, UserRequest userRequest)
     public async Task<ServiceResponse<BrokerIdResponse>> CreateCorporateBroker(CreateCorporateBrokerRequest request)
     {
         var resp = new ServiceResponse<BrokerIdResponse>();
@@ -174,7 +168,6 @@ public sealed class BrokerService : IBrokerService
         return resp;
     }
 
-    //private Broker CreateCorporateBrokerEntity(CreateCorporateBrokerRequest request, UserRequest userRequest)
     private Broker CreateCorporateBrokerEntity(CreateCorporateBrokerRequest request)
     {
         var companyEmail = Email.Create(request.CompanyEmail);
@@ -232,11 +225,3 @@ public sealed class BrokerService : IBrokerService
         return Broker.CreateFreelance(users, request.ProfessionalQualification);
     }
 }
-
-//var users = userRequest.Select(x =>
-//User.Create(
-//FullName.Create(x.LastName, x.FirstName, x.OtherNames),
-//Email.Create(x.Email),
-//         MobileNo.Create(x.MobileNumber),
-//         x.Gender)
-//    ).ToList();
