@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EasyStocks.Domain.ValueObjects;
+using EasyStocks.DTO.Requests;
+using Microsoft.EntityFrameworkCore;
 
 namespace EasyStocks.Service.BrokerServices;
 
@@ -14,6 +16,7 @@ public sealed class BrokerService : IBrokerService
         _validator = validator ?? throw new ArgumentNullException(nameof(validator));
     }
 
+    //public async Task<ServiceResponse<BrokerIdResponse>> CreateCorporateBroker(CreateCorporateBrokerRequest request, UserRequest userRequest)
     public async Task<ServiceResponse<BrokerIdResponse>> CreateCorporateBroker(CreateCorporateBrokerRequest request)
     {
         var resp = new ServiceResponse<BrokerIdResponse>();
@@ -28,16 +31,17 @@ public sealed class BrokerService : IBrokerService
                 var existingCorporateBroker = await _easyStockAppDbContext.Brokers.AnyAsync(b => b.CompanyEmail.Value.Trim().ToUpper() == request.CompanyEmail.Trim().ToUpper());
 
                 if (existingCorporateBroker)
-                {
                     return CreateDuplicateErrorResponse(resp, "Corporate broker");
-                }
 
-                var existingStaff = await _easyStockAppDbContext.Brokers.AnyAsync(b => b.Email.Value.Trim().ToUpper() == request.Email.Trim().ToUpper());
+                //var existingStaff = await _easyStockAppDbContext.Brokers.AnyAsync(b => b.Email.Value.Trim().ToUpper() == request.Users[0].Email.Trim().ToUpper());
 
-                if (existingStaff)
-                {
+                //if (existingStaff)
+                //    return CreateDuplicateErrorResponse(resp, "Staff");
+
+                // Check if the emails of the first and second staff members are the same
+                var duplicateStaff = request.Users.Count > 1 && request.Users[0].Email.Trim().ToUpper() == request.Users[1].Email.Trim().ToUpper();
+                if (duplicateStaff)
                     return CreateDuplicateErrorResponse(resp, "Staff");
-                }
 
                 var corporateBroker = CreateCorporateBrokerEntity(request);
 
@@ -45,9 +49,7 @@ public sealed class BrokerService : IBrokerService
                 await _easyStockAppDbContext.SaveChangesAsync();
 
                 if (retCorporateBroker == null || retCorporateBroker.Entity.BrokerId < 1)
-                {
                     return CreateDatabaseErrorResponse(resp);
-                }
 
                 resp.Value = new BrokerIdResponse { BrokerId = retCorporateBroker.Entity.BrokerId };
                 resp.IsSuccessful = true;
@@ -172,19 +174,38 @@ public sealed class BrokerService : IBrokerService
         return resp;
     }
 
+    //private Broker CreateCorporateBrokerEntity(CreateCorporateBrokerRequest request, UserRequest userRequest)
     private Broker CreateCorporateBrokerEntity(CreateCorporateBrokerRequest request)
     {
         var companyEmail = Email.Create(request.CompanyEmail);
         var companyMobileNo = MobileNo.Create(request.CompanyMobileNumber);
         var companyAddress = Address.Create(request.StreetNo, request.StreetName, request.City, request.State, request.ZipCode);
         var cac = CAC.Create(request.CACRegistrationNumber);
-        var stockBrokerLicense = StockBrokerLicense.Create(request.StockBrokerLicenseNumber);
+        var stockBrokerLicense = StockBrokerLicense.Create(request.StockBrokerLicense);
 
-        var fullName = FullName.Create(request.LastName, request.FirstName, request.OtherNames);
-        var email = Email.Create(request.Email);
-        var mobileNo = MobileNo.Create(request.MobileNumber);
+        var users = request.Users.Select(u =>
+            User.Create(
+                FullName.Create(u.FirstName, u.LastName, u.OtherNames),
+                Email.Create(u.Email),
+                MobileNo.Create(u.MobileNumber),
+                u.Gender,
+                u.PositionInOrg,
+                u.DateOfEmployment
+            )
+        ).ToList();
 
-        return Broker.CreateCorporate(fullName, email, mobileNo, request.Gender, request.CompanyName, companyEmail, companyMobileNo, companyAddress, cac, stockBrokerLicense, request.DateCertified, request.PositionInOrg, request.DateOfEmployment);
+
+        //var fullname = FullName.Create(userRequest.FirstName, userRequest.LastName, userRequest.OtherNames);
+
+        //var users = new List<User>
+        //{
+        //    User.Create(FullName.Create(userRequest.FirstName, userRequest.LastName, userRequest.OtherNames),
+        //                Email.Create(userRequest.Email),
+        //                MobileNo.Create(userRequest.Email),
+        //                userRequest.Gender)
+        //};
+
+        return Broker.CreateCorporate(request.CompanyName, companyEmail, companyMobileNo, companyAddress, cac, stockBrokerLicense, request.DateCertified, users);
     }
 
     private Broker CreateIndividualBrokerEntity(CreateIndividualBrokerRequest request)
@@ -208,3 +229,11 @@ public sealed class BrokerService : IBrokerService
         return Broker.CreateFreelance(fullName, email, mobileNo, request.Gender, request.ProfessionalQualification);
     }
 }
+
+//var users = userRequest.Select(x =>
+//User.Create(
+//FullName.Create(x.LastName, x.FirstName, x.OtherNames),
+//Email.Create(x.Email),
+//         MobileNo.Create(x.MobileNumber),
+//         x.Gender)
+//    ).ToList();

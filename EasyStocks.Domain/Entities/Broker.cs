@@ -1,7 +1,7 @@
 ﻿namespace EasyStocks.Domain.Entities;
 
 public partial class Broker : Entity
-{ 
+{
     public int BrokerId { get; set; }
     public FullName Name { get; private set; } = FullName.Default();
     public Email Email { get; private set; } = Email.Default();
@@ -14,13 +14,12 @@ public partial class Broker : Entity
     public MobileNo? CompanyMobileNumber { get; private set; } = MobileNo.Default();
     public Address? CompanyAddress { get; private set; } = Address.Default();
     public CAC? CACRegistrationNumber { get; private set; } = CAC.Default();
-    public StockBrokerLicense? StockBrokerLicenseNumber { get; private set; } = StockBrokerLicense.Default();
+    public StockBrokerLicense? StockBrokerLicense { get; private set; } = StockBrokerLicense.Default();
     public DateOnly? DateCertified { get; private set; }
-    public string? PositionInOrg { get; private set; } = default!;
-    public DateOnly? DateOfEmployment { get; private set; }
+    public List<User>? Users { get; private set; } = default!;
 
     // Individual Brokers
-    public Address? BusinessAddress { get; private set; } = Address.Default();
+    public Address BusinessAddress { get; private set; } = Address.Default();
 
     // Freelance Brokers
     public string? ProfessionalQualification { get; private set; } = default!;

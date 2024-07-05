@@ -3,42 +3,34 @@
 public partial class Broker : IAggregateRoot
 {
     private Broker() { }
-    // Corporate Broker
-    private Broker(FullName name, Email email, MobileNo mobileNumber, Gender gender,
-                    string companyName, Email companyEmail, MobileNo companyMobileNumber,
+    //Corporate Broker
+    private Broker(string companyName, Email companyEmail, MobileNo companyMobileNumber,
                     Address companyAddress, CAC cacRegistrationNumber,
-                    StockBrokerLicense stockBrokerLicenseNumber, DateOnly dateCertified,
-                    string positionInOrg, DateOnly dateOfEmployment, AccountStatus status,
-                    BrokerType brokerType)
+                    StockBrokerLicense stockBrokerLicense, DateOnly dateCertified, AccountStatus status, BrokerType brokerType, List<User> users)
     {
-        Name = name;
-        Email = email;
-        MobileNumber = mobileNumber;
-        Gender = gender;
         CompanyName = companyName;
         CompanyEmail = companyEmail;
         CompanyMobileNumber = companyMobileNumber;
         CompanyAddress = companyAddress;
         CACRegistrationNumber = cacRegistrationNumber;
-        StockBrokerLicenseNumber = stockBrokerLicenseNumber;
+        StockBrokerLicense = stockBrokerLicense;
         DateCertified = dateCertified;
-        PositionInOrg = positionInOrg;
-        DateOfEmployment = dateOfEmployment;
         Status = status;
         BrokerType = brokerType;
+        Users = users;
     }
 
     // Individual Broker
     public Broker(FullName name, Email email, MobileNo mobileNumber, Gender gender,
-                    StockBrokerLicense stockBrokerLicenseNumber, DateOnly dateCertified,
-                    AccountStatus status, Address businessAddress, string professionalQualification,
-                    BrokerType brokerType)
+                StockBrokerLicense stockBrokerLicenseNumber, DateOnly dateCertified,
+                AccountStatus status, Address businessAddress, string professionalQualification,
+                BrokerType brokerType)
     {
         Name = name;
         Email = email;
         MobileNumber = mobileNumber;
         Gender = gender;
-        StockBrokerLicenseNumber = stockBrokerLicenseNumber;
+        StockBrokerLicense = stockBrokerLicenseNumber;
         DateCertified = dateCertified;
         Status = status;
         BusinessAddress = businessAddress;
@@ -60,19 +52,15 @@ public partial class Broker : IAggregateRoot
         BrokerType = brokerType;
     }
 
-    public static Broker CreateCorporate(FullName name, Email email, MobileNo mobileNumber,
-                                            Gender gender, string companyName, Email companyEmail,
-                                            MobileNo companyMobileNumber, Address companyAddress,
-                                            CAC cacRegistrationNumber,
-                                            StockBrokerLicense stockBrokerLicenseNumber,
-                                            DateOnly dateCertified, string positionInOrg,
-                                            DateOnly dateOfEmployment)
+    public static Broker CreateCorporate(string companyName, Email companyEmail, MobileNo companyMobileNumber,
+                                            Address companyAddress, CAC cacRegistrationNumber,
+                                            StockBrokerLicense stockBrokerLicense, DateOnly dateCertified,
+                                             List<User> users)
     {
 
-        return new Broker(name, email, mobileNumber, gender, companyName,
-                            companyEmail, companyMobileNumber, companyAddress,
-                            cacRegistrationNumber, stockBrokerLicenseNumber, dateCertified,
-                            positionInOrg, dateOfEmployment, AccountStatus.Pending, BrokerType.Corporate);
+        return new Broker(companyName, companyEmail, companyMobileNumber, companyAddress,
+                            cacRegistrationNumber, stockBrokerLicense, dateCertified, 
+                            AccountStatus.Pending, BrokerType.Corporate, users);
     }
     
     public static Broker CreateIndividual(FullName name, Email email, MobileNo mobileNumber,
