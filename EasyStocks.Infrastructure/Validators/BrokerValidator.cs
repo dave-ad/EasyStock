@@ -4,7 +4,6 @@ namespace EasyStocks.Infrastructure.Validator;
 
 public class BrokerValidator
 {
-    //public ServiceResponse<BrokerIdResponse> ValidateCorporate(CreateCorporateBrokerRequest request, UserRequest userRequest)
     public ServiceResponse<BrokerIdResponse> ValidateCorporate(CreateCorporateBrokerRequest request)
     {
         var resp = new ServiceResponse<BrokerIdResponse>();
@@ -173,46 +172,49 @@ public class BrokerValidator
     {
         var resp = new ServiceResponse<BrokerIdResponse>();
 
-        if (string.IsNullOrWhiteSpace(request.FirstName))
+        foreach (var user in request.Users)
         {
-            resp.Error = "First Name is required.";
-            resp.IsSuccessful = false;
-            return resp;
-        }
+            if (string.IsNullOrWhiteSpace(user.FirstName))
+            {
+                resp.Error = "First Name is required.";
+                resp.IsSuccessful = false;
+                return resp;
+            }
 
-        if (string.IsNullOrWhiteSpace(request.LastName))
-        {
-            resp.Error = "Last Name is required.";
-            resp.IsSuccessful = false;
-            return resp;
-        }
+            if (string.IsNullOrWhiteSpace(user.LastName))
+            {
+                resp.Error = "Last Name is required.";
+                resp.IsSuccessful = false;
+                return resp;
+            }
 
-        if (string.IsNullOrWhiteSpace(request.Email))
-        {
-            resp.Error = "Email is required.";
-            resp.IsSuccessful = false;
-            return resp;
-        }
+            if (string.IsNullOrWhiteSpace(user.Email))
+            {
+                resp.Error = "Email is required.";
+                resp.IsSuccessful = false;
+                return resp;
+            }
 
-        if (!IsValidEmail(request.Email))
-        {
-            resp.Error = "Invalid Email format. 'example@mail.com'";
-            resp.IsSuccessful = false;
-            return resp;
-        }
+            if (!IsValidEmail(user.Email))
+            {
+                resp.Error = "Invalid Email format. 'example@mail.com'";
+                resp.IsSuccessful = false;
+                return resp;
+            }
 
-        if (string.IsNullOrWhiteSpace(request.MobileNumber))
-        {
-            resp.Error = "Mobile Number is required.";
-            resp.IsSuccessful = false;
-            return resp;
-        }
+            if (string.IsNullOrWhiteSpace(user.MobileNumber))
+            {
+                resp.Error = "Mobile Number is required.";
+                resp.IsSuccessful = false;
+                return resp;
+            }
 
-        if (!IsValidPhoneNumber(request.MobileNumber) || request.MobileNumber.Length > 11)
-        {
-            resp.Error = "Invalid Mobile Number format.";
-            resp.IsSuccessful = false;
-            return resp;
+            if (!IsValidPhoneNumber(user.MobileNumber) || user.MobileNumber.Length > 11)
+            {
+                resp.Error = "Invalid Mobile Number format.";
+                resp.IsSuccessful = false;
+                return resp;
+            }
         }
 
         // Address Property
@@ -286,46 +288,49 @@ public class BrokerValidator
     {
         var resp = new ServiceResponse<BrokerIdResponse>();
 
-        if (string.IsNullOrWhiteSpace(request.FirstName))
+        foreach (var user in request.Users)
         {
-            resp.Error = "First Name is required.";
-            resp.IsSuccessful = false;
-            return resp;
-        }
+            if (string.IsNullOrWhiteSpace(user.FirstName))
+            {
+                resp.Error = "First Name is required.";
+                resp.IsSuccessful = false;
+                return resp;
+            }
 
-        if (string.IsNullOrWhiteSpace(request.LastName))
-        {
-            resp.Error = "Last Name is required.";
-            resp.IsSuccessful = false;
-            return resp;
-        }
+            if (string.IsNullOrWhiteSpace(user.LastName))
+            {
+                resp.Error = "Last Name is required.";
+                resp.IsSuccessful = false;
+                return resp;
+            }
 
-        if (string.IsNullOrWhiteSpace(request.Email))
-        {
-            resp.Error = "Email is required.";
-            resp.IsSuccessful = false;
-            return resp;
-        }
+            if (string.IsNullOrWhiteSpace(user.Email))
+            {
+                resp.Error = "Email is required.";
+                resp.IsSuccessful = false;
+                return resp;
+            }
 
-        if (!IsValidEmail(request.Email))
-        {
-            resp.Error = "Invalid Email format. 'example@mail.com'";
-            resp.IsSuccessful = false;
-            return resp;
-        }
+            if (!IsValidEmail(user.Email))
+            {
+                resp.Error = "Invalid Email format. 'example@mail.com'";
+                resp.IsSuccessful = false;
+                return resp;
+            }
 
-        if (string.IsNullOrWhiteSpace(request.MobileNumber))
-        {
-            resp.Error = "Mobile Number is required.";
-            resp.IsSuccessful = false;
-            return resp;
-        }
+            if (string.IsNullOrWhiteSpace(user.MobileNumber))
+            {
+                resp.Error = "Mobile Number is required.";
+                resp.IsSuccessful = false;
+                return resp;
+            }
 
-        if (!IsValidPhoneNumber(request.MobileNumber) || request.MobileNumber.Length > 11)
-        {
-            resp.Error = "Invalid Mobile Number format.";
-            resp.IsSuccessful = false;
-            return resp;
+            if (!IsValidPhoneNumber(user.MobileNumber) || user.MobileNumber.Length > 11)
+            {
+                resp.Error = "Invalid Mobile Number format.";
+                resp.IsSuccessful = false;
+                return resp;
+            }
         }
 
         if (string.IsNullOrWhiteSpace(request.ProfessionalQualification))

@@ -26,4 +26,5 @@ internal sealed class EasyStockAppDbContext : DbContext, IEasyStockAppDbContext
     }
 
     public DbSet<Broker> Brokers { get; set; }
+    public DbSet<User> Users { get; set; }
 }

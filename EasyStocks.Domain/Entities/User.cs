@@ -7,15 +7,15 @@ public class User : Entity
     public Email Email { get; private set; } = Email.Default();
     public MobileNo MobileNumber { get; private set; } = MobileNo.Default();
     public Gender Gender { get; private set; }
-    public string PositionInOrg { get; private set; } = default!;
-    public DateOnly DateOfEmployment { get; private set; }
+    public string? PositionInOrg { get; private set; } = default!;
+    public DateOnly? DateOfEmployment { get; private set; }
 
     // Navigation property to Broker
     public int BrokerId { get; set; } // Foreign key
     public Broker Broker { get; set; } // Navigation property
 
     private User() { }
-    private User(/*int brokerId,*/ FullName name, Email email, MobileNo mobileNumber, Gender gender, string positionInOrg, DateOnly dateOfEmployment)
+    private User(/*int brokerId,*/ FullName name, Email email, MobileNo mobileNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment)
     {
         //BrokerId = brokerId;
         Name = name;
@@ -26,15 +26,8 @@ public class User : Entity
         DateOfEmployment = dateOfEmployment;
     }
 
-    public static User Create(FullName name, Email email, MobileNo mobileNumber, Gender gender, string positionInOrg, DateOnly dateOfEmployment)
+    public static User Create(FullName name, Email email, MobileNo mobileNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment)
     {
         return new User(name, email, mobileNumber, gender, positionInOrg, dateOfEmployment);
     }
-    
 }
-    //public static List<User> Create(FullName name, Email email, MobileNo mobileNumber, Gender gender)
-    //{
-    //    var user = new User(name, email, mobileNumber, gender);
-    //    return new List<User> { user };
-    //    //return new User(name, email, mobileNumber, gender);
-    //}

@@ -54,24 +54,24 @@ internal class CorporateBrokerConfig : IEntityTypeConfiguration<Broker>
             y.Property(z => z.Hash);
         });
 
-        builder.OwnsOne(x => x.Name, y =>
-        {
-            y.Property(z => z.Last).HasMaxLength(50).IsRequired();
-            y.Property(z => z.First).HasMaxLength(50).IsRequired();
-            y.Property(z => z.Others).HasMaxLength(50);
-        });
+        //builder.OwnsOne(x => x.Name, y =>
+        //{
+        //    y.Property(z => z.Last).HasMaxLength(50).IsRequired();
+        //    y.Property(z => z.First).HasMaxLength(50).IsRequired();
+        //    y.Property(z => z.Others).HasMaxLength(50);
+        //});
 
-        builder.OwnsOne(x => x.Email, y =>
-        {
-            y.Property(z => z.Value).HasMaxLength(100).IsRequired();
-            y.Property(z => z.Hash);
-        });
+        //builder.OwnsOne(x => x.Email, y =>
+        //{
+        //    y.Property(z => z.Value).HasMaxLength(100).IsRequired();
+        //    y.Property(z => z.Hash);
+        //});
 
-        builder.OwnsOne(x => x.MobileNumber, y =>
-        {
-            y.Property(z => z.Value).HasMaxLength(11).IsRequired();
-            y.Property(z => z.Hash);
-        });
+        //builder.OwnsOne(x => x.MobileNumber, y =>
+        //{
+        //    y.Property(z => z.Value).HasMaxLength(11).IsRequired();
+        //    y.Property(z => z.Hash);
+        //});
 
         // Configure User navigation property
         builder.HasMany(b => b.Users)

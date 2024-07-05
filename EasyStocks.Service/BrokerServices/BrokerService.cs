@@ -75,7 +75,7 @@ public sealed class BrokerService : IBrokerService
         {
             try
             {
-                var existingBroker = await _easyStockAppDbContext.Brokers.AnyAsync(b => b.Email.Value.Trim().ToUpper() == request.Email.Trim().ToUpper());
+                var existingBroker = await _easyStockAppDbContext.Users.AnyAsync(b => b.Email.Value.Trim().ToUpper() == request.Users[0].Email.Trim().ToUpper());
 
                 if (existingBroker)
                 {
@@ -120,7 +120,7 @@ public sealed class BrokerService : IBrokerService
 
             try
             {
-                var existingBroker = await _easyStockAppDbContext.Brokers.AnyAsync(b => b.Email.Value.Trim().ToUpper() ==  request.Email.Trim().ToUpper());
+                var existingBroker = await _easyStockAppDbContext.Users.AnyAsync(b => b.Email.Value.Trim().ToUpper() == request.Users[0].Email.Trim().ToUpper());
 
                 if (existingBroker)
                 {
@@ -194,39 +194,42 @@ public sealed class BrokerService : IBrokerService
             )
         ).ToList();
 
-
-        //var fullname = FullName.Create(userRequest.FirstName, userRequest.LastName, userRequest.OtherNames);
-
-        //var users = new List<User>
-        //{
-        //    User.Create(FullName.Create(userRequest.FirstName, userRequest.LastName, userRequest.OtherNames),
-        //                Email.Create(userRequest.Email),
-        //                MobileNo.Create(userRequest.Email),
-        //                userRequest.Gender)
-        //};
-
         return Broker.CreateCorporate(request.CompanyName, companyEmail, companyMobileNo, companyAddress, cac, stockBrokerLicense, request.DateCertified, users);
     }
 
     private Broker CreateIndividualBrokerEntity(CreateIndividualBrokerRequest request)
     {
-        var fullName = FullName.Create(request.LastName, request.FirstName, request.OtherNames);
-        var email = Email.Create(request.Email);
-        var mobileNo = MobileNo.Create(request.MobileNumber);
+        var users = request.Users.Select(u =>
+            User.Create(
+                FullName.Create(u.FirstName, u.LastName, u.OtherNames),
+                Email.Create(u.Email),
+                MobileNo.Create(u.MobileNumber),
+                u.Gender,
+                u.PositionInOrg,
+                u.DateOfEmployment
+            )
+        ).ToList();
 
-        var businessAddress = Address.Create(request.StreetNo, request.StreetName, request.City, request.State, request.ZipCode);
         var stockBrokerLicense = StockBrokerLicense.Create(request.StockBrokerLicenseNumber);
+        var businessAddress = Address.Create(request.StreetNo, request.StreetName, request.City, request.State, request.ZipCode);
 
-        return Broker.CreateIndividual(fullName, email, mobileNo, request.Gender, stockBrokerLicense, request.DateCertified, businessAddress, request.ProfessionalQualification);
+        return Broker.CreateIndividual(users, stockBrokerLicense, request.DateCertified, businessAddress, request.ProfessionalQualification);
     }
 
     private Broker CreateFreelanceBrokerEntity(CreateFreelanceBrokerRequest request)
     {
-        var fullName = FullName.Create(request.LastName, request.FirstName, request.OtherNames);
-        var email = Email.Create(request.Email);
-        var mobileNo = MobileNo.Create(request.MobileNumber);
+        var users = request.Users.Select(u =>
+            User.Create(
+                FullName.Create(u.FirstName, u.LastName, u.OtherNames),
+                Email.Create(u.Email),
+                MobileNo.Create(u.MobileNumber),
+                u.Gender,
+                u.PositionInOrg,
+                u.DateOfEmployment
+            )
+        ).ToList();
 
-        return Broker.CreateFreelance(fullName, email, mobileNo, request.Gender, request.ProfessionalQualification);
+        return Broker.CreateFreelance(users, request.ProfessionalQualification);
     }
 }
 

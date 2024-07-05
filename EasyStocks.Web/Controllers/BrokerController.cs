@@ -128,7 +128,7 @@ public class BrokerController : Controller
                 return View(nameof(CreateFreelanceBroker), request);
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) 
         {
             _logger.LogError(ex, "An exception occurred while adding new broker.");
             ModelState.AddModelError(string.Empty, "An error occurred while  adding new broker.");

@@ -1,17 +1,16 @@
 ﻿@model CreateIndividualBrokerRequest
 @Html.AntiForgeryToken()
 
-<h1>Individual Broker</h1>
-<hr />
-
 @{
-    ViewData["Title"] = "Individual Broker";
+    ViewData["Title"] = "Create Individual Broker";
 }
 
-@if (ViewBag.BrokerAddedMessage != null)
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success" role="alert">
-        @ViewBag.BrokerCreatedMessage
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
     </div>
 }
 
@@ -22,40 +21,46 @@
 <form asp-action="CreateIndividualBroker" method="post">
     <div asp-validation-summary="All" class="text-danger"></div>
 
-    <hr />
+    <h6>Key Staff 1</h6>
     <div class="form-group">
-        <label asp-for="FirstName"></label>
-        <input asp-for="FirstName" class="form-control" id="FirstName" name="FirstName" required>
-        <span asp-validation-for="FirstName" class="text-danger"></span>
+        <label asp-for="Users[0].FirstName" class="control-label">First Name</label>
+        <input asp-for="Users[0].FirstName" class="form-control" />
+        <span asp-validation-for="Users[0].FirstName" class="text-danger"></span>
     </div>
+
     <div class="form-group">
-        <label asp-for="LastName"></label>
-        <input asp-for="LastName" class="form-control" id="LastName" name="LastName" required>
-        <span asp-validation-for="LastName" class="text-danger"></span>
+        <label asp-for="Users[0].LastName" class="control-label">Last Name</label>
+        <input asp-for="Users[0].LastName" class="form-control" />
+        <span asp-validation-for="Users[0].LastName" class="text-danger"></span>
     </div>
+
     <div class="form-group">
-        <label asp-for="OtherNames"></label>
-        <input asp-for="OtherNames" class="form-control" id="OtherNames" name="OtherNames">
-        <span asp-validation-for="OtherNames" class="text-danger"></span>
+        <label asp-for="Users[0].OtherNames" class="control-label">Other Name</label>
+        <input asp-for="Users[0].OtherNames" class="form-control" />
+        <span asp-validation-for="Users[0].OtherNames" class="text-danger"></span>
     </div>
+
     <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" id="Email" name="Email" required>
-        <span asp-validation-for="Email" class="text-danger"></span>
+        <label asp-for="Users[0].Email" class="control-label">Email</label>
+        <input asp-for="Users[0].Email" class="form-control" />
+        <span asp-validation-for="Users[0].Email" class="text-danger"></span>
     </div>
+
     <div class="form-group">
-        <label asp-for="MobileNumber"></label>
-        <input asp-for="MobileNumber" class="form-control" id="MobileNumber" name="MobileNumber" required>
-        <span asp-validation-for="MobileNumber" class="text-danger"></span>
+        <label asp-for="Users[0].MobileNumber" class="control-label">Mobile Number</label>
+        <input asp-for="Users[0].MobileNumber" class="form-control" />
+        <span asp-validation-for="Users[0].MobileNumber" class="text-danger"></span>
     </div>
+
     <div class="form-group">
-        <label asp-for="Gender">Gender</label>
-        <select asp-for="Gender" class="form-control" id="Gender" name="Gender" required>
+        <label asp-for="Users[0].Gender">Gender</label>
+        <select asp-for="Users[0].Gender" class="form-control" required>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
         </select>
-        <span asp-validation-for="Gender" class="text-danger"></span>
+        <span asp-validation-for="Users[0].Gender" class="text-danger"></span>
     </div>
+
     <div class="form-group">
         <label asp-for="StreetNo"></label>
         <input asp-for="StreetNo" class="form-control" />
@@ -96,5 +101,6 @@
         <input asp-for="ProfessionalQualification" class="form-control" id="ProfessionalQualification" name="ProfessionalQualification" required>
         <span asp-validation-for="ProfessionalQualification" class="text-danger"></span>
     </div>
+
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>

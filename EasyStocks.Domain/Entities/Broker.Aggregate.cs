@@ -21,15 +21,16 @@ public partial class Broker : IAggregateRoot
     }
 
     // Individual Broker
-    public Broker(FullName name, Email email, MobileNo mobileNumber, Gender gender,
+    public Broker(List<User> users,/* FullName name, Email email, MobileNo mobileNumber, Gender gender,*/
                 StockBrokerLicense stockBrokerLicenseNumber, DateOnly dateCertified,
                 AccountStatus status, Address businessAddress, string professionalQualification,
                 BrokerType brokerType)
     {
-        Name = name;
-        Email = email;
-        MobileNumber = mobileNumber;
-        Gender = gender;
+        Users = users;
+        //Name = name;
+        //Email = email;
+        //MobileNumber = mobileNumber;
+        //Gender = gender;
         StockBrokerLicense = stockBrokerLicenseNumber;
         DateCertified = dateCertified;
         Status = status;
@@ -39,14 +40,15 @@ public partial class Broker : IAggregateRoot
     }
     
     // Freelance Broker
-    public Broker(FullName name, Email email, MobileNo mobileNumber, Gender gender,
+    public Broker(/*FullName name, Email email, MobileNo mobileNumber, Gender gender,*/List<User> users,
                     AccountStatus status, string professionalQualification,
                     BrokerType brokerType)
     {
-        Name = name;
-        Email = email;
-        MobileNumber = mobileNumber;
-        Gender = gender;
+        //Name = name;
+        //Email = email;
+        //MobileNumber = mobileNumber;
+        //Gender = gender;
+        Users = users;
         Status = status;
         ProfessionalQualification = professionalQualification;
         BrokerType = brokerType;
@@ -63,22 +65,23 @@ public partial class Broker : IAggregateRoot
                             AccountStatus.Pending, BrokerType.Corporate, users);
     }
     
-    public static Broker CreateIndividual(FullName name, Email email, MobileNo mobileNumber,
-                                            Gender gender, StockBrokerLicense stockBrokerLicenseNumber,
+    public static Broker CreateIndividual(/*FullName name, Email email, MobileNo mobileNumber,
+                                            Gender gender,*/ List<User> users,
+                                            StockBrokerLicense stockBrokerLicenseNumber,
                                             DateOnly dateCertified, Address businessAddress, 
                                             string professionalQualification)
     {
 
-        return new Broker(name, email, mobileNumber, gender,
+        return new Broker(/*name, email, mobileNumber, gender,*/ users,
                             stockBrokerLicenseNumber, dateCertified,
                             AccountStatus.Pending, businessAddress, professionalQualification, BrokerType.Individual);
     }
     
-    public static Broker CreateFreelance(FullName name, Email email, MobileNo mobileNumber,
-                                            Gender gender, string professionalQualification)
+    public static Broker CreateFreelance(/*FullName name, Email email, MobileNo mobileNumber,
+                                            Gender gender,*/ List<User> users, string professionalQualification)
     {
 
-        return new Broker(name, email, mobileNumber, gender,
+        return new Broker(/*name, email, mobileNumber, gender,*/users,
                             AccountStatus.Pending, professionalQualification, BrokerType.Freelance);
     }
 }

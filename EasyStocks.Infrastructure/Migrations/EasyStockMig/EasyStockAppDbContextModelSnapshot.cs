@@ -46,9 +46,6 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                     b.Property<DateOnly?>("DateCertified")
                         .HasColumnType("date");
 
-                    b.Property<int>("Gender")
-                        .HasColumnType("int");
-
                     b.Property<string>("ProfessionalQualification")
                         .HasColumnType("nvarchar(max)");
 
@@ -80,14 +77,13 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateOnly>("DateOfEmployment")
+                    b.Property<DateOnly?>("DateOfEmployment")
                         .HasColumnType("date");
 
                     b.Property<int>("Gender")
                         .HasColumnType("int");
 
                     b.Property<string>("PositionInOrg")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedOn")
@@ -230,76 +226,6 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                                 .HasForeignKey("BrokerId");
                         });
 
-                    b.OwnsOne("EasyStocks.Domain.ValueObjects.Email", "Email", b1 =>
-                        {
-                            b1.Property<int>("BrokerId")
-                                .HasColumnType("int");
-
-                            b1.Property<int>("Hash")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)");
-
-                            b1.HasKey("BrokerId");
-
-                            b1.ToTable("Broker", "ThriftSchema");
-
-                            b1.WithOwner()
-                                .HasForeignKey("BrokerId");
-                        });
-
-                    b.OwnsOne("EasyStocks.Domain.ValueObjects.MobileNo", "MobileNumber", b1 =>
-                        {
-                            b1.Property<int>("BrokerId")
-                                .HasColumnType("int");
-
-                            b1.Property<int>("Hash")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(11)
-                                .HasColumnType("nvarchar(11)");
-
-                            b1.HasKey("BrokerId");
-
-                            b1.ToTable("Broker", "ThriftSchema");
-
-                            b1.WithOwner()
-                                .HasForeignKey("BrokerId");
-                        });
-
-                    b.OwnsOne("EasyStocks.Domain.ValueObjects.FullName", "Name", b1 =>
-                        {
-                            b1.Property<int>("BrokerId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("First")
-                                .IsRequired()
-                                .HasMaxLength(50)
-                                .HasColumnType("nvarchar(50)");
-
-                            b1.Property<string>("Last")
-                                .IsRequired()
-                                .HasMaxLength(50)
-                                .HasColumnType("nvarchar(50)");
-
-                            b1.Property<string>("Others")
-                                .IsRequired()
-                                .HasMaxLength(50)
-                                .HasColumnType("nvarchar(50)");
-
-                            b1.HasKey("BrokerId");
-
-                            b1.ToTable("Broker", "ThriftSchema");
-
-                            b1.WithOwner()
-                                .HasForeignKey("BrokerId");
-                        });
-
                     b.OwnsOne("EasyStocks.Domain.ValueObjects.CAC", "CACRegistrationNumber", b1 =>
                         {
                             b1.Property<int>("BrokerId")
@@ -352,15 +278,6 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                     b.Navigation("CompanyEmail");
 
                     b.Navigation("CompanyMobileNumber");
-
-                    b.Navigation("Email")
-                        .IsRequired();
-
-                    b.Navigation("MobileNumber")
-                        .IsRequired();
-
-                    b.Navigation("Name")
-                        .IsRequired();
 
                     b.Navigation("StockBrokerLicense");
                 });
