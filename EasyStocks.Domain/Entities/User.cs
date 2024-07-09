@@ -1,10 +1,13 @@
-﻿namespace EasyStocks.Domain.Entities;
+﻿using Microsoft.AspNetCore.Identity;
 
-public class User : Entity
+namespace EasyStocks.Domain.Entities;
+
+public class User : IdentityUser
 {
-    public int UserId { get; set; }
+    //public int UserId { get; set; }
     public FullName Name { get; private set; } = FullName.Default();
-    public Email Email { get; private set; } = Email.Default();
+    //public Email Email { get; private set; } = Email.Default();
+    //public string Email { get; set; }
     public MobileNo MobileNumber { get; private set; } = MobileNo.Default();
     public Gender Gender { get; private set; }
     public string? PositionInOrg { get; private set; } = default!;
@@ -14,8 +17,8 @@ public class User : Entity
     public int BrokerId { get; set; } // Foreign key
     public Broker Broker { get; set; } // Navigation property
 
-    private User() { }
-    private User(FullName name, Email email, MobileNo mobileNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment)
+    public User() { }
+    public User(FullName name, string email, MobileNo mobileNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment)
     {
         Name = name;
         Email = email;
@@ -25,7 +28,7 @@ public class User : Entity
         DateOfEmployment = dateOfEmployment;
     }
 
-    public static User Create(FullName name, Email email, MobileNo mobileNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment)
+    public static User Create(FullName name, string email, MobileNo mobileNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment)
     {
         return new User(name, email, mobileNumber, gender, positionInOrg, dateOfEmployment);
     }

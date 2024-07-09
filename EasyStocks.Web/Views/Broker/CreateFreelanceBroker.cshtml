@@ -65,5 +65,18 @@
         <input asp-for="ProfessionalQualification" class="form-control" id="ProfessionalQualification" name="ProfessionalQualification" required>
         <span asp-validation-for="ProfessionalQualification" class="text-danger"></span>
     </div>
+
+    <div class="form-group">
+        <label asp-for="Users[0].Password">Password</label>
+        <input asp-for="Users[0].Password" type="password" class="form-control" />
+        <span asp-validation-for="Users[0].Password" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[0].ConfirmPassword">Confirm Password</label>
+        <input asp-for="Users[0].ConfirmPassword" type="password" class="form-control" />
+        <span asp-validation-for="Users[0].ConfirmPassword" class="text-danger"></span>
+    </div>
+
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>

@@ -1,15 +1,14 @@
+using EasyStocks.Infrastructure;
+using EasyStocks.Service;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//builder.Services.AddScoped<IEasyStockAppDbContext, EasyStockAppDbContext>();
-
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddEasyStockServices();
 
-// Dependency Injections
-//builder.Services.AddDbContext<EasyStockAppDbContext>(options =>
-//    options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection")));
+var configuration = builder.Configuration;
+builder.Services.AddEasyStockServices(configuration);
 
 var app = builder.Build();
 
@@ -26,7 +25,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-//app.UseAuthentication();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
