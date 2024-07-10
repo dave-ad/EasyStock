@@ -1,106 +1,61 @@
-﻿//using EasyStocks.Service.AuthService;
-//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Identity.Data;
-//using Microsoft.AspNetCore.Mvc;
+﻿using EasyStocks.Service.AuthServices;
+using EasyStocks.Web.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Mvc;
 
-//namespace EasyStocks.Web.Controllers
-//{
-//    public class AuthController : Controller
-//    {
-//        private readonly IAuthService _authService;
+namespace EasyStocks.Web.Controllers
+{
+    public class AuthController : Controller
+    {
+        private readonly IAuthService _authService;
 
-//        public AuthController(IAuthService authService)
-//        {
-//            _authService = authService;
-//        }
+        public AuthController(IAuthService authService)
+        {
+            _authService = authService;
+        }
 
-//        // GET: AuthController
-//        public ActionResult Index()
-//        {
-//            return View();
-//        }
+        // GET: /Auth/Login
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
 
-//        // GET: AuthController/Details/5
-//        public ActionResult Details(int id)
-//        {
-//            return View();
-//        }
 
-//        // GET: AuthController/Create
-//        public ActionResult Register()
-//        {
-//            return View();
-//        }
+        // POST: /Auth/Login
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login([FromForm] LoginModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                //return BadRequest(ModelState);
+                return View(model);
+            }
 
-//        // POST: AuthController/Create
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        [Route("register")]
-//        public async Task<IActionResult> Register([FromBody] UserRequest userRequest)
-//        {
-//            if (!ModelState.IsValid)
-//            {
-//                return BadRequest(ModelState);
-//            }
+            var result = await _authService.LoginUserAsync(model.Email, model.Password);
+            if (result.Succeeded)
+            {
+                //return Ok("Login successful");
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                //return Unauthorized("Invalid login attempt");
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                return View(model);
+            }
+        }
 
-//            var result = await _authService.RegisterUserAsync(userRequest);
-//            if (result.Succeeded)
-//            {
-//                return Ok("Registration successful");
-//            }
-//            else
-//            {
-//                return BadRequest(result.Errors);
-//            }
-//        }
-
-//        // GET: AuthController/Edit/5
-//        public ActionResult Edit(int id)
-//        {
-//            return View();
-//        }
-
-//        // POST: AuthController/Edit/5
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        [Route("login")]
-//        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
-//        {
-//            if (!ModelState.IsValid)
-//            {
-//                return BadRequest(ModelState);
-//            }
-
-//            var result = await _authService.LoginUserAsync(loginRequest.Email, loginRequest.Password);
-//            if (result.Succeeded)
-//            {
-//                return Ok("Login successful");
-//            }
-//            else
-//            {
-//                return Unauthorized("Invalid login attempt");
-//            }
-//        }
-
-//        // GET: AuthController/Delete/5
-//        public ActionResult Delete(int id)
-//        {
-//            return View();
-//        }
-
-//        // POST: AuthController/Delete/5
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        public ActionResult Delete(int id, IFormCollection collection)
-//        {
-//            try
-//            {
-//                return RedirectToAction(nameof(Index));
-//            }
-//            catch
-//            {
-//                return View();
-//            }
-//        }
-//    } 
-//}
+        // POST: /Auth/Logout
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _authService.LogoutAsync();
+            //return Ok(new { message = "Logout successful" });
+            return RedirectToAction("Index", "Home");
+        }
+    }
+}

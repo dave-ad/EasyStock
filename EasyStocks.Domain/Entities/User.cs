@@ -4,10 +4,7 @@ namespace EasyStocks.Domain.Entities;
 
 public class User : IdentityUser
 {
-    //public int UserId { get; set; }
     public FullName Name { get; private set; } = FullName.Default();
-    //public Email Email { get; private set; } = Email.Default();
-    //public string Email { get; set; }
     public MobileNo MobileNumber { get; private set; } = MobileNo.Default();
     public Gender Gender { get; private set; }
     public string? PositionInOrg { get; private set; } = default!;

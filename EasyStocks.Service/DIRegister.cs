@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using EasyStocks.Service.AuthServices;
+using Microsoft.Extensions.Configuration;
 
 namespace EasyStocks.Service;
 
@@ -8,6 +9,7 @@ public static class DIRegister
     {
         services.AddInfrastructure(configuration);
         services.AddScoped<IBrokerService, BrokerService>();
+        services.AddScoped<IAuthService, AuthService>();
         return services;
     }
 }

@@ -15,7 +15,7 @@ public sealed class BrokerService : IBrokerService
         _logger = logger;
     }
 
-    public async Task<ServiceResponse<BrokerIdResponse>> CreateCorporateBroker(CreateCorporateBrokerRequest request)
+    public async Task<ServiceResponse<BrokerIdResponse>> CreateCorporateBroker(CreateCorporateBrokerRequest request) 
     {
         var resp = new ServiceResponse<BrokerIdResponse>();
 
@@ -36,22 +36,21 @@ public sealed class BrokerService : IBrokerService
                 //if (existingStaff)
                 //    return CreateDuplicateErrorResponse(resp, "Staff");
 
-                //var duplicateStaff = request.Users.Count > 1 && request.Users[0].Email.Trim().ToUpper() == request.Users[1].Email.Trim().ToUpper();
-                //if (duplicateStaff)
-                //    return CreateDuplicateErrorResponse(resp, "Staff");
+                var duplicateStaff = request.Users.Count > 1 && request.Users[0].Email.Trim().ToUpper() == request.Users[1].Email.Trim().ToUpper();
+                if (duplicateStaff)
+                    return CreateDuplicateErrorResponse(resp, "Staff");
 
-                var corporateBroker = await CreateCorporateBrokerEntity(request);
+                //var corporateBroker = await CreateCorporateBrokerEntity(request);
+                var corporateBroker =  CreateCorporateBrokerEntity(request);
 
                 var retCorporateBroker = _easyStockAppDbContext.Brokers.Add(corporateBroker);
                 await _easyStockAppDbContext.SaveChangesAsync();
 
-                if (retCorporateBroker.Entity.BrokerId < 1)
+                if (retCorporateBroker == null || retCorporateBroker.Entity.BrokerId < 1)
                     return CreateDatabaseErrorResponse(resp);
 
-                // Now create users associated with this broker
-                var usersCreationResponse = await CreateUsersForBroker(corporateBroker, request.Users);
-                if (!usersCreationResponse.IsSuccessful)
-                    return usersCreationResponse;
+                // Create users and assign them to the created broker
+                await CreateUsersAndAssignToBroker(request.Users, retCorporateBroker.Entity.BrokerId);
 
                 resp.Value = new BrokerIdResponse { BrokerId = retCorporateBroker.Entity.BrokerId };
                 resp.IsSuccessful = true;
@@ -88,25 +87,19 @@ public sealed class BrokerService : IBrokerService
                 var existingBroker = await _userManager.FindByEmailAsync(request.Users[0].Email.Trim());
 
                 if (existingBroker != null)
-                {
                     return CreateDuplicateErrorResponse(resp, "broker");
-                }
 
-                var individualBroker = await CreateIndividualBrokerEntity(request);
+                var individualBroker = CreateIndividualBrokerEntity(request);
 
                 var retIndividualBroker = _easyStockAppDbContext.Brokers.Add(individualBroker);
                 await _easyStockAppDbContext.SaveChangesAsync();
 
-                //if (retIndividualBroker == null || retIndividualBroker.Entity.BrokerId < 1)
-                if (retIndividualBroker.Entity.BrokerId < 1)
-                {
+                if (retIndividualBroker == null || retIndividualBroker.Entity.BrokerId < 1)
                     return CreateDatabaseErrorResponse(resp);
-                }
 
-                // Now create user associated with this broker
-                var userCreationResponse = await CreateUserForBroker(individualBroker, request.Users[0]);
-                if (!userCreationResponse.IsSuccessful)
-                    return userCreationResponse;
+                // Create users and assign them to the created broker
+                await CreateUsersAndAssignToBroker(request.Users, retIndividualBroker.Entity.BrokerId);
+
 
                 resp.Value = new BrokerIdResponse { BrokerId = retIndividualBroker.Entity.BrokerId };
                 resp.IsSuccessful = true;
@@ -144,26 +137,19 @@ public sealed class BrokerService : IBrokerService
                 var existingBroker = await _userManager.FindByEmailAsync(request.Users[0].Email.Trim());
 
                 if (existingBroker != null)
-                {
                     return CreateDuplicateErrorResponse(resp, "broker");
-                }
 
-                var freelanceBroker = await CreateFreelanceBrokerEntity(request);
+                //var freelanceBroker = await CreateFreelanceBrokerEntity(request);
+                var freelanceBroker = CreateFreelanceBrokerEntity(request);
 
                 var retFreelanceBroker = _easyStockAppDbContext.Brokers.Add(freelanceBroker);
                 await _easyStockAppDbContext.SaveChangesAsync();
 
-                //if (retFreelanceBroker == null || retFreelanceBroker.Entity.BrokerId < 1)
-                if (retFreelanceBroker.Entity.BrokerId < 1)
-                {
+                if (retFreelanceBroker == null || retFreelanceBroker.Entity.BrokerId < 1)
                     return CreateDatabaseErrorResponse(resp);
-                }
 
-                // Now create user associated with this broker
-                var userCreationResponse = await CreateUserForBroker(freelanceBroker, request.Users[0]);
-                if (!userCreationResponse.IsSuccessful)
-                    return userCreationResponse;
-
+                // Create users and assign them to the created broker
+                await CreateUsersAndAssignToBroker(request.Users, retFreelanceBroker.Entity.BrokerId);
 
                 resp.Value = new BrokerIdResponse { BrokerId = retFreelanceBroker.Entity.BrokerId };
                 resp.IsSuccessful = true;
@@ -186,208 +172,67 @@ public sealed class BrokerService : IBrokerService
         return resp;
     }
 
-    private async Task<Broker> CreateCorporateBrokerEntity(CreateCorporateBrokerRequest request)
+    private async Task CreateUsersAndAssignToBroker(List<UserRequest> userRequests, int brokerId)
     {
-        //// Validate input data
-        //var validationResults = _validator.ValidateCorporate(request);
-        //if (!validationResults.IsSuccessful)
-        //{
-        //    throw new ArgumentException("Invalid request data", nameof(request));
-        //}
+        foreach (var userRequest in userRequests)
+        {
+            var user = new User(
+                FullName.Create(userRequest.FirstName, userRequest.LastName, userRequest.OtherNames),
+                userRequest.Email,
+                MobileNo.Create(userRequest.MobileNumber),
+                userRequest.Gender,
+                userRequest.PositionInOrg,
+                userRequest.DateOfEmployment)
+            {
+                BrokerId = brokerId // Assign the created brokerId to the user
+            };
 
-        //// Create users with ASP.NET Core Identity
-        //var users = new List<User>();
+            user.UserName = user.Email;
 
-        //foreach (var userRequest in request.Users)
-        //{
-        //    var user = new User(
-        //        FullName.Create(userRequest.FirstName, userRequest.LastName, userRequest.OtherNames),
-        //        userRequest.Email,
-        //        MobileNo.Create(userRequest.MobileNumber),
-        //        userRequest.Gender,
-        //        userRequest.PositionInOrg,
-        //        userRequest.DateOfEmployment
-        //    );
+            var result = await _userManager.CreateAsync(user, userRequest.Password);
+            if (!result.Succeeded)
+            {
+                var errorMessage = string.Join(", ", result.Errors.Select(e => e.Description));
+                _logger.LogWarning("Failed to register user {Email}. Errors: {Errors}", userRequest.Email, errorMessage);
+                throw new InvalidOperationException($"User registration failed for {userRequest.Email}. Errors: {errorMessage}");
+            }
 
-        //    var result = await _userManager.CreateAsync(user, userRequest.Password);
-        //    if (result.Succeeded)
-        //    {
-        //        users.Add(user);
-        //        _logger.LogInformation("User {Email} registered successfully.", userRequest.Email);
-        //    }
-        //    else
-        //    {
-        //        var errorMessage = string.Join(", ", result.Errors.Select(e => e.Description));
-        //        _logger.LogWarning("Failed to register user {Email}. Errors: {Errors}", userRequest.Email, errorMessage);
-        //        throw new InvalidOperationException($"User registration failed for {userRequest.Email}. Errors: {errorMessage}");
-        //    }
-        //}
+            _logger.LogInformation("User {Email} registered successfully.", userRequest.Email);
+        }
+    }
 
-
+    private Broker CreateCorporateBrokerEntity(CreateCorporateBrokerRequest request)
+    {
         var companyEmail = Email.Create(request.CompanyEmail);
         var companyMobileNo = MobileNo.Create(request.CompanyMobileNumber);
         var companyAddress = Address.Create(request.StreetNo, request.StreetName, request.City, request.State, request.ZipCode);
         var cac = CAC.Create(request.CACRegistrationNumber);
         var stockBrokerLicense = StockBrokerLicense.Create(request.StockBrokerLicense);
-
-        var corporateBroker = new Broker(companyEmail, companyMobileNo, companyAddress, cac, stockBrokerLicense);
-
-        return await Task.FromResult(corporateBroker);
-        //// Create the broker entity
-        //var broker = Broker.CreateCorporate(request.CompanyName, companyEmail, companyMobileNo, companyAddress, cac, stockBrokerLicense, request.DateCertified, users);
-
-        //return broker;
-    }
-
-    private async Task<Broker> CreateIndividualBrokerEntity(CreateIndividualBrokerRequest request)
-    {
-        // Validate input data
-        var validationResults = _validator.ValidateIndividual(request);
-        if (!validationResults.IsSuccessful) throw new ArgumentException("Invalid request data", nameof(request));
-
-        // Create users with ASP.NET Core Identity
-        var users = new List<User>();
-
-        foreach (var userRequest in request.Users)
-        {
-            var user = new User(
-                FullName.Create(userRequest.FirstName, userRequest.LastName, userRequest.OtherNames),
-                userRequest.Email,
-                MobileNo.Create(userRequest.MobileNumber),
-                userRequest.Gender,
-                userRequest.PositionInOrg,
-                userRequest.DateOfEmployment
+        var broker = Broker.CreateCorporate(
+            request.CompanyName,
+            companyEmail,
+            companyMobileNo,
+            companyAddress,
+            cac,
+            stockBrokerLicense,
+            request.DateCertified,
+            new List<User>() // Empty list for now
             );
 
-            var result = await _userManager.CreateAsync(user, userRequest.Password);
-            if (result.Succeeded)
-            {
-                users.Add(user);
-                _logger.LogInformation("User {Email} registered successfully.", userRequest.Email);
-            }
-            else
-            {
-                var errorMessage = string.Join(", ", result.Errors.Select(e => e.Description));
-                _logger.LogWarning("Failed to register user {Email}. Errors: {Errors}", userRequest.Email, errorMessage);
-                throw new InvalidOperationException($"User registration failed for {userRequest.Email}. Errors: {errorMessage}");
-            }
-        }
+        return broker;
+    }
 
+    private Broker CreateIndividualBrokerEntity(CreateIndividualBrokerRequest request)
+    {
         var stockBrokerLicense = StockBrokerLicense.Create(request.StockBrokerLicenseNumber);
         var businessAddress = Address.Create(request.StreetNo, request.StreetName, request.City, request.State, request.ZipCode);
 
-        return Broker.CreateIndividual(users, stockBrokerLicense, request.DateCertified, businessAddress, request.ProfessionalQualification);
+        return Broker.CreateIndividual(new List<User>(), stockBrokerLicense, request.DateCertified, businessAddress, request.ProfessionalQualification);
     }
 
-    private async Task<Broker> CreateFreelanceBrokerEntity(CreateFreelanceBrokerRequest request)
+    private Broker CreateFreelanceBrokerEntity(CreateFreelanceBrokerRequest request)
     {
-        // Validate input data
-        var validationResults = _validator.ValidateFreelance(request);
-        if (!validationResults.IsSuccessful) throw new ArgumentException("Invalid request data", nameof(request));
-
-        // Create users with ASP.NET Core Identity
-        var users = new List<User>();
-
-        foreach (var userRequest in request.Users)
-        {
-            var user = new User(
-                FullName.Create(userRequest.FirstName, userRequest.LastName, userRequest.OtherNames),
-                userRequest.Email,
-                MobileNo.Create(userRequest.MobileNumber),
-                userRequest.Gender,
-                userRequest.PositionInOrg,
-                userRequest.DateOfEmployment
-            );
-
-            user.UserName = user.Email;
-
-            var result = await _userManager.CreateAsync(user, userRequest.Password);
-            if (result.Succeeded)
-            {
-                users.Add(user);
-                _logger.LogInformation("User {Email} registered successfully.", userRequest.Email);
-            }
-            else
-            {
-                var errorMessage = string.Join(", ", result.Errors.Select(e => e.Description));
-                _logger.LogWarning("Failed to register user {Email}. Errors: {Errors}", userRequest.Email, errorMessage);
-                throw new InvalidOperationException($"User registration failed for {userRequest.Email}. Errors: {errorMessage}");
-            }
-        }
-
-        return Broker.CreateFreelance(users, request.ProfessionalQualification);
-    }
-
-    private async Task<ServiceResponse> CreateUsersForBroker(Broker broker, List<UserRequest> users)
-    {
-        var response = new ServiceResponse();
-
-        foreach (var userRequest in users)
-        {
-            var user = new User(
-                FullName.Create(userRequest.FirstName, userRequest.LastName, userRequest.OtherNames),
-                userRequest.Email,
-                MobileNo.Create(userRequest.MobileNumber),
-                userRequest.Gender,
-                userRequest.PositionInOrg,
-                userRequest.DateOfEmployment
-            );
-
-            // Set UserName to Email
-            user.UserName = user.Email;
-
-            var result = await _userManager.CreateAsync(user, userRequest.Password);
-            if (result.Succeeded)
-            {
-                broker.Users.Add(user); // Assuming Broker.Users is a navigation property
-                _logger.LogInformation("User {Email} registered successfully.", userRequest.Email);
-            }
-            else
-            {
-                var errorMessage = string.Join(", ", result.Errors.Select(e => e.Description));
-                _logger.LogWarning("Failed to register user {Email}. Errors: {Errors}", userRequest.Email, errorMessage);
-                throw new InvalidOperationException($"User registration failed for {userRequest.Email}. Errors: {errorMessage}");
-            }
-        }
-
-        await _easyStockAppDbContext.SaveChangesAsync();
-
-        response.IsSuccessful = true;
-        return response;
-    }
-
-    private async Task<ServiceResponse> CreateUserForBroker(Broker broker, UserRequest userRequest)
-    {
-        var response = new ServiceResponse();
-
-        var user = new User(
-            FullName.Create(userRequest.FirstName, userRequest.LastName, userRequest.OtherNames),
-            userRequest.Email,
-            MobileNo.Create(userRequest.MobileNumber),
-            userRequest.Gender,
-            userRequest.PositionInOrg,
-            userRequest.DateOfEmployment
-        );
-
-        // Set UserName to Email
-        user.UserName = user.Email;
-
-        var result = await _userManager.CreateAsync(user, userRequest.Password);
-        if (result.Succeeded)
-        {
-            broker.Users.Add(user); // Assuming Broker.Users is a navigation property
-            _logger.LogInformation("User {Email} registered successfully.", userRequest.Email);
-            await _easyStockAppDbContext.SaveChangesAsync();
-            response.IsSuccessful = true;
-        }
-        else
-        {
-            var errorMessage = string.Join(", ", result.Errors.Select(e => e.Description));
-            _logger.LogWarning("Failed to register user {Email}. Errors: {Errors}", userRequest.Email, errorMessage);
-            throw new InvalidOperationException($"User registration failed for {userRequest.Email}. Errors: {errorMessage}");
-        }
-
-        return response;
+        return Broker.CreateFreelance(new List<User>(), request.ProfessionalQualification);
     }
 
     private static ServiceResponse<BrokerIdResponse> CreateDuplicateErrorResponse(ServiceResponse<BrokerIdResponse> resp, string entityType)

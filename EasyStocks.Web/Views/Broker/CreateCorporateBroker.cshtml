@@ -1,245 +1,218 @@
 ﻿@model CreateCorporateBrokerRequest
 
+@Html.AntiForgeryToken()
+
 @{
     ViewData["Title"] = "Create Corporate Broker";
 }
 
-<h2>Create Corporate Broker</h2>
+<h2>@ViewData["Title"]</h2>
 
-@using (Html.BeginForm("CreateCorporateBroker", "Broker", FormMethod.Post, new { @class = "form-horizontal", @role = "form" }))
+@if (TempData["SuccessMessage"] != null)
 {
-    @Html.AntiForgeryToken()
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.CompanyName, new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.CompanyName, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.CompanyName, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.CompanyEmail, new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.CompanyEmail, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.CompanyEmail, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.CompanyMobileNumber, new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.CompanyMobileNumber, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.CompanyMobileNumber, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.StreetNo, new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.StreetNo, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.StreetNo, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.StreetName, new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.StreetName, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.StreetName, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.City, new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.City, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.City, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.State, new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.State, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.State, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.ZipCode, new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.ZipCode, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.ZipCode, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.CACRegistrationNumber, new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.CACRegistrationNumber, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.CACRegistrationNumber, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.StockBrokerLicense, new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.StockBrokerLicense, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.StockBrokerLicense, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.DateCertified, new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.DateCertified, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.DateCertified, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <fieldset>
-        <legend>Users</legend>
-        <hr />
-        <!-- First User Details -->
-        <h6>Key Staff 1</h6>
-        <div class="form-group">
-            <label asp-for="Users[0].FirstName" class="control-label">First Name</label>
-            <input asp-for="Users[0].FirstName" class="form-control" />
-            <span asp-validation-for="Users[0].FirstName" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Users[0].LastName" class="control-label">Last Name</label>
-            <input asp-for="Users[0].LastName" class="form-control" />
-            <span asp-validation-for="Users[0].LastName" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Users[0].OtherNames" class="control-label">Other Name</label>
-            <input asp-for="Users[0].OtherNames" class="form-control" />
-            <span asp-validation-for="Users[0].OtherNames" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Users[0].Email" class="control-label">Email</label>
-            <input asp-for="Users[0].Email" class="form-control" />
-            <span asp-validation-for="Users[0].Email" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Users[0].MobileNumber" class="control-label">Mobile Number</label>
-            <input asp-for="Users[0].MobileNumber" class="form-control" />
-            <span asp-validation-for="Users[0].MobileNumber" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Users[0].Gender">Gender</label>
-            <select asp-for="Users[0].Gender" class="form-control" required>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-            </select>
-            <span asp-validation-for="Users[0].Gender" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Users[0].PositionInOrg">Position In Organisation</label>
-            <input asp-for="Users[0].PositionInOrg" class="form-control" />
-            <span asp-validation-for="Users[0].PositionInOrg" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Users[0].DateOfEmployment">Date Of Employment</label>
-            <input asp-for="Users[0].DateOfEmployment" type="date" class="form-control" />
-            <span asp-validation-for="Users[0].DateOfEmployment" class="text-danger"></span>
-        </div>
-        
-        <div class="form-group">
-            <label asp-for="Users[0].Password">Password</label>
-            <input asp-for="Users[0].Password" class="form-control" />
-            <span asp-validation-for="Users[0].Password" class="text-danger"></span>
-        </div>
-        
-        <div class="form-group">
-            <label asp-for="Users[0].ConfirmPassword">Confirm Password</label>
-            <input asp-for="Users[0].ConfirmPassword" class="form-control" />
-            <span asp-validation-for="Users[0].ConfirmPassword" class="text-danger"></span>
-        </div>
-
-        <!-- Second User Details -->
-        <h6>Key Staff 2</h6>
-        <div class="form-group">
-            <label asp-for="Users[1].FirstName" class="control-label">First Name</label>
-            <input asp-for="Users[1].FirstName" class="form-control" />
-            <span asp-validation-for="Users[1].FirstName" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Users[1].LastName" class="control-label">Last Name</label>
-            <input asp-for="Users[1].LastName" class="form-control" />
-            <span asp-validation-for="Users[1].LastName" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Users[1].OtherNames" class="control-label">Other Name</label>
-            <input asp-for="Users[1].OtherNames" class="form-control" />
-            <span asp-validation-for="Users[1].OtherNames" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Users[1].Email" class="control-label">Email</label>
-            <input asp-for="Users[1].Email" class="form-control" />
-            <span asp-validation-for="Users[1].Email" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Users[1].MobileNumber" class="control-label">Mobile Number</label>
-            <input asp-for="Users[1].MobileNumber" class="form-control" />
-            <span asp-validation-for="Users[1].MobileNumber" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Users[1].Gender">Gender</label>
-            <select asp-for="Users[1].Gender" class="form-control" required>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-            </select>
-            <span asp-validation-for="Users[1].Gender" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Users[1].PositionInOrg">Position In Organisation</label>
-            <input asp-for="Users[1].PositionInOrg" class="form-control" />
-            <span asp-validation-for="Users[1].PositionInOrg" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Users[1].DateOfEmployment">Date Of Employment</label>
-            <input asp-for="Users[1].DateOfEmployment" type="date" class="form-control" />
-            <span asp-validation-for="Users[1].DateOfEmployment" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Users[1].Password">Password</label>
-            <input asp-for="Users[1].Password" class="form-control" />
-            <span asp-validation-for="Users[1].Password" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Users[1].ConfirmPassword">Confirm Password</label>
-            <input asp-for="Users[1].ConfirmPassword" class="form-control" />
-            <span asp-validation-for="Users[1].ConfirmPassword" class="text-danger"></span>
-        </div>
-
-        <hr />
-    </fieldset>
-
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <input type="submit" value="Create" class="btn btn-default" />
-        </div>
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
     </div>
 }
+
+<h3>Create a corporate broker account</h3>
+<p>This would include company details and two key staff information</p>
+
+<form asp-action="CreateCorporateBroker" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div>
+        <h6>Company Information</h6>
+        <div class="form-group">
+            <label asp-for="CompanyName">Company Name</label>
+            <input asp-for="CompanyName" class="form-control" />
+            <span asp-validation-for="CompanyName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="CompanyEmail">Company Email</label>
+            <input asp-for="CompanyEmail" class="form-control" />
+            <span asp-validation-for="CompanyEmail" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="CompanyMobileNumber">Company Mobile Number</label>
+            <input asp-for="CompanyMobileNumber" class="form-control" />
+            <span asp-validation-for="CompanyMobileNumber" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="StreetNo">Street Number</label>
+            <input asp-for="StreetNo" class="form-control" />
+            <span asp-validation-for="StreetNo" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="StreetName">Street Name</label>
+            <input asp-for="StreetName" class="form-control" />
+            <span asp-validation-for="StreetName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="City">City</label>
+            <input asp-for="City" class="form-control" />
+            <span asp-validation-for="City" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="State">State</label>
+            <input asp-for="State" class="form-control" />
+            <span asp-validation-for="State" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ZipCode">ZipCode</label>
+            <input asp-for="ZipCode" class="form-control" />
+            <span asp-validation-for="ZipCode" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="CACRegistrationNumber">CAC Registration Number</label>
+            <input asp-for="CACRegistrationNumber" class="form-control" />
+            <span asp-validation-for="CACRegistrationNumber" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="StockBrokerLicense">Stock Broker License</label>
+            <input asp-for="StockBrokerLicense" class="form-control" />
+            <span asp-validation-for="StockBrokerLicense" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="DateCertified">Date Certified</label>
+            <input asp-for="DateCertified" type="date" class="form-control" />
+            <span asp-validation-for="DateCertified" class="text-danger"></span>
+        </div>
+    </div>
+
+    <hr />
+    <!-- First User Details -->
+    <h6>Key Staff 1</h6>
+    <div class="form-group">
+        <label asp-for="Users[0].FirstName" class="control-label">First Name</label>
+        <input asp-for="Users[0].FirstName" class="form-control" />
+        <span asp-validation-for="Users[0].FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[0].LastName" class="control-label">Last Name</label>
+        <input asp-for="Users[0].LastName" class="form-control" />
+        <span asp-validation-for="Users[0].LastName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[0].OtherNames" class="control-label">Other Name</label>
+        <input asp-for="Users[0].OtherNames" class="form-control" />
+        <span asp-validation-for="Users[0].OtherNames" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[0].Email" class="control-label">Email</label>
+        <input asp-for="Users[0].Email" class="form-control" />
+        <span asp-validation-for="Users[0].Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[0].MobileNumber" class="control-label">Mobile Number</label>
+        <input asp-for="Users[0].MobileNumber" class="form-control" />
+        <span asp-validation-for="Users[0].MobileNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[0].Gender">Gender</label>
+        <select asp-for="Users[0].Gender" class="form-control" required>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+        <span asp-validation-for="Users[0].Gender" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[0].PositionInOrg">Position In Organisation</label>
+        <input asp-for="Users[0].PositionInOrg" class="form-control" />
+        <span asp-validation-for="Users[0].PositionInOrg" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[0].DateOfEmployment">Date Of Employment</label>
+        <input asp-for="Users[0].DateOfEmployment" type="date" class="form-control" />
+        <span asp-validation-for="Users[0].DateOfEmployment" class="text-danger"></span>
+    </div>
+        
+    <div class="form-group">
+        <label asp-for="Users[0].Password">Password</label>
+        <input asp-for="Users[0].Password" type="password" class="form-control" />
+        <span asp-validation-for="Users[0].Password" class="text-danger"></span>
+    </div>
+        
+    <div class="form-group">
+        <label asp-for="Users[0].ConfirmPassword">Confirm Password</label>
+        <input asp-for="Users[0].ConfirmPassword" type="password" class="form-control" />
+        <span asp-validation-for="Users[0].ConfirmPassword" class="text-danger"></span>
+    </div>
+
+    <!-- Second User Details -->
+    <h6>Key Staff 2</h6>
+    <div class="form-group">
+        <label asp-for="Users[1].FirstName" class="control-label">First Name</label>
+        <input asp-for="Users[1].FirstName" class="form-control" />
+        <span asp-validation-for="Users[1].FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[1].LastName" class="control-label">Last Name</label>
+        <input asp-for="Users[1].LastName" class="form-control" />
+        <span asp-validation-for="Users[1].LastName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[1].OtherNames" class="control-label">Other Name</label>
+        <input asp-for="Users[1].OtherNames" class="form-control" />
+        <span asp-validation-for="Users[1].OtherNames" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[1].Email" class="control-label">Email</label>
+        <input asp-for="Users[1].Email" class="form-control" />
+        <span asp-validation-for="Users[1].Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[1].MobileNumber" class="control-label">Mobile Number</label>
+        <input asp-for="Users[1].MobileNumber" class="form-control" />
+        <span asp-validation-for="Users[1].MobileNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[1].Gender">Gender</label>
+        <select asp-for="Users[1].Gender" class="form-control" required>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+        <span asp-validation-for="Users[1].Gender" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[1].PositionInOrg">Position In Organisation</label>
+        <input asp-for="Users[1].PositionInOrg" class="form-control" />
+        <span asp-validation-for="Users[1].PositionInOrg" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[1].DateOfEmployment">Date Of Employment</label>
+        <input asp-for="Users[1].DateOfEmployment" type="date" class="form-control" />
+        <span asp-validation-for="Users[1].DateOfEmployment" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[1].Password">Password</label>
+        <input asp-for="Users[1].Password" type="password" class="form-control" />
+        <span asp-validation-for="Users[1].Password" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Users[1].ConfirmPassword">Confirm Password</label>
+        <input asp-for="Users[1].ConfirmPassword" type="password" class="form-control" />
+        <span asp-validation-for="Users[1].ConfirmPassword" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
 
 @section Scripts {
     @{

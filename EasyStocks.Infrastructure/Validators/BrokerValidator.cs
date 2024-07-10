@@ -1,5 +1,4 @@
-﻿using EasyStocks.DTO.Requests;
-
+﻿
 namespace EasyStocks.Infrastructure.Validator;
 
 public class BrokerValidator

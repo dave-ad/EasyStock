@@ -5,7 +5,7 @@ global using EasyStocks.DTO.Requests;
 global using EasyStocks.DTO.Responses;
 global using EasyStocks.Infrastructure;
 global using EasyStocks.Infrastructure.Validator;
-global using EasyStocks.Service.AuthService;
+global using EasyStocks.Service.AuthServices;
 global using EasyStocks.Service.BrokerServices;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.EntityFrameworkCore;
