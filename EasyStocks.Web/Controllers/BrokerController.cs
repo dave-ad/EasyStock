@@ -2,11 +2,13 @@
 
 public class BrokerController : Controller
 {
+    private readonly SignInManager<User> _signInManager;
     private readonly ILogger<BrokerController> _logger;
     private readonly IBrokerService _brokerService;
 
-    public BrokerController(ILogger<BrokerController> logger, IBrokerService brokerService)
+    public BrokerController(SignInManager<User> signInManager, ILogger<BrokerController> logger, IBrokerService brokerService)
     {
+        _signInManager = signInManager;
         _brokerService = brokerService;
         _logger = logger;
     }
@@ -51,7 +53,7 @@ public class BrokerController : Controller
         catch (Exception ex)
         {
             _logger.LogError(ex, "An exception occurred while adding new broker.");
-            ModelState.AddModelError(string.Empty, "An error occurred while  adding new broker.");
+            ModelState.AddModelError(string.Empty, "An error occurred while adding new broker.");
             return View(nameof(CreateCorporateBroker), request);
         }
     }
@@ -59,7 +61,6 @@ public class BrokerController : Controller
     [HttpGet]
     public ActionResult CreateIndividualBroker()
     {
-        //ViewBag.BrokerCreatedMessage = "Account creation Successfully 👍";
         return View();
     }
 
@@ -91,15 +92,14 @@ public class BrokerController : Controller
         catch (Exception ex)
         {
             _logger.LogError(ex, "An exception occurred while adding new broker.");
-            ModelState.AddModelError(string.Empty, "An error occurred while  adding new broker.");
+            ModelState.AddModelError(string.Empty, "An error occurred while adding new broker.");
             return View(nameof(CreateIndividualBroker), request);
         }
     }
-    
+
     [HttpGet]
     public ActionResult CreateFreelanceBroker()
     {
-        //ViewBag.BrokerCreatedMessage = "Account creation Successfully 👍";
         return View();
     }
 
@@ -128,10 +128,10 @@ public class BrokerController : Controller
                 return View(nameof(CreateFreelanceBroker), request);
             }
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
             _logger.LogError(ex, "An exception occurred while adding new broker.");
-            ModelState.AddModelError(string.Empty, "An error occurred while  adding new broker.");
+            ModelState.AddModelError(string.Empty, "An error occurred while adding new broker.");
             return View(nameof(CreateFreelanceBroker), request);
         }
     }

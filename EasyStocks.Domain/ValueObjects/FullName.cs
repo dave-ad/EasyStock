@@ -6,11 +6,11 @@ public record FullName
     public string First { get; }
     public string Others { get; }
 
-    private FullName(string lastName, string firstName, string Othernames)
+    private FullName(string lastName, string firstName, string othernames)
     {
         Last = lastName;
         First = firstName;
-        Others = Othernames;
+        Others = othernames;
     }
 
     private FullName()
@@ -23,6 +23,6 @@ public record FullName
 
     public static FullName Default() => new();
 
-    public static FullName Create(string lastName, string firstName, string Othernames)
-        => new(lastName, firstName, Othernames);
+    public static FullName Create(string lastName, string firstName, string othernames)
+        => new(lastName, firstName, othernames);
 }

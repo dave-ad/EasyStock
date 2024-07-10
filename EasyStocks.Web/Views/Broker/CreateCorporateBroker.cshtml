@@ -1,4 +1,5 @@
 ﻿@model CreateCorporateBrokerRequest
+
 @Html.AntiForgeryToken()
 
 @{
@@ -80,7 +81,6 @@
     </div>
 
     <hr />
-    <!-- Users Details -->
     <!-- First User Details -->
     <h6>Key Staff 1</h6>
     <div class="form-group">
@@ -127,11 +127,23 @@
         <input asp-for="Users[0].PositionInOrg" class="form-control" />
         <span asp-validation-for="Users[0].PositionInOrg" class="text-danger"></span>
     </div>
-    
+
     <div class="form-group">
         <label asp-for="Users[0].DateOfEmployment">Date Of Employment</label>
         <input asp-for="Users[0].DateOfEmployment" type="date" class="form-control" />
         <span asp-validation-for="Users[0].DateOfEmployment" class="text-danger"></span>
+    </div>
+        
+    <div class="form-group">
+        <label asp-for="Users[0].Password">Password</label>
+        <input asp-for="Users[0].Password" type="password" class="form-control" />
+        <span asp-validation-for="Users[0].Password" class="text-danger"></span>
+    </div>
+        
+    <div class="form-group">
+        <label asp-for="Users[0].ConfirmPassword">Confirm Password</label>
+        <input asp-for="Users[0].ConfirmPassword" type="password" class="form-control" />
+        <span asp-validation-for="Users[0].ConfirmPassword" class="text-danger"></span>
     </div>
 
     <!-- Second User Details -->
@@ -187,10 +199,21 @@
         <span asp-validation-for="Users[1].DateOfEmployment" class="text-danger"></span>
     </div>
 
-    <!-- Add other user fields here if needed -->
+    <div class="form-group">
+        <label asp-for="Users[1].Password">Password</label>
+        <input asp-for="Users[1].Password" type="password" class="form-control" />
+        <span asp-validation-for="Users[1].Password" class="text-danger"></span>
+    </div>
 
-    <button type="submit" class="btn btn-primary">Create Broker</button>
+    <div class="form-group">
+        <label asp-for="Users[1].ConfirmPassword">Confirm Password</label>
+        <input asp-for="Users[1].ConfirmPassword" type="password" class="form-control" />
+        <span asp-validation-for="Users[1].ConfirmPassword" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
 </form>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

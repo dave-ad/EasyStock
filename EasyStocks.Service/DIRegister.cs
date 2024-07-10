@@ -1,11 +1,15 @@
-﻿namespace EasyStocks.Service;
+﻿using EasyStocks.Service.AuthServices;
+using Microsoft.Extensions.Configuration;
+
+namespace EasyStocks.Service;
 
 public static class DIRegister
 {
-    public static IServiceCollection AddEasyStockServices(this IServiceCollection services)
+    public static IServiceCollection AddEasyStockServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddInfrastructure();
+        services.AddInfrastructure(configuration);
         services.AddScoped<IBrokerService, BrokerService>();
+        services.AddScoped<IAuthService, AuthService>();
         return services;
     }
 }
