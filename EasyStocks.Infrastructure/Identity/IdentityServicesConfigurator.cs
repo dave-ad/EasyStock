@@ -8,6 +8,11 @@ public static class IdentityServicesConfigurator
             .AddEntityFrameworkStores<EasyStockAppDbContext>()
             .AddDefaultTokenProviders();
 
+        //services.AddAuthorization(options =>
+        //{
+        //    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole(Roles.Admin));
+        //});
+
         services.Configure<IdentityOptions>(options =>
         {
             // Password settings

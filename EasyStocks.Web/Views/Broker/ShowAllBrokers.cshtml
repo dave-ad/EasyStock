@@ -1,0 +1,38 @@
+﻿@model BrokerListResponse
+
+<h1>Stocks List</h1>
+
+@if (Model != null && Model.Brokers != null && Model.Brokers.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Broker ID</th>
+                <th>Company Name</th>
+                <th>Email</th>
+                <th>Mobile Number</th>
+                <th>Address</th>
+                <th>Type</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var broker in Model.Brokers)
+            {
+                <tr>
+                    <td>@broker.BrokerId</td>
+                    <td>@broker.CompanyName</td>
+                    <td>@broker.CompanyEmail</td>
+                    <td>@broker.CompanyMobileNumber</td>
+                    <td>@broker.CompanyAddress</td>
+                    <td>@broker.BrokerType</td>
+                    <td>@broker.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No Broker found.</p>
+}

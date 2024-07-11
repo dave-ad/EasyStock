@@ -1,6 +1,4 @@
-﻿using EasyStocks.Service.StocksServices;
-
-namespace EasyStocks.Web.Controllers;
+﻿namespace EasyStocks.Web.Controllers;
 
 public class StockController : Controller
 {

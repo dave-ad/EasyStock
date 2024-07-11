@@ -1,9 +1,6 @@
-﻿
-using Azure;
+﻿namespace EasyStocks.Service.StocksServices;
 
-namespace EasyStocks.Service.StocksServices;
-
-public class StockService :IStockService
+public class StockService : IStockService
 {
     private readonly IEasyStockAppDbContext _easyStockAppDbContext;
     private readonly StockValidator _validator;

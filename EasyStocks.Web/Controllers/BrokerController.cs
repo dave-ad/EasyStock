@@ -19,6 +19,22 @@ public class BrokerController : Controller
         return View();
     }
 
+    public async Task<IActionResult> GetAllBrokers()
+    {
+        var response = await _brokerService.GetAllBrokers();
+
+        if (response.IsSuccessful)
+        {
+            return View(response.Value); // Assuming you have a view to display stocks
+        }
+        else
+        {
+            _logger.LogError("Failed to retrieve stocks: {Error}", response.Error);
+            ModelState.AddModelError(string.Empty, "Failed to retrieve stocks");
+            return View(); // Handle error scenario in the view
+        }
+    }
+
     [HttpGet]
     public ActionResult CreateCorporateBroker()
     {
