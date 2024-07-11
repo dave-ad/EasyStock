@@ -13,11 +13,6 @@ public class StockController : Controller
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    //public ActionResult Index()
-    //{
-    //    return View();
-    //}
-
     public async Task<IActionResult> Index()
     {
         var response = await _stockService.GetAllStocks();
