@@ -1,4 +1,6 @@
-﻿namespace EasyStocks.Infrastructure.Context;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace EasyStocks.Infrastructure.Context;
 
 internal sealed class EasyStockAppDbContext : IdentityDbContext<User>, IEasyStockAppDbContext
 {
@@ -23,5 +25,5 @@ internal sealed class EasyStockAppDbContext : IdentityDbContext<User>, IEasyStoc
     }
 
     public DbSet<Broker> Brokers { get; set; }
-    //public DbSet<User> Users { get; set; }
+    public DbSet<Stocks> Stocks { get; set; }
 }

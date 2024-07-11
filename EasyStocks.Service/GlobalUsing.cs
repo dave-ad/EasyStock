@@ -12,3 +12,4 @@ global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using System.Transactions;
+global using EasyStocks.Infrastructure.Validators;

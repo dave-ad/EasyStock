@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-
-namespace EasyStocks.Domain.Entities;
+﻿namespace EasyStocks.Domain.Entities;
 
 public class User : IdentityUser
 {
@@ -14,7 +12,7 @@ public class User : IdentityUser
     public int BrokerId { get; set; } // Foreign key
     public Broker Broker { get; set; } // Navigation property
 
-    public User() { }
+    private User() { }
     public User(FullName name, string email, MobileNo mobileNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment)
     {
         Name = name;

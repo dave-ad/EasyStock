@@ -12,7 +12,7 @@ public sealed class BrokerService : IBrokerService
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _easyStockAppDbContext = easyStockAppDbContext ?? throw new ArgumentNullException(nameof(easyStockAppDbContext));
         _validator = validator ?? throw new ArgumentNullException(nameof(validator));
-        _logger = logger;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<ServiceResponse<BrokerIdResponse>> CreateCorporateBroker(CreateCorporateBrokerRequest request) 
@@ -40,7 +40,6 @@ public sealed class BrokerService : IBrokerService
                 if (duplicateStaff)
                     return CreateDuplicateErrorResponse(resp, "Staff");
 
-                //var corporateBroker = await CreateCorporateBrokerEntity(request);
                 var corporateBroker =  CreateCorporateBrokerEntity(request);
 
                 var retCorporateBroker = _easyStockAppDbContext.Brokers.Add(corporateBroker);
@@ -49,7 +48,6 @@ public sealed class BrokerService : IBrokerService
                 if (retCorporateBroker == null || retCorporateBroker.Entity.BrokerId < 1)
                     return CreateDatabaseErrorResponse(resp);
 
-                // Create users and assign them to the created broker
                 await CreateUsersAndAssignToBroker(request.Users, retCorporateBroker.Entity.BrokerId);
 
                 resp.Value = new BrokerIdResponse { BrokerId = retCorporateBroker.Entity.BrokerId };
