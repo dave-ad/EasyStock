@@ -1,0 +1,56 @@
+﻿@model EasyStocks.DTO.Responses.BrokerResponse
+
+<h1>Broker Details</h1>
+
+<table class="table">
+    <tr>
+        <th>Broker ID</th>
+        <td>@Model.BrokerId</td>
+    </tr>
+    <tr>
+        <th>Company Name</th>
+        <td>@Model.CompanyName</td>
+    </tr>
+    <tr>
+        <th>Company Email</th>
+        <td>@Model.CompanyEmail</td>
+    </tr>
+    <tr>
+        <th>Company Mobile Number</th>
+        <td>@Model.CompanyMobileNumber</td>
+    </tr>
+    <tr>
+        <th>Company Address</th>
+        <td>@Model.CompanyAddress?.StreetNo @Model.CompanyAddress?.StreetName, @Model.CompanyAddress?.City, @Model.CompanyAddress?.State @Model.CompanyAddress?.ZipCode</td>
+    </tr>
+    <tr>
+        <th>CAC Registration Number</th>
+        <td>@Model.CACRegistrationNumber</td>
+    </tr>
+    <tr>
+        <th>Stock Broker License</th>
+        <td>@Model.StockBrokerLicense</td>
+    </tr>
+    <tr>
+        <th>Date Certified</th>
+        <td>@Model.DateCertified</td>
+    </tr>
+    <tr>
+        <th>Business Address</th>
+        <td>@Model.BusinessAddress?.StreetNo @Model.BusinessAddress?.StreetName, @Model.BusinessAddress?.City, @Model.BusinessAddress?.State @Model.BusinessAddress?.ZipCode</td>
+    </tr>
+    <tr>
+        <th>Professional Qualification</th>
+        <td>@Model.ProfessionalQualification</td>
+    </tr>
+    <tr>
+        <th>Broker Type</th>
+        <td>@Model.BrokerType</td>
+    </tr>
+    <tr>
+        <th>Status</th>
+        <td>@Model.Status</td>
+    </tr>
+</table>
+
+<a href="@Url.Action("Index", "Broker")">Back to List</a>

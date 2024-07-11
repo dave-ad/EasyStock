@@ -85,6 +85,11 @@ public sealed class BrokerService : IBrokerService
         return resp;
     }
 
+    public async Task<ServiceResponse<BrokerResponse>> GetBrokerById(int id)
+    {
+
+    }
+
     public async Task<ServiceResponse<BrokerIdResponse>> CreateCorporateBroker(CreateCorporateBrokerRequest request) 
     {
         var resp = new ServiceResponse<BrokerIdResponse>();

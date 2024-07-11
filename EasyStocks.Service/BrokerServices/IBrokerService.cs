@@ -7,4 +7,5 @@ public interface IBrokerService
     Task<ServiceResponse<BrokerIdResponse>> CreateFreelanceBroker(CreateFreelanceBrokerRequest request);
 
     Task<ServiceResponse<BrokerListResponse>> GetAllBrokers();
+    Task<ServiceResponse<BrokerResponse>> GetBrokerById(int id);
 }

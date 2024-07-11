@@ -1,6 +1,6 @@
 ﻿@model BrokerListResponse
 
-<h1>Stocks List</h1>
+<h1>Brokers List</h1>
 
 @if (Model != null && Model.Brokers != null && Model.Brokers.Count > 0)
 {
@@ -27,6 +27,9 @@
                     <td>@broker.CompanyAddress</td>
                     <td>@broker.BrokerType</td>
                     <td>@broker.Status</td>
+                    <td>
+                        <a href="@Url.Action("Details", "Broker", new { id = broker.BrokerId })">View Details</a>
+                    </td>
                 </tr>
             }
         </tbody>

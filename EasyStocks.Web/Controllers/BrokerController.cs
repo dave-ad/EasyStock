@@ -35,6 +35,19 @@ public class BrokerController : Controller
         }
     }
 
+    public async Task<IActionResult> BrokerDetails(int id)
+    {
+        var response = await _brokerService.GetBrokerById(id);
+
+        if (!response.IsSuccessful)
+        {
+            ViewBag.Error = response.Error;
+            return View("Error");
+        }
+
+        return View(response.Value);
+    }
+
     [HttpGet]
     public ActionResult CreateCorporateBroker()
     {
