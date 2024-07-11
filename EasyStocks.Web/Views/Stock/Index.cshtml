@@ -1,0 +1,48 @@
+﻿@model StockListResponse
+
+<h1>Stocks List</h1>
+
+@if (Model != null && Model.Stocks != null && Model.Stocks.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Stock Title</th>
+                <th>Company Name</th>
+                <th>Stock Type</th>
+                <th>Total Units</th>
+                <th>Price Per Unit</th>
+                <th>Opening Date</th>
+                <th>Closing Date</th>
+                <th>Minimum Purchase</th>
+                <th>Initial Deposit</th>
+                <th>Date Listed</th>
+                <th>Listed By</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var stock in Model.Stocks)
+            {
+                <tr>
+                    <td>@stock.Id</td>
+                    <td>@stock.StockTitle</td>
+                    <td>@stock.CompanyName</td>
+                    <td>@stock.StockType</td>
+                    <td>@stock.TotalUnits</td>
+                    <td>@stock.PricePerUnit</td>
+                    <td>@stock.OpeningDate.ToShortDateString()</td>
+                    <td>@stock.ClosingDate.ToShortDateString()</td>
+                    <td>@stock.MinimumPurchase</td>
+                    <td>@stock.InitialDeposit</td>
+                    <td>@stock.DateListed.ToShortDateString()</td>
+                    <td>@stock.ListedBy</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No stocks found.</p>
+}

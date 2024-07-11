@@ -21,7 +21,7 @@ public partial class Broker : IAggregateRoot
     }
 
     // Individual Broker
-    public Broker(List<User> users, 
+    private Broker(List<User> users, 
                     StockBrokerLicense stockBrokerLicenseNumber, DateOnly dateCertified,
                     AccountStatus status, Address businessAddress,
                     string professionalQualification, BrokerType brokerType)
@@ -36,7 +36,7 @@ public partial class Broker : IAggregateRoot
     }
     
     // Freelance Broker
-    public Broker(List<User> users, AccountStatus status,
+    private Broker(List<User> users, AccountStatus status,
                     string professionalQualification, BrokerType brokerType)
     {
         Users = users;

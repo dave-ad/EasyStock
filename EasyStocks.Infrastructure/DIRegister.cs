@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using EasyStocks.Infrastructure.Validators;
+using Microsoft.Extensions.Configuration;
 
 namespace EasyStocks.Infrastructure;
 
@@ -8,6 +9,7 @@ public static class DIRegister
     {
         services.AddScoped<IEasyStockAppDbContext, EasyStockAppDbContext>();
         services.AddScoped<BrokerValidator>();
+        services.AddScoped<StockValidator>();
 
         // Register DbContext with the service container
         services.AddDbContext<EasyStockAppDbContext>(options =>

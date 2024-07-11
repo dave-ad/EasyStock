@@ -4,6 +4,7 @@ using EasyStocks.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
 {
     [DbContext(typeof(EasyStockAppDbContext))]
-    partial class EasyStockAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240710122414_Stocks")]
+    partial class Stocks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -85,9 +88,8 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MinimumPurchase")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("MinimumPurchase")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("OpeningDate")
                         .HasColumnType("datetime2");
@@ -103,9 +105,8 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TotalUnits")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("TotalUnits")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
