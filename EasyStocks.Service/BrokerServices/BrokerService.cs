@@ -15,6 +15,76 @@ public sealed class BrokerService : IBrokerService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    public async Task<ServiceResponse<BrokerListResponse>> GetAllBrokers()
+    {
+        var resp = new ServiceResponse<BrokerListResponse>();
+
+        try
+        {
+            var brokers = await _easyStockAppDbContext.Brokers.Include(b => b.Users).ToListAsync();
+
+            if (brokers == null || !brokers.Any())
+            {
+                resp.IsSuccessful = false;
+                resp.Error = "No brokers found.";
+                return resp;
+            }
+
+            var brokerListResponse = new BrokerListResponse
+            {
+                Brokers = brokers.Select(b => new BrokerResponse
+                {
+                    BrokerId = b.BrokerId,
+                    Users = b.Users.Select(u => new UserResponse
+                    {
+                        //UserId = int.TryParse(u.Id, out int userId) ? userId : 0,
+                        UserId = u.Id,
+                        Email = u.Email,
+                        // Map other necessary properties from User
+                    }).ToList(),
+                    CompanyName = b.CompanyName,
+                    CompanyEmail = b.CompanyEmail?.Value,
+                    CompanyMobileNumber = b.CompanyMobileNumber?.Value,
+                    CompanyAddress = new AddressResponse
+                    {
+                        StreetNo = b.CompanyAddress?.StreetNo,
+                        StreetName = b.CompanyAddress?.StreetName,
+                        City = b.CompanyAddress?.City,
+                        State = b.CompanyAddress?.State,
+                        ZipCode = b.CompanyAddress?.ZipCode
+                    },
+                    CACRegistrationNumber = b.CACRegistrationNumber?.Value,
+                    StockBrokerLicense = b.StockBrokerLicense?.Value,
+                    DateCertified = b.DateCertified,
+                    BusinessAddress = new AddressResponse
+                    {
+                        StreetNo = b.BusinessAddress?.StreetNo,
+                        StreetName = b.BusinessAddress?.StreetName,
+                        City = b.BusinessAddress?.City,
+                        State = b.BusinessAddress?.State,
+                        ZipCode = b.BusinessAddress?.ZipCode
+                    },
+                    ProfessionalQualification = b.ProfessionalQualification,
+                    BrokerType = b.BrokerType,
+                    Status = b.Status
+                }).ToList()
+            };
+
+            resp.Value = brokerListResponse;
+            resp.IsSuccessful = true;
+        }
+        catch (Exception ex)
+        {
+            //_logger.LogError(ex, "An error occurred while fetching all brokers.");
+            //resp = CreateExceptionResponse(new ServiceResponse<BrokerListResponse>(), ex);
+            resp.IsSuccessful = false;
+            resp.Error = "An error occurred while fetching stocks.";
+            resp.TechMessage = ex.Message;
+        }
+
+        return resp;
+    }
+
     public async Task<ServiceResponse<BrokerIdResponse>> CreateCorporateBroker(CreateCorporateBrokerRequest request) 
     {
         var resp = new ServiceResponse<BrokerIdResponse>();

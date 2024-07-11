@@ -4,5 +4,6 @@ global using EasyStocks.DTO.Requests;
 global using EasyStocks.DTO.Responses;
 global using EasyStocks.Service;
 global using EasyStocks.Service.BrokerServices;
+global using EasyStocks.Service.StocksServices;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.AspNetCore.Mvc;
