@@ -1,6 +1,6 @@
 ﻿@model BrokerListResponse
 
-<h1>Brokers List</h1>
+<h1>Brokers</h1>
 
 @if (Model != null && Model.Brokers != null && Model.Brokers.Count > 0)
 {
@@ -8,12 +8,13 @@
         <thead>
             <tr>
                 <th>Broker ID</th>
-                <th>Company Name</th>
-                <th>Email</th>
-                <th>Mobile Number</th>
-                <th>Address</th>
                 <th>Type</th>
+                <th>Stock Broker License</th>
+                <th>Email</th>
+                <th>Company Name</th>
+                <th>Company Email</th>
                 <th>Status</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -21,14 +22,20 @@
             {
                 <tr>
                     <td>@broker.BrokerId</td>
+                    <td>@broker.BrokerType</td>
+                    <td>@broker.StockBrokerLicense</td>
+                    <td>
+                        @foreach (var user in broker.Users)
+                        {
+                            <span>@user.Email</span>
+                            <br/>
+                        }
+                    </td>
                     <td>@broker.CompanyName</td>
                     <td>@broker.CompanyEmail</td>
-                    <td>@broker.CompanyMobileNumber</td>
-                    <td>@broker.CompanyAddress</td>
-                    <td>@broker.BrokerType</td>
                     <td>@broker.Status</td>
                     <td>
-                        <a href="@Url.Action("Details", "Broker", new { id = broker.BrokerId })">View Details</a>
+                        <a asp-action="Details" asp-route-id="@broker.BrokerId" class="btn btn-primary">Details</a>
                     </td>
                 </tr>
             }

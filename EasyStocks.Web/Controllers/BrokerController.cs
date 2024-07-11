@@ -1,12 +1,15 @@
-﻿namespace EasyStocks.Web.Controllers;
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace EasyStocks.Web.Controllers;
 
 public class BrokerController : Controller
 {
     private readonly SignInManager<User> _signInManager;
+    private readonly UserManager<User> _userManager;
     private readonly ILogger<BrokerController> _logger;
     private readonly IBrokerService _brokerService;
 
-    public BrokerController(SignInManager<User> signInManager, ILogger<BrokerController> logger, IBrokerService brokerService)
+    public BrokerController(SignInManager<User> signInManager,UserManager<User> userManager, ILogger<BrokerController> logger, IBrokerService brokerService)
     {
         _signInManager = signInManager;
         _brokerService = brokerService;
@@ -19,7 +22,7 @@ public class BrokerController : Controller
         return View();
     }
 
-    public async Task<IActionResult> GetAllBrokers()
+    public async Task<IActionResult> BrokersList()
     {
         var response = await _brokerService.GetAllBrokers();
 
@@ -35,18 +38,31 @@ public class BrokerController : Controller
         }
     }
 
-    public async Task<IActionResult> BrokerDetails(int id)
+    private async Task<List<UserResponse>> GetUsersForBroker(int brokerId)
     {
-        var response = await _brokerService.GetBrokerById(id);
+        var users = await _userManager.GetUsersInRoleAsync("Broker"); // Adjust role name as per your setup
 
-        if (!response.IsSuccessful)
-        {
-            ViewBag.Error = response.Error;
-            return View("Error");
-        }
-
-        return View(response.Value);
+        return users
+            .Where(u => u.BrokerId == brokerId)
+            .Select(u => new UserResponse
+            {
+                Email = u.Email,
+                // Map other necessary properties from User
+            }).ToList();
     }
+
+    //public async Task<IActionResult> BrokerDetails(int id)
+    //{
+    //    var response = await _brokerService.GetBrokerById(id);
+
+    //    if (!response.IsSuccessful)
+    //    {
+    //        ViewBag.Error = response.Error;
+    //        return View("Error");
+    //    }
+
+    //    return View(response.Value);
+    //}
 
     [HttpGet]
     public ActionResult CreateCorporateBroker()

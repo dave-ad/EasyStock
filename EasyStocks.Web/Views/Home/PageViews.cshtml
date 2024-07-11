@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "Page Views";
+}
+
+<div class="container">
+    <h1>Page Views</h1>
+
+    <ul class="nav nav-pills">
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Broker" asp-action="CreateCorporateBroker">Create Corporate Broker</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Broker" asp-action="CreateIndividualBroker">Create Individual Broker</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Broker" asp-action="CreateFreelanceBroker">Create Freelance Broker</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Broker" asp-action="BrokersList">Brokers List</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Stock" asp-action="AddStock">Create Stock</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Stock" asp-action="Index">Stocks</a>
+        </li>
+    </ul>
+</div>

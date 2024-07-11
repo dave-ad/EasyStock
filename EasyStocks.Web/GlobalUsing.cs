@@ -7,3 +7,5 @@ global using EasyStocks.Service.BrokerServices;
 global using EasyStocks.Service.StocksServices;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.AspNetCore.Mvc;
+global using EasyStocks.Service.AuthServices;
+global using EasyStocks.Web.Models;

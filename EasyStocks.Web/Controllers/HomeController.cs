@@ -37,6 +37,11 @@ namespace EasyStocks.Web.Controllers
             }
         }
 
+        public IActionResult PageViews()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();
