@@ -38,7 +38,7 @@ public sealed class BrokerService : IBrokerService
                     Users = b.Users.Select(u => new UserResponse
                     {
                         //UserId = int.TryParse(u.Id, out int userId) ? userId : 0,
-                        UserId = u.Id,
+                        Id = u.Id,
                         Email = u.Email,
                         // Map other necessary properties from User
                     }).ToList(),
@@ -85,9 +85,125 @@ public sealed class BrokerService : IBrokerService
         return resp;
     }
 
-    public async Task<ServiceResponse<BrokerResponse>> GetBrokerById(int id)
+    public async Task<ServiceResponse<BrokerResponse>> GetBrokerById(int brokerId)
     {
+       var resp = new ServiceResponse<BrokerResponse>();
 
+        try
+        {
+            var broker = await _easyStockAppDbContext.Brokers
+                .Include(b => b.Users)
+                .FirstOrDefaultAsync(b => b.BrokerId == brokerId);
+
+            if (broker == null)
+            {
+                resp.IsSuccessful = false;
+                resp.Error = "Broker not found.";
+                return resp;
+            }
+
+            var brokerResponse = new BrokerResponse
+            {
+                BrokerId = broker.BrokerId,
+                BrokerType = broker.BrokerType,
+                StockBrokerLicense = broker.StockBrokerLicense?.Value,
+                Users = broker.Users.Select(u => new UserResponse
+                {
+                    Id = u.Id,
+                    Email = u.Email
+                }).ToList(),
+                CompanyName = broker.CompanyName,
+                CompanyEmail = broker.CompanyEmail?.Value,
+                CompanyMobileNumber = broker.CompanyMobileNumber?.Value,
+                CompanyAddress = new AddressResponse
+                {
+                    StreetNo = broker.CompanyAddress?.StreetNo,
+                    StreetName = broker.CompanyAddress?.StreetName,
+                    City = broker.CompanyAddress?.City,
+                    State = broker.CompanyAddress?.State,
+                    ZipCode = broker.CompanyAddress?.ZipCode
+                },
+                CACRegistrationNumber = broker.CACRegistrationNumber?.Value,
+                DateCertified = broker.DateCertified,
+                BusinessAddress = new AddressResponse
+                {
+                    StreetNo = broker.BusinessAddress?.StreetNo,
+                    StreetName = broker.BusinessAddress?.StreetName,
+                    City = broker.BusinessAddress?.City,
+                    State = broker.BusinessAddress?.State,
+                    ZipCode = broker.BusinessAddress?.ZipCode
+                },
+                ProfessionalQualification = broker.ProfessionalQualification,
+                Status = broker.Status
+            };
+
+            resp.IsSuccessful = true;
+            resp.Value = brokerResponse;
+        }
+        catch (Exception ex)
+        {
+            resp.IsSuccessful = false;
+            resp.Error = "An error occurred while fetching broker.";
+            resp.TechMessage = ex.Message;
+        }
+        return resp;
+    }
+
+    public async Task<ServiceResponse<BrokerListResponse>> GetBrokersByType(BrokerType? brokerType = null)
+    {
+        var resp = new ServiceResponse<BrokerListResponse>();
+
+        try
+        {
+            var query = _easyStockAppDbContext.Brokers.AsQueryable();
+
+            if (brokerType.HasValue)
+            {
+                query = query.Where(b => b.BrokerType == brokerType.Value);
+            }
+
+            var brokers = await query
+                .Include(b => b.Users)
+                .ToListAsync();
+
+            if (brokers == null || !brokers.Any())
+            {
+                resp.IsSuccessful = false;
+                resp.Error = brokerType.HasValue ? $"No {brokerType.ToString()} brokers found." : "No brokers found.";
+                return resp;
+            }
+
+            var brokerListResponse = new BrokerListResponse
+            {
+                Brokers = new List<BrokerResponse>()
+            };
+
+            foreach (var broker in brokers)
+            {
+                var brokerResponse = new BrokerResponse
+                {
+                    BrokerId = broker.BrokerId,
+                    BrokerType = broker.BrokerType,
+                    StockBrokerLicense = broker.StockBrokerLicense?.Value,
+                    CompanyName = broker.CompanyName,
+                    CompanyEmail = broker.CompanyEmail?.Value,
+                    Status = broker.Status,
+                    Users = await GetUsersForBroker(broker.Users)
+                };
+                brokerListResponse.Brokers.Add(brokerResponse);
+            }
+
+            resp.Value = brokerListResponse;
+            resp.IsSuccessful = true;
+        }
+        catch (Exception ex)
+        {
+            resp.IsSuccessful = false;
+            resp.Error = $"An error occurred while fetching {(brokerType.HasValue ? brokerType.ToString() : "all")} brokers.";
+            resp.TechMessage = ex.Message;
+        }
+
+        return resp;
     }
 
     public async Task<ServiceResponse<BrokerIdResponse>> CreateCorporateBroker(CreateCorporateBrokerRequest request) 
@@ -245,6 +361,206 @@ public sealed class BrokerService : IBrokerService
         return resp;
     }
 
+    public async Task<ServiceResponse<BrokerResponse>> UpdateCorporateBroker(UpdateCorporateBrokerRequest request)
+    {
+        var resp = new ServiceResponse<BrokerResponse>();
+        try
+        {
+            var existingBrokerResponse = await GetBrokerById(request.BrokerId);
+
+            if (existingBrokerResponse == null || !existingBrokerResponse.IsSuccessful || existingBrokerResponse.Value == null)
+            {
+                resp.IsSuccessful = false;
+                resp.Error = "Broker not found.";
+                return resp;
+            }
+
+            // Fetch the actual Broker entity from the database
+            var existingBroker = await _easyStockAppDbContext.Brokers
+                .Include(b => b.Users)
+                .FirstOrDefaultAsync(b => b.BrokerId == existingBrokerResponse.Value.BrokerId);
+
+            if (existingBroker == null)
+            {
+                throw new InvalidOperationException($"Broker with ID {existingBrokerResponse.Value.BrokerId} not found.");
+            }
+
+            // Update the existing broker entity with the new data
+            await UpdateCorporateBrokerEntity(existingBroker, request);
+
+            // Save changes to the database
+            _easyStockAppDbContext.Brokers.Update(existingBroker);
+            await _easyStockAppDbContext.SaveChangesAsync();
+
+            // Map the updated entity back to a response object
+            var updatedBrokerResponse = new BrokerResponse
+            {
+                BrokerId = existingBroker.BrokerId,
+                CompanyName = existingBroker.CompanyName,
+                CompanyEmail = existingBroker.CompanyEmail?.Value,
+                CompanyMobileNumber = existingBroker.CompanyMobileNumber?.Value,
+                CompanyAddress = new AddressResponse
+                {
+                    StreetNo = existingBroker.CompanyAddress?.StreetNo,
+                    StreetName = existingBroker.CompanyAddress?.StreetName,
+                    City = existingBroker.CompanyAddress?.City,
+                    State = existingBroker.CompanyAddress?.State,
+                    ZipCode = existingBroker.CompanyAddress?.ZipCode
+                },
+                CACRegistrationNumber = existingBroker.CACRegistrationNumber?.Value,
+                StockBrokerLicense = existingBroker.StockBrokerLicense?.Value,
+                DateCertified = existingBroker.DateCertified,
+                //Users = existingBroker.Users.Select(u => new UserResponse
+                //{
+                //    Id = u.Id,
+                //    Email = u.Email
+                //}).ToList(),
+            };
+
+            resp.IsSuccessful = true;
+            resp.Value = updatedBrokerResponse;
+        }
+        catch (Exception ex)
+        {
+            resp.IsSuccessful = false;
+            resp.Error = "An error occurred while updating broker.";
+            resp.TechMessage = ex.Message;
+        }
+
+        return resp;
+    }
+
+    public async Task<ServiceResponse<BrokerResponse>> UpdateIndividualBroker(UpdateIndividualBrokerRequest request)
+    {
+        var resp = new ServiceResponse<BrokerResponse>();
+        try
+        {
+            var existingBrokerResponse = await GetBrokerById(request.BrokerId);
+
+            if (existingBrokerResponse == null || !existingBrokerResponse.IsSuccessful || existingBrokerResponse.Value == null)
+            {
+                resp.IsSuccessful = false;
+                resp.Error = "Broker not found.";
+                return resp;
+            }
+
+            var existingBroker = await _easyStockAppDbContext.Brokers
+                .Include(b => b.Users)
+                .FirstOrDefaultAsync(b => b.BrokerId == existingBrokerResponse.Value.BrokerId);
+
+            if (existingBroker == null)
+            {
+                throw new InvalidOperationException($"Broker with ID {existingBrokerResponse.Value.BrokerId} not found.");
+            }
+
+            await UpdateIndividualBrokerEntity(existingBroker, request);
+
+            _easyStockAppDbContext.Brokers.Update(existingBroker);
+            await _easyStockAppDbContext.SaveChangesAsync();
+
+            var updatedBrokerResponse = new BrokerResponse
+            {
+                BrokerId = existingBroker.BrokerId,
+                BusinessAddress = new AddressResponse
+                {
+                    StreetNo = existingBroker.BusinessAddress?.StreetNo,
+                    StreetName = existingBroker.BusinessAddress?.StreetName,
+                    City = existingBroker.BusinessAddress?.City,
+                    State = existingBroker.BusinessAddress?.State,
+                    ZipCode = existingBroker.BusinessAddress?.ZipCode
+                },
+                StockBrokerLicense = existingBroker.StockBrokerLicense?.Value,
+                DateCertified = existingBroker.DateCertified,
+                ProfessionalQualification = existingBroker.ProfessionalQualification,
+            };
+
+            _logger.LogInformation("Updated Broker Response: {@updatedBrokerResponse}", updatedBrokerResponse);
+
+            resp.IsSuccessful = true;
+            resp.Value = updatedBrokerResponse;
+        }
+        catch (Exception ex)
+        {
+            resp.IsSuccessful = false;
+            resp.Error = "An error occurred while updating broker.";
+            resp.TechMessage = ex.Message;
+        }
+
+        return resp;
+    }
+
+    public async Task<ServiceResponse<BrokerResponse>> UpdateFreelanceBroker(UpdateFreelanceBrokerRequest request)
+    {
+        var resp = new ServiceResponse<BrokerResponse>();
+        try
+        {
+            var existingBrokerResponse = await GetBrokerById(request.BrokerId);
+
+            if (existingBrokerResponse == null || !existingBrokerResponse.IsSuccessful || existingBrokerResponse.Value == null)
+            {
+                resp.IsSuccessful = false;
+                resp.Error = "Broker not found.";
+                return resp;
+            }
+
+            var existingBroker = await _easyStockAppDbContext.Brokers
+                .Include(b => b.Users)
+                .FirstOrDefaultAsync(b => b.BrokerId == existingBrokerResponse.Value.BrokerId);
+
+            if (existingBroker == null)
+            {
+                throw new InvalidOperationException($"Broker with ID {existingBrokerResponse.Value.BrokerId} not found.");
+            }
+
+            await UpdateFreelanceBrokerEntity(existingBroker, request);
+
+            _easyStockAppDbContext.Brokers.Update(existingBroker);
+            await _easyStockAppDbContext.SaveChangesAsync();
+
+            var updatedBrokerResponse = new BrokerResponse
+            {
+                BrokerId = existingBroker.BrokerId,
+                ProfessionalQualification = existingBroker.ProfessionalQualification,
+                //Users = existingBroker.Users.Select(u => new UserResponse
+                //{
+                //    Id = u.Id,
+                //    Email = u.Email
+                //}).ToList(),
+            };
+
+            resp.IsSuccessful = true;
+            resp.Value = updatedBrokerResponse;
+        }
+        catch (Exception ex)
+        {
+            resp.IsSuccessful = false;
+            resp.Error = "An error occurred while updating broker.";
+            resp.TechMessage = ex.Message;
+        }
+
+        return resp;
+    }
+
+    // Helper Methods
+
+    private async Task<List<UserResponse>> GetUsersForBroker(List<User> users)
+    {
+        var userResponses = new List<UserResponse>();
+
+        foreach (var user in users)
+        {
+            var userResponse = new UserResponse
+            {
+                Id = user.Id,
+                Email = user.Email
+            };
+
+            userResponses.Add(userResponse);
+        }
+
+        return userResponses;
+    }
+
     private async Task CreateUsersAndAssignToBroker(List<UserRequest> userRequests, int brokerId)
     {
         foreach (var userRequest in userRequests)
@@ -306,6 +622,46 @@ public sealed class BrokerService : IBrokerService
     private Broker CreateFreelanceBrokerEntity(CreateFreelanceBrokerRequest request)
     {
         return Broker.CreateFreelance(new List<User>(), request.ProfessionalQualification);
+    }
+
+    private async Task UpdateCorporateBrokerEntity(Broker existingBroker, UpdateCorporateBrokerRequest request)
+    {
+        // Validate and create new values
+        var companyEmail = Email.Update(request.CompanyEmail);
+        var companyMobileNo = MobileNo.Update(request.CompanyMobileNumber);
+        var companyAddress = Address.Update(request.StreetNo, request.StreetName, request.City, request.State, request.ZipCode);
+        var cac = CAC.Update(request.CACRegistrationNumber);
+        var stockBrokerLicense = StockBrokerLicense.Update(request.StockBrokerLicense);
+
+        existingBroker.UpdateCorporate(
+            request.CompanyName,
+            companyEmail,
+            companyMobileNo,
+            companyAddress,
+            cac,
+            stockBrokerLicense,
+            request.DateCertified
+        );
+    }
+
+    private async Task UpdateIndividualBrokerEntity(Broker existingBroker, UpdateIndividualBrokerRequest request)
+    {
+        var businessAddress = Address.Update(request.StreetNo, request.StreetName, request.City, request.State, request.ZipCode);
+        var stockBrokerLicense = StockBrokerLicense.Update(request.StockBrokerLicense);
+
+        existingBroker.UpdateIndividual(
+            businessAddress,
+            stockBrokerLicense,
+            request.DateCertified,
+            request.ProfessionalQualification
+        );
+    }
+    
+    private async Task UpdateFreelanceBrokerEntity(Broker existingBroker, UpdateFreelanceBrokerRequest request)
+    {
+        existingBroker.UpdateFreelance(
+            request.ProfessionalQualification
+        );
     }
 
     private static ServiceResponse<BrokerIdResponse> CreateDuplicateErrorResponse(ServiceResponse<BrokerIdResponse> resp, string entityType)

@@ -1,0 +1,9 @@
+﻿@model EasyStocks.DTO.Responses.BrokerListResponse
+
+<h1>Freelance Brokers</h1>
+<ul>
+    @foreach (var broker in Model.Brokers)
+    {
+        <li>@broker.CompanyName - @broker.CompanyEmail</li>
+    }
+</ul>

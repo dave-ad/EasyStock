@@ -20,6 +20,16 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+//app.Use(next => context =>
+//{
+//    if (context.Request.Query.ContainsKey("_method") &&
+//        context.Request.Query["_method"] == "PUT")
+//    {
+//        context.Request.Method = "PUT";
+//    }
+//    return next(context);
+//});
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -27,6 +37,14 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+//app.UseEndpoints(endpoints =>
+//{
+//    endpoints.MapControllers();
+//    endpoints.MapControllerRoute(
+//        name: "default",
+//        pattern: "{controller=Home}/{action=Index}/{id?}");
+//});
 
 app.MapControllerRoute(
     name: "default",

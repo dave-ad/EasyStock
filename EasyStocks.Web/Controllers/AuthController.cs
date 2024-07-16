@@ -1,10 +1,4 @@
-﻿using EasyStocks.Service.AuthServices;
-using EasyStocks.Web.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.AspNetCore.Mvc;
-
-namespace EasyStocks.Web.Controllers
+﻿namespace EasyStocks.Web.Controllers
 {
     public class AuthController : Controller
     {

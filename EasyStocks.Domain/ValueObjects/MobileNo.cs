@@ -17,4 +17,5 @@ public record MobileNo
     }
     public static MobileNo Default() => new MobileNo();
     public static MobileNo Create(string value) => new MobileNo(value);
+    public static MobileNo Update(string value) => new MobileNo(value);
 }

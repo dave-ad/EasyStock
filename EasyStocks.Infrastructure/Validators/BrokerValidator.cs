@@ -1,4 +1,4 @@
-﻿namespace EasyStocks.Infrastructure.Validator;
+﻿namespace EasyStocks.Infrastructure.Validators;
 
 public class BrokerValidator
 {

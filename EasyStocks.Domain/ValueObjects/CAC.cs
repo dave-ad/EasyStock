@@ -17,4 +17,5 @@ public record CAC
     }
     public static CAC Default() => new();
     public static CAC Create(string value) => new(value);
+    public static CAC Update(string value) => new(value);
 }
