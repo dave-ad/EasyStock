@@ -433,4 +433,32 @@ public class BrokerController : Controller
             return View(request);
         }
     }
+
+    //[HttpPost]
+    //[ValidateAntiForgeryToken]
+    //public async Task<IActionResult> DeleteBroker(int id)
+    //{
+    //    try
+    //    {
+    //        var response = await _brokerService.DeleteBroker(id);
+
+    //        if (response.IsSuccessful)
+    //        {
+    //            TempData["SuccessMessage"] = "Broker deleted successfully.";
+    //            return RedirectToAction(nameof(Index));
+    //        }
+    //        else
+    //        {
+    //            _logger.LogError("Failed to delete broker: {Error}", response.Error);
+    //            TempData["ErrorMessage"] = "Failed to delete broker.";
+    //            return RedirectToAction(nameof(Index));
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, "An exception occurred while deleting broker.");
+    //        TempData["ErrorMessage"] = "An error occurred while deleting broker.";
+    //        return RedirectToAction(nameof(Index));
+    //    }
+    //}
 }

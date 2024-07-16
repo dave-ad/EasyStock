@@ -8,7 +8,6 @@ internal class StocksConfig : IEntityTypeConfiguration<Stocks>
         builder.ToTable(nameof(Stocks));
         builder.HasKey(x => x.Id);
 
-        // Specify column types for decimal properties
         builder.Property(s => s.PricePerUnit)
                 .IsRequired()
                 .HasColumnType("decimal(18,2)");

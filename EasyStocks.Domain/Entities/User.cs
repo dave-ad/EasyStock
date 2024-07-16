@@ -8,9 +8,8 @@ public class User : IdentityUser
     public string? PositionInOrg { get; private set; } = default!;
     public DateOnly? DateOfEmployment { get; private set; }
 
-    // Navigation property to Broker
-    public int BrokerId { get; set; } // Foreign key
-    public Broker Broker { get; set; } // Navigation property
+    public int BrokerId { get; set; }
+    public Broker Broker { get; set; }
 
     private User() { }
     public User(FullName name, string email, MobileNo mobileNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment)

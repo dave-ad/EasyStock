@@ -95,6 +95,8 @@ public class StockService : IStockService
         return resp;
     }
 
+    // Helper Methods
+
     private Stocks CreateStockRequestEntity(CreateStockRequest request)
     {
         var stock = Stocks.Create(

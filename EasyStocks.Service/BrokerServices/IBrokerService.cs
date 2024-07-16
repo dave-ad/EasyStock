@@ -8,16 +8,8 @@ public interface IBrokerService
     Task<ServiceResponse<BrokerListResponse>> GetAllBrokers();
     Task<ServiceResponse<BrokerResponse>> GetBrokerById(int brokerId);
     Task<ServiceResponse<BrokerListResponse>> GetBrokersByType(BrokerType? brokerType = null);
-
     Task<ServiceResponse<BrokerResponse>> UpdateCorporateBroker(UpdateCorporateBrokerRequest request);
     Task<ServiceResponse<BrokerResponse>> UpdateIndividualBroker(UpdateIndividualBrokerRequest request);
     Task<ServiceResponse<BrokerResponse>> UpdateFreelanceBroker(UpdateFreelanceBrokerRequest request);
-
-    //Task<ServiceResponse<BrokerResponse>> UpdateCorporateBroker(UpdateCorporateBrokerRequest request);
-
-    //Task<ServiceResponse<BrokerResponse>> UpdateIndividualBroker(UpdateIndividualBrokerRequest request);
-
-    //Task<ServiceResponse<BrokerResponse>> UpdateFreelanceBroker(UpdateFreelanceBrokerRequest request);
-
-    //Task<ServiceResponse<BrokerIdResponse>> DeleteBroker(int brokerId);
+    //Task<ServiceResponse> DeleteBroker(int brokerId);
 }

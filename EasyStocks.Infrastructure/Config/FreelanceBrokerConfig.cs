@@ -13,7 +13,6 @@ internal class FreelanceBrokerConfig : IEntityTypeConfiguration<Broker>
             y.Property(z => z.Hash);
         });
 
-        // Configure User navigation property
         builder.HasMany(b => b.Users)
              .WithOne(u => u.Broker)
              .HasForeignKey(u => u.BrokerId)
