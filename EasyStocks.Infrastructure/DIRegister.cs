@@ -1,7 +1,4 @@
-﻿using EasyStocks.Infrastructure.Validators;
-using Microsoft.Extensions.Configuration;
-
-namespace EasyStocks.Infrastructure;
+﻿namespace EasyStocks.Infrastructure;
 
 public static class DIRegister
 {

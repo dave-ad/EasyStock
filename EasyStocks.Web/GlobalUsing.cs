@@ -10,3 +10,4 @@ global using EasyStocks.Utils.Enums;
 global using EasyStocks.Web.Models;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.AspNetCore.Mvc;
+global using System.Diagnostics;

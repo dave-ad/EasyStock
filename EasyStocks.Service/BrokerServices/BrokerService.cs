@@ -40,7 +40,6 @@ public sealed class BrokerService : IBrokerService
                         //UserId = int.TryParse(u.Id, out int userId) ? userId : 0,
                         Id = u.Id,
                         Email = u.Email,
-                        // Map other necessary properties from User
                     }).ToList(),
                     CompanyName = b.CompanyName,
                     CompanyEmail = b.CompanyEmail?.Value,
@@ -93,7 +92,7 @@ public sealed class BrokerService : IBrokerService
         {
             var broker = await _easyStockAppDbContext.Brokers
                 .Include(b => b.Users)
-                .FirstOrDefaultAsync(b => b.BrokerId == brokerId);
+                .FirstOrDefaultAsync(b => b.BrokerId == brokerId /*&& !b.Deleted*/); // Exclude deleted brokers
 
             if (broker == null)
             {
@@ -540,6 +539,38 @@ public sealed class BrokerService : IBrokerService
 
         return resp;
     }
+
+    //public async Task<ServiceResponse> DeleteBroker(int brokerId)
+    //{
+    //    var resp = new ServiceResponse();
+
+    //    var existingBrokerResponse = await GetBrokerById(brokerId);
+
+    //    if (existingBrokerResponse == null || !existingBrokerResponse.IsSuccessful || existingBrokerResponse.Value == null)
+    //    {
+    //        resp.IsSuccessful = false;
+    //        resp.Error = "Broker not found.";
+    //        return resp;
+    //    }
+
+    //    var existingBroker = await _easyStockAppDbContext.Brokers
+    //        .FirstOrDefaultAsync(b => b.BrokerId == existingBrokerResponse.Value.BrokerId);
+
+    //    if (existingBroker == null)
+    //    {
+    //        resp.IsSuccessful = false;
+    //        resp.Error = "Broker not found.";
+    //        return resp;
+    //    }
+
+    //    existingBroker.Delete();
+
+    //    _easyStockAppDbContext.Brokers.Update(existingBroker);
+    //    await _easyStockAppDbContext.SaveChangesAsync();
+
+    //    resp.IsSuccessful = true;
+    //    return resp;
+    //}
 
     // Helper Methods
 

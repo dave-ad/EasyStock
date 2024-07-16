@@ -1,8 +1,3 @@
-using EasyStocks.Service.StocksServices;
-using EasyStocks.Web.Models;
-using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-
 namespace EasyStocks.Web.Controllers
 {
     public class HomeController : Controller
@@ -13,7 +8,7 @@ namespace EasyStocks.Web.Controllers
         public HomeController(IStockService stockService, ILogger<HomeController> logger)
         {
             _stockService = stockService ?? throw new ArgumentNullException(nameof(stockService));
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         //public IActionResult Index()
