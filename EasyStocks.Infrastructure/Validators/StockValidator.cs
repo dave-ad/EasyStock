@@ -83,13 +83,6 @@ public class StockValidator
             return resp;
         }
 
-        if (request.InitialDeposit < 0)
-        {
-            resp.Error = "Initial Deposit must be a non-negative value.";
-            resp.IsSuccessful = false;
-            return resp;
-        }
-
         if (request.DateListed == default)
         {
             resp.Error = "Date Listed is required.";

@@ -108,7 +108,6 @@ public class StockService : IStockService
             request.OpeningDate,
             request.ClosingDate,
             request.MinimumPurchase,
-            request.InitialDeposit,
             request.DateListed,
             request.ListedBy
             );

@@ -10,7 +10,7 @@ public class CreateStockRequest
     public DateTime OpeningDate { get; set; }
     public DateTime ClosingDate { get; set; }
     public string MinimumPurchase { get; set; } = string.Empty;
-    public decimal InitialDeposit { get; set; }
+    //public decimal InitialDeposit { get; set; }
     public DateTime DateListed { get; set; }
     public string ListedBy { get; set; } = string.Empty;
 }

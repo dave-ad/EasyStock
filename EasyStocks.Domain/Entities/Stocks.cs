@@ -16,7 +16,11 @@ public class Stocks
     public string ListedBy { get; private set; }
 
     internal Stocks() { }
-    internal Stocks(string stockTitle, string companyName, string stockType, string totalUnits, decimal pricePerUnit, DateTime openingDate, DateTime closingDate, string minimunPurchase, decimal initialDeposit, DateTime dateListed, string listedBy) 
+    internal Stocks(string stockTitle, string companyName,
+                    string stockType, string totalUnits,
+                    decimal pricePerUnit, DateTime openingDate,
+                    DateTime closingDate, string minimumPurchase, 
+                    DateTime dateListed, string listedBy) 
     {
         StockTitle = stockTitle;
         CompanyName = companyName;
@@ -25,14 +29,31 @@ public class Stocks
         PricePerUnit = pricePerUnit;
         OpeningDate = openingDate;
         ClosingDate = closingDate;
-        MinimumPurchase = minimunPurchase;
-        InitialDeposit = initialDeposit;
+        MinimumPurchase = minimumPurchase;
+        InitialDeposit = CalculateInitialDeposit(pricePerUnit, minimumPurchase);
         DateListed = dateListed;
         ListedBy = listedBy;
     }
 
-    public static Stocks Create(string stockTitle, string companyName, string stockType, string totalUnits, decimal pricePerUnit, DateTime openingDate, DateTime closingDate, string minimunPurchase, decimal initialDeposit, DateTime dateListed, string listedBy)
+    private decimal CalculateInitialDeposit(decimal pricePerUnit, string minimumPurchase)
     {
-        return new Stocks(stockTitle, companyName, stockType, totalUnits, pricePerUnit, openingDate, closingDate, minimunPurchase, initialDeposit, dateListed, listedBy);
+        if (decimal.TryParse(minimumPurchase, out var minPurchaseUnits))
+        {
+            return pricePerUnit * minPurchaseUnits;
+        }
+        throw new ArgumentException("MinimumPurchase must be a valid number.");
+    }
+
+    public static Stocks Create(string stockTitle, string companyName,
+                                string stockType, string totalUnits, 
+                                decimal pricePerUnit, DateTime openingDate,
+                                DateTime closingDate, string minimumPurchase, 
+                                DateTime dateListed, string listedBy)
+    {
+        return new Stocks(stockTitle, companyName, 
+                            stockType, totalUnits,
+                            pricePerUnit, openingDate, 
+                            closingDate, minimumPurchase, 
+                            dateListed, listedBy);
     }
 }
