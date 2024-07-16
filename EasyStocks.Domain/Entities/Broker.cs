@@ -15,7 +15,7 @@ public partial class Broker : Entity
     public DateOnly? DateCertified { get; private set; }
 
     // Individual Brokers
-    public Address BusinessAddress { get; private set; } = Address.Default();
+    public Address? BusinessAddress { get; private set; } = Address.Default();
 
     // Freelance Brokers
     public string? ProfessionalQualification { get; private set; } = default!;

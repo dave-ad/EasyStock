@@ -1,5 +1,54 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@model BrokerListResponse
+
+<h1>Brokers</h1>
+<div>
+    <h3>Filter Brokers By Type:</h3>
+    <div>
+        <a asp-action="GetBrokersByType" asp-route-brokerType="BrokerType.0" class="btn btn-primary">Corporate Brokers</a>
+        <a asp-action="GetBrokersByType" asp-route-brokerType="BrokerType.1" class="btn btn-primary">Individual Brokers</a>
+        <a asp-action="GetBrokersByType" asp-route-brokerType="BrokerType.2" class="btn btn-primary">Freelance Brokers</a>
+    </div>
+</div>
+
+@if (Model != null && Model.Brokers != null && Model.Brokers.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Stock Broker License</th>
+                <th>Email</th>
+                <th>Company Name</th>
+                <th>Company Email</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var broker in Model.Brokers)
+            {
+                <tr>
+                    <td>@broker.BrokerType</td>
+                    <td>@broker.StockBrokerLicense</td>
+                    <td>
+                        @foreach (var user in broker.Users)
+                        {
+                            <span>@user.Email</span>
+                            <br />
+                        }
+                    </td>
+                    <td>@broker.CompanyName</td>
+                    <td>@broker.CompanyEmail</td>
+                    <td>@broker.Status</td>
+                    <td>
+                        <a asp-action="BrokerDetails" asp-route-id="@broker.BrokerId" class="btn btn-primary">Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No Broker found.</p>
 }

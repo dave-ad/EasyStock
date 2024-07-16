@@ -29,4 +29,7 @@ public record Address
     public static Address Default() => new();
     public static Address Create(string streetNo, string streetName, string city, string state, string zipCode)
         => new(streetNo, streetName, city, state, zipCode);
+    
+    public static Address Update(string streetNo, string streetName, string city, string state, string zipCode)
+        => new(streetNo, streetName, city, state, zipCode);
 }

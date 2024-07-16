@@ -17,4 +17,5 @@ public record StockBrokerLicense
     }
     public static StockBrokerLicense Default() => new();
     public static StockBrokerLicense Create(string value) => new(value);
+    public static StockBrokerLicense Update(string value) => new(value);
 }

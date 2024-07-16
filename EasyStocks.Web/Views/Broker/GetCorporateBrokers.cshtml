@@ -1,13 +1,11 @@
-﻿@model BrokerListResponse
+﻿@model EasyStocks.DTO.Responses.BrokerListResponse
 
-<h1>Brokers</h1>
-
+<h1>Corporate Brokers</h1>
 @if (Model != null && Model.Brokers != null && Model.Brokers.Count > 0)
 {
     <table class="table">
         <thead>
             <tr>
-                <th>Broker ID</th>
                 <th>Type</th>
                 <th>Stock Broker License</th>
                 <th>Email</th>
@@ -21,21 +19,20 @@
             @foreach (var broker in Model.Brokers)
             {
                 <tr>
-                    <td>@broker.BrokerId</td>
                     <td>@broker.BrokerType</td>
                     <td>@broker.StockBrokerLicense</td>
                     <td>
                         @foreach (var user in broker.Users)
                         {
                             <span>@user.Email</span>
-                            <br/>
+                            <br />
                         }
                     </td>
                     <td>@broker.CompanyName</td>
                     <td>@broker.CompanyEmail</td>
                     <td>@broker.Status</td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@broker.BrokerId" class="btn btn-primary">Details</a>
+                        <a asp-action="BrokerDetails" asp-route-id="@broker.BrokerId" class="btn btn-primary">Details</a>
                     </td>
                 </tr>
             }
@@ -44,5 +41,5 @@
 }
 else
 {
-    <p>No Broker found.</p>
+    <p>No Corporate Brokers found.</p>
 }

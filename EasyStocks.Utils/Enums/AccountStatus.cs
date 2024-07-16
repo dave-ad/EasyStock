@@ -8,5 +8,6 @@ public enum AccountStatus
 
     InActive = 0,
     Registered,
-    Authorized
+    Authorized,
+    Deleted
 }

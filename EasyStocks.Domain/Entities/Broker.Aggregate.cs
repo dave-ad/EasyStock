@@ -21,7 +21,7 @@ public partial class Broker : IAggregateRoot
     }
 
     // Individual Broker
-    private Broker(List<User> users, 
+    private Broker(List<User> users,
                     StockBrokerLicense stockBrokerLicenseNumber, DateOnly dateCertified,
                     AccountStatus status, Address businessAddress,
                     string professionalQualification, BrokerType brokerType)
@@ -34,7 +34,7 @@ public partial class Broker : IAggregateRoot
         ProfessionalQualification = professionalQualification;
         BrokerType = brokerType;
     }
-    
+
     // Freelance Broker
     private Broker(List<User> users, AccountStatus status,
                     string professionalQualification, BrokerType brokerType)
@@ -52,13 +52,13 @@ public partial class Broker : IAggregateRoot
     {
 
         return new Broker(companyName, companyEmail, companyMobileNumber, companyAddress,
-                            cacRegistrationNumber, stockBrokerLicense, dateCertified, 
+                            cacRegistrationNumber, stockBrokerLicense, dateCertified,
                             AccountStatus.Pending, BrokerType.Corporate, users);
     }
-    
+
     public static Broker CreateIndividual(List<User> users,
                                             StockBrokerLicense stockBrokerLicenseNumber,
-                                            DateOnly dateCertified, Address businessAddress, 
+                                            DateOnly dateCertified, Address businessAddress,
                                             string professionalQualification)
     {
 
@@ -66,11 +66,38 @@ public partial class Broker : IAggregateRoot
                             stockBrokerLicenseNumber, dateCertified, AccountStatus.Pending,
                             businessAddress, professionalQualification, BrokerType.Individual);
     }
-    
+
     public static Broker CreateFreelance(List<User> users, string professionalQualification)
     {
 
         return new Broker(users,
                             AccountStatus.Pending, professionalQualification, BrokerType.Freelance);
+    }
+
+    public void UpdateCorporate(string companyName, Email companyEmail, MobileNo companyMobileNumber,
+                                    Address companyAddress, CAC cacRegistrationNumber,
+                                    StockBrokerLicense stockBrokerLicense, DateOnly? dateCertified)
+    {
+        CompanyName = companyName;
+        CompanyEmail = companyEmail;
+        CompanyMobileNumber = companyMobileNumber;
+        CompanyAddress = companyAddress;
+        CACRegistrationNumber = cacRegistrationNumber;
+        StockBrokerLicense = stockBrokerLicense;
+        DateCertified = dateCertified;
+    }
+
+    public void UpdateIndividual(Address businessAddress, StockBrokerLicense stockBrokerLicense,
+                                 DateOnly? dateCertified, string professionalQualification)
+    {
+        BusinessAddress = businessAddress;
+        StockBrokerLicense = stockBrokerLicense;
+        DateCertified = dateCertified;
+        ProfessionalQualification = professionalQualification;
+    }
+
+    public void UpdateFreelance(string professionalQualification)
+    {
+        ProfessionalQualification = professionalQualification;
     }
 }

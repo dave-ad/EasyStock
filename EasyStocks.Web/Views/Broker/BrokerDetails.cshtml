@@ -1,56 +1,170 @@
 ﻿@model EasyStocks.DTO.Responses.BrokerResponse
 
 <h1>Broker Details</h1>
+<a href="@Url.Action("Index", "Broker")" class="btn btn-primary">Back to List</a>
+@if (Model.BrokerType == BrokerType.Corporate)
+{
+    <a href="@Url.Action("UpdateCorporateBroker", "Broker", new { id = Model.BrokerId })" class="btn btn-secondary">Edit</a>
+}
+else if (Model.BrokerType == BrokerType.Individual)
+{
+    <a href="@Url.Action("UpdateIndividualBroker", "Broker", new { id = Model.BrokerId })" class="btn btn-secondary">Edit</a>
+}
+else if (Model.BrokerType == BrokerType.Freelance)
+{
+    <a href="@Url.Action("UpdateFreelanceBroker", "Broker", new { id = Model.BrokerId })" class="btn btn-secondary">Edit</a>
+}
 
-<table class="table">
-    <tr>
-        <th>Broker ID</th>
-        <td>@Model.BrokerId</td>
-    </tr>
-    <tr>
-        <th>Company Name</th>
-        <td>@Model.CompanyName</td>
-    </tr>
-    <tr>
-        <th>Company Email</th>
-        <td>@Model.CompanyEmail</td>
-    </tr>
-    <tr>
-        <th>Company Mobile Number</th>
-        <td>@Model.CompanyMobileNumber</td>
-    </tr>
-    <tr>
-        <th>Company Address</th>
-        <td>@Model.CompanyAddress?.StreetNo @Model.CompanyAddress?.StreetName, @Model.CompanyAddress?.City, @Model.CompanyAddress?.State @Model.CompanyAddress?.ZipCode</td>
-    </tr>
-    <tr>
-        <th>CAC Registration Number</th>
-        <td>@Model.CACRegistrationNumber</td>
-    </tr>
-    <tr>
-        <th>Stock Broker License</th>
-        <td>@Model.StockBrokerLicense</td>
-    </tr>
-    <tr>
-        <th>Date Certified</th>
-        <td>@Model.DateCertified</td>
-    </tr>
-    <tr>
-        <th>Business Address</th>
-        <td>@Model.BusinessAddress?.StreetNo @Model.BusinessAddress?.StreetName, @Model.BusinessAddress?.City, @Model.BusinessAddress?.State @Model.BusinessAddress?.ZipCode</td>
-    </tr>
-    <tr>
-        <th>Professional Qualification</th>
-        <td>@Model.ProfessionalQualification</td>
-    </tr>
-    <tr>
-        <th>Broker Type</th>
-        <td>@Model.BrokerType</td>
-    </tr>
-    <tr>
-        <th>Status</th>
-        <td>@Model.Status</td>
-    </tr>
-</table>
 
-<a href="@Url.Action("Index", "Broker")">Back to List</a>
+
+@if (Model.BrokerType == BrokerType.Corporate)
+{
+    <table class="table">
+        <tr>
+            <th>Company Name</th>
+            <td>@Model.CompanyName</td>
+        </tr>
+        <tr>
+            <th>Company Email</th>
+            <td>@Model.CompanyEmail</td>
+        </tr>
+        <tr>
+            <th>Company Mobile Number</th>
+            <td>@Model.CompanyMobileNumber</td>
+        </tr>
+        <tr>
+            <th>Company Address</th>
+            <td>
+                @if (Model.CompanyAddress != null)
+                {
+                    <address>
+                        @Model.CompanyAddress.StreetNo @Model.CompanyAddress.StreetName<br />
+                        @Model.CompanyAddress.City, @Model.CompanyAddress.State @Model.CompanyAddress.ZipCode
+                    </address>
+                }
+                else
+                {
+                    <span>No address specified</span>
+                }
+            </td>
+        </tr>
+        <tr>
+            <th>CAC Registration Number</th>
+            <td>@Model.CACRegistrationNumber</td>
+        </tr>
+        <tr>
+            <th>Stock Broker License</th>
+            <td>@Model.StockBrokerLicense</td>
+        </tr>
+        <tr>
+            <th>Date Certified</th>
+            <td>@Model.DateCertified</td>
+        </tr>
+        <tr>
+            <th>Broker Type</th>
+            <td>@Model.BrokerType</td>
+        </tr>
+        <tr>
+            <th>Stock Broker License</th>
+            <td>@Model.StockBrokerLicense</td>
+        </tr>
+        <tr>
+            <th>Status</th>
+            <td>@Model.Status</td>
+        </tr>
+        <tr>
+            <th>Users</th>
+            <td>
+                <ul>
+                    @foreach (var user in Model.Users)
+                    {
+                        @* <li>@user.Email (ID: @user.Id)</li> *@
+                        <li>@user.Email</li>
+                    }
+                </ul>
+            </td>
+        </tr>
+    </table>
+}
+else if (Model.BrokerType == BrokerType.Individual)
+{
+    <table class="table">
+        <tr>
+            <th>Business Address</th>
+            <td>
+                @if (Model.BusinessAddress != null)
+                {
+                    <address>
+                        @Model.BusinessAddress.StreetNo @Model.BusinessAddress.StreetName<br />
+                        @Model.BusinessAddress.City, @Model.BusinessAddress.State @Model.BusinessAddress.ZipCode
+                    </address>
+                }
+                else
+                {
+                    <span>No address specified</span>
+                }
+            </td>
+        </tr>
+        <tr>
+            <th>Stock Broker License</th>
+            <td>@Model.StockBrokerLicense</td>
+        </tr>
+        <tr>
+            <th>Date Certified</th>
+            <td>@Model.DateCertified</td>
+        </tr>
+        <tr>
+            <th>Broker Type</th>
+            <td>@Model.BrokerType</td>
+        </tr>
+        <tr>
+            <th>Stock Broker License</th>
+            <td>@Model.StockBrokerLicense</td>
+        </tr>
+        <tr>
+            <th>Professional Qualification</th>
+            <td>@Model.ProfessionalQualification</td>
+        </tr>
+        <tr>
+            <th>Status</th>
+            <td>@Model.Status</td>
+        </tr>
+
+        <tr>
+            <th>Users</th>
+            <td>
+                <ul>
+                    @foreach (var user in Model.Users)
+                    {
+                        <li>@user.Email</li>
+                    }
+                </ul>
+            </td>
+        </tr>
+    </table>
+}
+else if (Model.BrokerType == BrokerType.Freelance)
+{
+    <table class="table">
+        <tr>
+            <th>Professional Qualification</th>
+            <td>@Model.ProfessionalQualification</td>
+        </tr>
+        <tr>
+            <th>Status</th>
+            <td>@Model.Status</td>
+        </tr>
+
+        <tr>
+            <th>Users</th>
+            <td>
+                <ul>
+                    @foreach (var user in Model.Users)
+                    {
+                        <li>@user.Email</li>
+                    }
+                </ul>
+            </td>
+        </tr>
+    </table>
+}

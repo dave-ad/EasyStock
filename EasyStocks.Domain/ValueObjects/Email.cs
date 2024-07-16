@@ -17,4 +17,5 @@ public record Email
     }
     public static Email Default() => new();
     public static Email Create(string value) => new(value);
+    public static Email Update(string value) => new(value);
 }

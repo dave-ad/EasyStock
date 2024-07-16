@@ -24,6 +24,12 @@ internal sealed class EasyStockAppDbContext : IdentityDbContext<User>, IEasyStoc
         builder.ApplyConfiguration(new UserConfig());
     }
 
+    //public async Task UpdateAsync<TEntity>(TEntity entity) where TEntity : class
+    //{
+    //    Entry(entity).State = EntityState.Modified;
+    //    await SaveChangesAsync();
+    //}
+
     public DbSet<Broker> Brokers { get; set; }
     public DbSet<Stocks> Stocks { get; set; }
 }
