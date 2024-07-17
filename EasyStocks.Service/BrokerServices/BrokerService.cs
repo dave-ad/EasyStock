@@ -15,13 +15,20 @@ public sealed class BrokerService : IBrokerService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    /// <summary>
+    /// Retrieves a list of brokers from the database.
+    /// </summary>
+    /// <param name="brokers">A list of broker IDs to retrieve.</param>
+    /// <returns>A list of broker objects.</returns>
     public async Task<ServiceResponse<BrokerListResponse>> GetAllBrokers()
     {
         var resp = new ServiceResponse<BrokerListResponse>();
 
         try
         {
-            var brokers = await _easyStockAppDbContext.Brokers.Include(b => b.Users).ToListAsync();
+            var brokers = await _easyStockAppDbContext.Brokers
+                .Include(b => b.Users)
+                .ToListAsync();
 
             if (brokers == null || !brokers.Any())
             {
@@ -565,11 +572,7 @@ public sealed class BrokerService : IBrokerService
     //    return resp;
     //}
 
-    /// <summary>
     /// Helper Methods
-    /// </summary>
-    /// <param name="users"></param>
-    /// <returns></returns>
 
     private async Task<List<UserResponse>> GetUsersForBroker(List<User> users)
     {

@@ -253,31 +253,31 @@ public class BrokerController : Controller
     [HttpGet]
     public async Task<IActionResult> UpdateCorporateBroker(int id)
     {
-        var response = await _brokerService.GetBrokerById(id);
+        var resp = await _brokerService.GetBrokerById(id);
 
-        if (response.IsSuccessful)
+        if (resp.IsSuccessful)
         {
             var updateRequest = new UpdateCorporateBrokerRequest
             {
-                BrokerId = response.Value.BrokerId,
-                CompanyName = response.Value.CompanyName,
-                CompanyEmail = response.Value.CompanyEmail,
-                CompanyMobileNumber = response.Value.CompanyMobileNumber,
-                StreetNo = response.Value.CompanyAddress?.StreetNo,
-                StreetName = response.Value.CompanyAddress?.StreetName,
-                City = response.Value.CompanyAddress?.City,
-                State = response.Value.CompanyAddress?.State,
-                ZipCode = response.Value.CompanyAddress?.ZipCode,
-                CACRegistrationNumber = response.Value.CACRegistrationNumber,
-                StockBrokerLicense = response.Value.StockBrokerLicense,
-                DateCertified = response.Value.DateCertified
+                BrokerId = resp.Value.BrokerId,
+                CompanyName = resp.Value.CompanyName,
+                CompanyEmail = resp.Value.CompanyEmail,
+                CompanyMobileNumber = resp.Value.CompanyMobileNumber,
+                StreetNo = resp.Value.CompanyAddress?.StreetNo,
+                StreetName = resp.Value.CompanyAddress?.StreetName,
+                City = resp.Value.CompanyAddress?.City,
+                State = resp.Value.CompanyAddress?.State,
+                ZipCode = resp.Value.CompanyAddress?.ZipCode,
+                CACRegistrationNumber = resp.Value.CACRegistrationNumber,
+                StockBrokerLicense = resp.Value.StockBrokerLicense,
+                DateCertified = resp.Value.DateCertified
             };
 
             return View(updateRequest);
         }
         else
         {
-            _logger.LogError("Failed to retrieve broker for update: {Error}", response.Error);
+            _logger.LogError("Failed to retrieve broker for update: {Error}", resp.Error);
             ModelState.AddModelError(string.Empty, "Failed to retrieve broker for update");
             return View();
         }

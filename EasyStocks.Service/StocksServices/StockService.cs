@@ -4,8 +4,8 @@ public class StockService : IStockService
 {
     private readonly IEasyStockAppDbContext _easyStockAppDbContext;
     private readonly StockValidator _validator;
-    private readonly ILogger<BrokerService> _logger;
-    public StockService(IEasyStockAppDbContext easyStockAppDbContext, StockValidator validator, ILogger<BrokerService> logger)
+    private readonly ILogger<StockService> _logger;
+    public StockService(IEasyStockAppDbContext easyStockAppDbContext, StockValidator validator, ILogger<StockService> logger)
     {
         _easyStockAppDbContext = easyStockAppDbContext ?? throw new ArgumentNullException(nameof(easyStockAppDbContext));
         _validator = validator ?? throw new ArgumentNullException(nameof(validator));
@@ -28,7 +28,7 @@ public class StockService : IStockService
                 if (existingStock)
                     return CreateDuplicateErrorResponse(resp, "Stocks");
 
-                var stocks = CreateStockRequestEntity(request);
+                var stocks = CreateStockEntity(request);
 
                 var retStocks = _easyStockAppDbContext.Stocks.Add(stocks);
                 await _easyStockAppDbContext.SaveChangesAsync();
@@ -105,7 +105,7 @@ public class StockService : IStockService
             if (stock == null)
             {
                 resp.IsSuccessful = false;
-                resp.Error = "Broker not found.";
+                resp.Error = "Stock not found.";
                 return resp;
             }
 
@@ -134,6 +134,62 @@ public class StockService : IStockService
             resp.Error = "An error occurred while fetching stock.";
             resp.TechMessage = ex.Message;
         }
+        return resp;
+    }
+
+    public async Task<ServiceResponse<StockResponse>> UpdateStock(UpdateStockRequest request)
+    {
+        var resp = new ServiceResponse<StockResponse>();
+        try
+        {
+            var existingStockResponse = await GetStockById(request.Id);
+
+            if (existingStockResponse == null || !existingStockResponse.IsSuccessful || existingStockResponse.Value == null)
+            {
+                resp.IsSuccessful = false;
+                resp.Error = "Stock not found.";
+                return resp;
+            }
+
+            var existingStock = await _easyStockAppDbContext.Stocks
+                .FirstOrDefaultAsync(b => b.Id == existingStockResponse.Value.Id);
+
+            if (existingStock == null)
+            {
+                throw new InvalidOperationException($"Stock with ID {existingStockResponse.Value.Id} not found.");
+            }
+
+            await UpdateStockEntity(existingStock, request);
+
+            _easyStockAppDbContext.Stocks.Update(existingStock);
+            await _easyStockAppDbContext.SaveChangesAsync();
+
+            var updatedStockResponse = new StockResponse
+            {
+                Id = existingStock.Id,
+                StockTitle = existingStock.StockTitle,
+                CompanyName = existingStock.CompanyName,
+                StockType = existingStock.StockType,
+                TotalUnits = existingStock.TotalUnits,
+                PricePerUnit = existingStock.PricePerUnit,
+                OpeningDate = existingStock.OpeningDate,
+                ClosingDate = existingStock.ClosingDate,
+                MinimumPurchase = existingStock.MinimumPurchase,
+                InitialDeposit = existingStock.InitialDeposit,
+                DateListed = existingStock.DateListed,
+                ListedBy = existingStock.ListedBy
+            };
+
+            resp.IsSuccessful = true;
+            resp.Value = updatedStockResponse;
+        }
+        catch (Exception ex)
+        {
+            resp.IsSuccessful = false;
+            resp.Error = "An error occurred while updating stock.";
+            resp.TechMessage = ex.Message;
+        }
+
         return resp;
     }
 
@@ -176,7 +232,7 @@ public class StockService : IStockService
 
     // Helper Methods
 
-    private Stocks CreateStockRequestEntity(CreateStockRequest request)
+    private Stocks CreateStockEntity(CreateStockRequest request)
     {
         var stock = Stocks.Create(
             request.StockTitle,
@@ -192,6 +248,22 @@ public class StockService : IStockService
             );
 
         return stock;
+    }
+
+    private async Task UpdateStockEntity(Stocks existingStock, UpdateStockRequest request)
+    {
+        existingStock.Update(
+            request.StockTitle,
+            request.CompanyName,
+            request.StockType,
+            request.TotalUnits,
+            request.PricePerUnit,
+            request.OpeningDate,
+            request.ClosingDate,
+            request.MinimumPurchase,
+            request.DateListed,
+            request.ListedBy
+        );
     }
 
     private static ServiceResponse<StockIdResponse> CreateDuplicateErrorResponse(ServiceResponse<StockIdResponse> resp, string entityType)

@@ -1,7 +1,8 @@
 ﻿namespace EasyStocks.DTO.Requests;
 
-public class CreateStockRequest
+public class UpdateStockRequest
 {
+    public int Id { get; set; }
     public string StockTitle { get; set; } = string.Empty;
     public string CompanyName { get; set; } = string.Empty;
     public string StockType { get; set; } = string.Empty;
