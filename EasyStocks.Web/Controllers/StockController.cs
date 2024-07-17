@@ -65,4 +65,63 @@ public class StockController : Controller
             return View(nameof(AddStock), request);
         }
     }
+
+    [HttpGet]
+    [Route("Stock/GetStockById/{id}")]
+    public async Task<IActionResult> GetStockById(int id)
+    {
+        var resp = await _stockService.GetStockById(id);
+
+        if (!resp.IsSuccessful)
+        {
+            _logger.LogError("Failed to fetch stock: {Message}", resp.Error);
+            ModelState.AddModelError(string.Empty, "Failed to fetch stock");
+            return NotFound(resp.Error);
+        }
+
+        return Ok(resp.Value);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> StockDetails(int id)
+    {
+        var response = await _stockService.GetStockById(id);
+
+        if (response.IsSuccessful)
+        {
+            return View(response.Value);
+        }
+        else
+        {
+            _logger.LogError("Failed to retrieve broker: {Error}", response.Error);
+            ModelState.AddModelError(string.Empty, "Failed to retrieve broker");
+            return View();
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteStock(int id)
+    {
+        try
+        {
+            var response = await _stockService.DeleteStock(id);
+
+            if (response.IsSuccessful)
+            {
+                TempData["SuccessMessage"] = "Stock deleted successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = $"Failed to delete stock: {response.Error}";
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred while deleting stock.");
+            TempData["ErrorMessage"] = "An error occurred while deleting stock.";
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
 }

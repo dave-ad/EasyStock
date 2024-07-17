@@ -27,6 +27,15 @@ public class StockValidator
             return resp;
         }
 
+        var validStockTypes = new List<string> { "Common", "Preferred" };
+        if (!validStockTypes.Contains(request.StockType))
+        {
+            resp.Error = "Invalid Stock Type. Stock type can only be 'Common' or 'Preferred'.";
+            resp.IsSuccessful = false;
+            return resp;
+        }
+
+
         if (string.IsNullOrWhiteSpace(request.TotalUnits))
         {
             resp.Error = "Total Units is required.";

@@ -85,11 +85,90 @@ public class StockService : IStockService
         }
         catch (Exception ex)
         {
-            //_logger.LogError(ex, "An error occurred while retrieving all stocks.");
-            //return CreateExceptionResponse(resp, ex);
+            _logger.LogError(ex, "An error occurred while retrieving all stocks.");
             resp.IsSuccessful = false;
             resp.Error = "An error occurred while fetching stocks.";
             resp.TechMessage = ex.Message;
+        }
+
+        return resp;
+    }
+
+    public async Task<ServiceResponse<StockResponse>> GetStockById(int stockId)
+    {
+        var resp = new ServiceResponse<StockResponse>();
+        try
+        {
+            var stock = await _easyStockAppDbContext.Stocks
+                .FirstOrDefaultAsync(s => s.Id == stockId);
+
+            if (stock == null)
+            {
+                resp.IsSuccessful = false;
+                resp.Error = "Broker not found.";
+                return resp;
+            }
+
+            var stockResponse = new StockResponse
+            {
+                Id = stockId,
+                StockTitle = stock.StockTitle,
+                CompanyName = stock.CompanyName,
+                StockType = stock.StockType,
+                TotalUnits = stock.TotalUnits,
+                PricePerUnit = stock.PricePerUnit,
+                OpeningDate = stock.OpeningDate,
+                ClosingDate = stock.ClosingDate,
+                MinimumPurchase = stock.MinimumPurchase,
+                InitialDeposit = stock.InitialDeposit,
+                DateListed = stock.DateListed,
+                ListedBy = stock.ListedBy
+            };
+
+            resp.IsSuccessful = true;
+            resp.Value = stockResponse;
+        }
+        catch (Exception ex)
+        {
+            resp.IsSuccessful = false;
+            resp.Error = "An error occurred while fetching stock.";
+            resp.TechMessage = ex.Message;
+        }
+        return resp;
+    }
+
+    public async Task<ServiceResponse<DeleteStockResponse>> DeleteStock(int stockId)
+    {
+        var resp = new ServiceResponse<DeleteStockResponse>();
+
+        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            try
+            {
+                var stock = await _easyStockAppDbContext.Stocks.FindAsync(stockId);
+
+                if (stock == null)
+                {
+                    resp.Error = "Stock not found.";
+                    resp.IsSuccessful = false;
+                    return resp;
+                }
+
+                _easyStockAppDbContext.Stocks.Remove(stock);
+                await _easyStockAppDbContext.SaveChangesAsync();
+
+                resp.Value = new DeleteStockResponse { Success = true };
+                resp.IsSuccessful = true;
+
+                transaction.Complete();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while deleting the stock.");
+                resp.IsSuccessful = false;
+                resp.Error = "An error occurred while deleting the stock.";
+                resp.TechMessage = ex.Message;
+            }
         }
 
         return resp;

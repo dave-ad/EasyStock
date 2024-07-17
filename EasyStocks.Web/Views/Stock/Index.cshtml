@@ -21,6 +21,7 @@
                 <th>Initial Deposit</th>
                 <th>Date Listed</th>
                 <th>Listed By</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -39,6 +40,10 @@
                     <td>@stock.InitialDeposit</td>
                     <td>@stock.DateListed.ToShortDateString()</td>
                     <td>@stock.ListedBy</td>
+                    <td>
+                        <a asp-action="StockDetails" asp-route-id="@stock.Id" class="btn btn-primary">Details</a>
+                        
+                    </td>
                 </tr>
             }
         </tbody>
