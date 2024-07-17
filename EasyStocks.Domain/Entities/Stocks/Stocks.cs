@@ -5,6 +5,7 @@ public class Stocks
     public int Id { get; private set; }
     public string StockTitle { get; private set; }
     public string CompanyName { get; private set; }
+    //public StockType StockType { get; private set; }
     public string StockType { get; private set; }
     public string TotalUnits { get; private set; }
     public decimal PricePerUnit { get; private set; }
@@ -19,8 +20,8 @@ public class Stocks
     internal Stocks(string stockTitle, string companyName,
                     string stockType, string totalUnits,
                     decimal pricePerUnit, DateTime openingDate,
-                    DateTime closingDate, string minimumPurchase, 
-                    DateTime dateListed, string listedBy) 
+                    DateTime closingDate, string minimumPurchase,
+                    DateTime dateListed, string listedBy)
     {
         StockTitle = stockTitle;
         CompanyName = companyName;
@@ -41,19 +42,19 @@ public class Stocks
         {
             return pricePerUnit * minPurchaseUnits;
         }
-        throw new ArgumentException("MinimumPurchase must be a valid number.");
+        throw new ArgumentException("Minimum Purchase must be a valid number.");
     }
 
     public static Stocks Create(string stockTitle, string companyName,
-                                string stockType, string totalUnits, 
+                                string stockType, string totalUnits,
                                 decimal pricePerUnit, DateTime openingDate,
-                                DateTime closingDate, string minimumPurchase, 
+                                DateTime closingDate, string minimumPurchase,
                                 DateTime dateListed, string listedBy)
     {
-        return new Stocks(stockTitle, companyName, 
+        return new Stocks(stockTitle, companyName,
                             stockType, totalUnits,
-                            pricePerUnit, openingDate, 
-                            closingDate, minimumPurchase, 
+                            pricePerUnit, openingDate,
+                            closingDate, minimumPurchase,
                             dateListed, listedBy);
     }
 }

@@ -65,4 +65,31 @@ public class StockController : Controller
             return View(nameof(AddStock), request);
         }
     }
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteStock(int id)
+    {
+        try
+        {
+            var response = await _stockService.DeleteStock(id);
+
+            if (response.IsSuccessful)
+            {
+                TempData["SuccessMessage"] = "Stock deleted successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = $"Failed to delete stock: {response.Error}";
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred while deleting stock.");
+            TempData["ErrorMessage"] = "An error occurred while deleting stock.";
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
 }
