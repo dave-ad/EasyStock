@@ -57,4 +57,22 @@ public class Stocks
                             closingDate, minimumPurchase,
                             dateListed, listedBy);
     }
+
+    public void Update(string stockTitle, string companyName,
+                            string stockType, string totalUnits,
+                            decimal pricePerUnit, DateTime openingDate,
+                            DateTime closingDate, string minimumPurchase,
+                            DateTime dateListed, string listedBy)
+    {
+        StockTitle = stockTitle;
+        CompanyName = companyName;
+        StockType = stockType;
+        TotalUnits = totalUnits;
+        PricePerUnit = pricePerUnit;
+        OpeningDate = openingDate;
+        ClosingDate = closingDate;
+        MinimumPurchase = minimumPurchase;
+        DateListed = dateListed;
+        ListedBy = listedBy;
+    }
 }

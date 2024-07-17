@@ -85,17 +85,78 @@ public class StockController : Controller
     [HttpGet]
     public async Task<IActionResult> StockDetails(int id)
     {
-        var response = await _stockService.GetStockById(id);
+        var resp = await _stockService.GetStockById(id);
 
-        if (response.IsSuccessful)
+        if (resp.IsSuccessful)
         {
-            return View(response.Value);
+            return View(resp.Value);
         }
         else
         {
-            _logger.LogError("Failed to retrieve broker: {Error}", response.Error);
-            ModelState.AddModelError(string.Empty, "Failed to retrieve broker");
+            _logger.LogError("Failed to retrieve stock: {Error}", resp.Error);
+            ModelState.AddModelError(string.Empty, "Failed to retrieve stock");
             return View();
+        }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> UpdateStock(int id)
+    {
+        var resp = await _stockService.GetStockById(id);
+
+        if (resp.IsSuccessful)
+        {
+            var updateRequest = new UpdateStockRequest
+            {
+                Id = id,
+                StockTitle = resp.Value.StockTitle,
+                CompanyName = resp.Value.CompanyName,
+                StockType = resp.Value.StockType,
+                TotalUnits = resp.Value.TotalUnits,
+                PricePerUnit = resp.Value.PricePerUnit,
+                OpeningDate = resp.Value.OpeningDate,
+                ClosingDate = resp.Value.ClosingDate,
+                MinimumPurchase = resp.Value.MinimumPurchase,
+                DateListed = resp.Value.DateListed,
+                ListedBy = resp.Value.ListedBy
+            };
+
+            return View(updateRequest);
+        }
+        else
+        {
+            _logger.LogError("Failed to retrieve stock for update: {Error}", resp.Error);
+            ModelState.AddModelError(string.Empty, "Failed to retrieve stock for update");
+            return View();
+        }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> UpdateStock(UpdateStockRequest request)
+    {
+        if (!ModelState.IsValid)
+            return View(request);
+
+        try
+        {
+            var response = await _stockService.UpdateStock(request);
+            if (response.IsSuccessful)
+            {
+                TempData["SuccessMessage"] = "Stock updated successfully.";
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                _logger.LogError("Failed to update broker: {Error}", response.Error);
+                ModelState.AddModelError(string.Empty, "Failed to update broker");
+                return View(request);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred while updating broker.");
+            ModelState.AddModelError(string.Empty, "An error occurred while updating broker.");
+            return View(request);
         }
     }
 
