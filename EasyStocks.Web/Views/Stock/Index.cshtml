@@ -41,10 +41,8 @@
                     <td>@stock.DateListed.ToShortDateString()</td>
                     <td>@stock.ListedBy</td>
                     <td>
-                        <form asp-action="DeleteStock" asp-route-id="@stock.Id" method="post" onsubmit="return confirm('Are you sure you want to delete this stock?');">
-                            <input type="submit" value="Delete" class="btn btn-danger" />
-                            @Html.AntiForgeryToken()
-                        </form>
+                        <a asp-action="StockDetails" asp-route-id="@stock.Id" class="btn btn-primary">Details</a>
+                        
                     </td>
                 </tr>
             }

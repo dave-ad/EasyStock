@@ -74,8 +74,7 @@ public sealed class BrokerService : IBrokerService
         }
         catch (Exception ex)
         {
-            //_logger.LogError(ex, "An error occurred while fetching all brokers.");
-            //resp = CreateExceptionResponse(new ServiceResponse<BrokerListResponse>(), ex);
+            _logger.LogError(ex, "An error occurred while fetching all brokers.");
             resp.IsSuccessful = false;
             resp.Error = "An error occurred while fetching stocks.";
             resp.TechMessage = ex.Message;
@@ -100,6 +99,7 @@ public sealed class BrokerService : IBrokerService
                 resp.Error = "Broker not found.";
                 return resp;
             }
+
 
             var brokerResponse = new BrokerResponse
             {
@@ -285,7 +285,6 @@ public sealed class BrokerService : IBrokerService
                 if (retIndividualBroker == null || retIndividualBroker.Entity.BrokerId < 1)
                     return CreateDatabaseErrorResponse(resp);
 
-                // Create users and assign them to the created broker
                 await CreateUsersAndAssignToBroker(request.Users, retIndividualBroker.Entity.BrokerId);
 
 
@@ -327,7 +326,6 @@ public sealed class BrokerService : IBrokerService
                 if (existingBroker != null)
                     return CreateDuplicateErrorResponse(resp, "broker");
 
-                //var freelanceBroker = await CreateFreelanceBrokerEntity(request);
                 var freelanceBroker = CreateFreelanceBrokerEntity(request);
 
                 var retFreelanceBroker = _easyStockAppDbContext.Brokers.Add(freelanceBroker);
@@ -336,7 +334,6 @@ public sealed class BrokerService : IBrokerService
                 if (retFreelanceBroker == null || retFreelanceBroker.Entity.BrokerId < 1)
                     return CreateDatabaseErrorResponse(resp);
 
-                // Create users and assign them to the created broker
                 await CreateUsersAndAssignToBroker(request.Users, retFreelanceBroker.Entity.BrokerId);
 
                 resp.Value = new BrokerIdResponse { BrokerId = retFreelanceBroker.Entity.BrokerId };
@@ -374,7 +371,6 @@ public sealed class BrokerService : IBrokerService
                 return resp;
             }
 
-            // Fetch the actual Broker entity from the database
             var existingBroker = await _easyStockAppDbContext.Brokers
                 .Include(b => b.Users)
                 .FirstOrDefaultAsync(b => b.BrokerId == existingBrokerResponse.Value.BrokerId);
@@ -384,14 +380,11 @@ public sealed class BrokerService : IBrokerService
                 throw new InvalidOperationException($"Broker with ID {existingBrokerResponse.Value.BrokerId} not found.");
             }
 
-            // Update the existing broker entity with the new data
             await UpdateCorporateBrokerEntity(existingBroker, request);
 
-            // Save changes to the database
             _easyStockAppDbContext.Brokers.Update(existingBroker);
             await _easyStockAppDbContext.SaveChangesAsync();
 
-            // Map the updated entity back to a response object
             var updatedBrokerResponse = new BrokerResponse
             {
                 BrokerId = existingBroker.BrokerId,
@@ -572,7 +565,11 @@ public sealed class BrokerService : IBrokerService
     //    return resp;
     //}
 
-    // Helper Methods
+    /// <summary>
+    /// Helper Methods
+    /// </summary>
+    /// <param name="users"></param>
+    /// <returns></returns>
 
     private async Task<List<UserResponse>> GetUsersForBroker(List<User> users)
     {

@@ -66,6 +66,38 @@ public class StockController : Controller
         }
     }
 
+    [HttpGet]
+    [Route("Stock/GetStockById/{id}")]
+    public async Task<IActionResult> GetStockById(int id)
+    {
+        var resp = await _stockService.GetStockById(id);
+
+        if (!resp.IsSuccessful)
+        {
+            _logger.LogError("Failed to fetch stock: {Message}", resp.Error);
+            ModelState.AddModelError(string.Empty, "Failed to fetch stock");
+            return NotFound(resp.Error);
+        }
+
+        return Ok(resp.Value);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> StockDetails(int id)
+    {
+        var response = await _stockService.GetStockById(id);
+
+        if (response.IsSuccessful)
+        {
+            return View(response.Value);
+        }
+        else
+        {
+            _logger.LogError("Failed to retrieve broker: {Error}", response.Error);
+            ModelState.AddModelError(string.Empty, "Failed to retrieve broker");
+            return View();
+        }
+    }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
