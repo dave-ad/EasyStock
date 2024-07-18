@@ -9,9 +9,19 @@
     @Html.AntiForgeryToken()
     <input type="hidden" name="brokerId" value="@Model.BrokerId" />
 
-    <button type="submit" name="newStatus" value="Approved" class="btn btn-success">Approve</button>
-    <button type="submit" name="newStatus" value="Rejected" class="btn btn-danger">Reject</button>
-    <button type="submit" name="newStatus" value="Suspended" class="btn btn-warning">Suspend</button>
+    <!-- Approve Button: Show if status is Pending or Suspended -->
+    <button type="submit" name="newStatus" value="Approved" class="btn btn-success" 
+        @(Model.Status == EasyStocks.Utils.Enums.AccountStatus.Pending || 
+        Model.Status == EasyStocks.Utils.Enums.AccountStatus.Suspended ||
+        Model.Status == EasyStocks.Utils.Enums.AccountStatus.Rejected ? "" : "hidden")>
+        Approve
+    </button>
+
+    <!-- Reject Button: Show if status is Pending -->
+    <button type="submit" name="newStatus" value="Rejected" class="btn btn-danger" @(Model.Status == EasyStocks.Utils.Enums.AccountStatus.Pending ? "" : "hidden")>Reject</button>
+
+    <!-- Suspend Button: Show if status is Approved -->
+    <button type="submit" name="newStatus" value="Suspended" class="btn btn-warning" @(Model.Status == EasyStocks.Utils.Enums.AccountStatus.Approved ? "" : "hidden")>Suspend</button>
 </form>
 
 @if (Model.BrokerType == BrokerType.Corporate)
@@ -180,17 +190,26 @@ else if (Model.BrokerType == BrokerType.Freelance)
 }
 
 
-
-
 @* Add a form for updating broker status *@
 @* @if (User.IsInRole("Admin")) // Example condition to show the update button based on user role
 {
-    <form asp-action="ChangeBrokerStatus" method="post">
-        @Html.AntiForgeryToken()
-        <input type="hidden" name="brokerId" value="@Model.BrokerId" />
+<h2>Change Status</h2>
+<form asp-action="ChangeBrokerStatus" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="brokerId" value="@Model.BrokerId" />
 
-        <button type="submit" name="newStatus" value="Approved" class="btn btn-success">Approve</button>
-        <button type="submit" name="newStatus" value="Rejected" class="btn btn-danger">Reject</button>
-        <button type="submit" name="newStatus" value="Suspended" class="btn btn-warning">Suspend</button>
-    </form>
+    <!-- Approve Button: Show if status is Pending or Suspended -->
+    <button type="submit" name="newStatus" value="Approved" class="btn btn-success"
+        @(Model.Status == EasyStocks.Utils.Enums.AccountStatus.Pending ||
+        Model.Status == EasyStocks.Utils.Enums.AccountStatus.Suspended ||
+        Model.Status == EasyStocks.Utils.Enums.AccountStatus.Rejected ? "" : "hidden")>
+        Approve
+    </button>
+
+    <!-- Reject Button: Show if status is Pending -->
+    <button type="submit" name="newStatus" value="Rejected" class="btn btn-danger" @(Model.Status == EasyStocks.Utils.Enums.AccountStatus.Pending ? "" : "hidden")>Reject</button>
+
+    <!-- Suspend Button: Show if status is Approved -->
+    <button type="submit" name="newStatus" value="Suspended" class="btn btn-warning" @(Model.Status == EasyStocks.Utils.Enums.AccountStatus.Approved ? "" : "hidden")>Suspend</button>
+</form>
 } *@
