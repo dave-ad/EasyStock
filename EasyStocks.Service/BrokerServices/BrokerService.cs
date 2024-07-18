@@ -209,6 +209,16 @@ public sealed class BrokerService : IBrokerService
     {
         var resp = new ServiceResponse<BrokerIdResponse>();
 
+        // Check if maximum limit of 20 brokers is reached
+        var currentBrokerCount = await _easyStockAppDbContext.Brokers.CountAsync();
+        if (currentBrokerCount >= 20)
+        {
+            resp.Error = "Cannot create account. Please contact admin for help.";
+            resp.IsSuccessful = false;
+            _logger.LogError("Maximum limit of broker accounts reached. Cannot create more.");
+            return resp;
+        }
+
         var validationResponse = _validator.ValidateCorporate(request);
         if (!validationResponse.IsSuccessful) return validationResponse;
 
