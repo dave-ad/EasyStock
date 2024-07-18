@@ -100,4 +100,10 @@ public partial class Broker : IAggregateRoot
     {
         ProfessionalQualification = professionalQualification;
     }
+
+    // Method to update status
+    public void UpdateStatus(AccountStatus newStatus)
+    {
+        Status = newStatus;
+    }
 }

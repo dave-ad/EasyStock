@@ -545,6 +545,42 @@ public sealed class BrokerService : IBrokerService
         return resp;
     }
 
+    public async Task<ServiceResponse> ChangeBrokerStatus(int brokerId, AccountStatus newStatus)
+    {
+        var resp = new ServiceResponse();
+
+        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            try
+            {
+                var broker = await _easyStockAppDbContext.Brokers.FindAsync( brokerId);
+
+                if (broker == null)
+                {
+                    resp.IsSuccessful = false;
+                    resp.Error = "Broker not found.";
+                    return resp;
+                }
+
+                broker.UpdateStatus(newStatus);
+                _easyStockAppDbContext.Brokers.Update(broker);
+                await _easyStockAppDbContext.SaveChangesAsync();
+
+                transaction.Complete();
+
+                resp.IsSuccessful = true;
+            }
+            catch (Exception ex)
+            {
+                resp.IsSuccessful = false;
+                resp.Error = "An error occurred while updating broker status.";
+                resp.TechMessage = ex.Message;
+            }
+        }
+
+        return resp;
+    }
+
     //public async Task<ServiceResponse> DeleteBroker(int brokerId)
     //{
     //    var resp = new ServiceResponse();

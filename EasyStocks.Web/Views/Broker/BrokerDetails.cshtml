@@ -4,6 +4,16 @@
 
 <a href="@Url.Action("Index", "Broker")" class="btn btn-primary">Back to List</a>
 
+<h2>Change Status</h2>
+<form asp-action="ChangeBrokerStatus" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="brokerId" value="@Model.BrokerId" />
+
+    <button type="submit" name="newStatus" value="Approved" class="btn btn-success">Approve</button>
+    <button type="submit" name="newStatus" value="Rejected" class="btn btn-danger">Reject</button>
+    <button type="submit" name="newStatus" value="Suspended" class="btn btn-warning">Suspend</button>
+</form>
+
 @if (Model.BrokerType == BrokerType.Corporate)
 {
     <a href="@Url.Action("UpdateCorporateBroker", "Broker", new { id = Model.BrokerId })" class="btn btn-secondary">Edit</a>
@@ -16,8 +26,6 @@ else if (Model.BrokerType == BrokerType.Freelance)
 {
     <a href="@Url.Action("UpdateFreelanceBroker", "Broker", new { id = Model.BrokerId })" class="btn btn-secondary">Edit</a>
 }
-
-
 
 @if (Model.BrokerType == BrokerType.Corporate)
 {
@@ -170,7 +178,19 @@ else if (Model.BrokerType == BrokerType.Freelance)
         </tr>
     </table>
 }
-@* <form asp-action="DeleteBroker" method="post">
-    <input type="hidden" name="id" value="@Model.BrokerId" />
-    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this broker?');">Delete</button>
-</form> *@
+
+
+
+
+@* Add a form for updating broker status *@
+@* @if (User.IsInRole("Admin")) // Example condition to show the update button based on user role
+{
+    <form asp-action="ChangeBrokerStatus" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="brokerId" value="@Model.BrokerId" />
+
+        <button type="submit" name="newStatus" value="Approved" class="btn btn-success">Approve</button>
+        <button type="submit" name="newStatus" value="Rejected" class="btn btn-danger">Reject</button>
+        <button type="submit" name="newStatus" value="Suspended" class="btn btn-warning">Suspend</button>
+    </form>
+} *@

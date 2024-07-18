@@ -412,4 +412,34 @@ public class BrokerController : Controller
             return View(request);
         }
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangeBrokerStatus(int brokerId, AccountStatus newStatus)
+    {
+        try
+        {
+            var resp = await _brokerService.ChangeBrokerStatus(brokerId, newStatus);
+
+            if (resp.IsSuccessful)
+            {
+                TempData["SuccessMessage"] = "Broker status updated successfully.";
+            }
+            else
+            {
+                _logger.LogError($"Failed to update broker status: {resp.TechMessage}");
+                TempData["ErrorMessage"] = "Failed to update broker status.";
+            }
+
+            return RedirectToAction(nameof(Index));
+            //return RedirectToAction(nameof(Details), new { id = brokerId });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred while updating broker status.");
+            ModelState.AddModelError(string.Empty, "An error occurred while updating broker status.");
+            return View(nameof(Index)); // Or appropriate view
+            //return RedirectToAction(nameof(Details), new { id = brokerId });
+        }
+    }
 }
