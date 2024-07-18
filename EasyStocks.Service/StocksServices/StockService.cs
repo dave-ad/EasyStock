@@ -140,54 +140,58 @@ public class StockService : IStockService
     public async Task<ServiceResponse<StockResponse>> UpdateStock(UpdateStockRequest request)
     {
         var resp = new ServiceResponse<StockResponse>();
-        try
-        {
-            var existingStockResponse = await GetStockById(request.Id);
 
-            if (existingStockResponse == null || !existingStockResponse.IsSuccessful || existingStockResponse.Value == null)
+        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            try
+            {
+                var existingStockResponse = await GetStockById(request.Id);
+
+                if (existingStockResponse == null || !existingStockResponse.IsSuccessful || existingStockResponse.Value == null)
+                {
+                    resp.IsSuccessful = false;
+                    resp.Error = "Stock not found.";
+                    return resp;
+                }
+
+                var existingStock = await _easyStockAppDbContext.Stocks
+                    .FirstOrDefaultAsync(b => b.Id == existingStockResponse.Value.Id);
+
+                if (existingStock == null)
+                    throw new InvalidOperationException($"Stock with ID {existingStockResponse.Value.Id} not found.");
+
+                await UpdateStockEntity(existingStock, request);
+
+                _easyStockAppDbContext.Stocks.Update(existingStock);
+                await _easyStockAppDbContext.SaveChangesAsync();
+
+                var updatedStockResponse = new StockResponse
+                {
+                    Id = existingStock.Id,
+                    StockTitle = existingStock.StockTitle,
+                    CompanyName = existingStock.CompanyName,
+                    StockType = existingStock.StockType,
+                    TotalUnits = existingStock.TotalUnits,
+                    PricePerUnit = existingStock.PricePerUnit,
+                    OpeningDate = existingStock.OpeningDate,
+                    ClosingDate = existingStock.ClosingDate,
+                    MinimumPurchase = existingStock.MinimumPurchase,
+                    InitialDeposit = existingStock.InitialDeposit,
+                    DateListed = existingStock.DateListed,
+                    ListedBy = existingStock.ListedBy
+                };
+
+                resp.IsSuccessful = true;
+                resp.Value = updatedStockResponse;
+
+                transaction.Complete();
+            }
+            catch (Exception ex)
             {
                 resp.IsSuccessful = false;
-                resp.Error = "Stock not found.";
-                return resp;
+                resp.Error = "An error occurred while updating stock.";
+                resp.TechMessage = ex.Message;
             }
-
-            var existingStock = await _easyStockAppDbContext.Stocks
-                .FirstOrDefaultAsync(b => b.Id == existingStockResponse.Value.Id);
-
-            if (existingStock == null)
-            {
-                throw new InvalidOperationException($"Stock with ID {existingStockResponse.Value.Id} not found.");
-            }
-
-            await UpdateStockEntity(existingStock, request);
-
-            _easyStockAppDbContext.Stocks.Update(existingStock);
-            await _easyStockAppDbContext.SaveChangesAsync();
-
-            var updatedStockResponse = new StockResponse
-            {
-                Id = existingStock.Id,
-                StockTitle = existingStock.StockTitle,
-                CompanyName = existingStock.CompanyName,
-                StockType = existingStock.StockType,
-                TotalUnits = existingStock.TotalUnits,
-                PricePerUnit = existingStock.PricePerUnit,
-                OpeningDate = existingStock.OpeningDate,
-                ClosingDate = existingStock.ClosingDate,
-                MinimumPurchase = existingStock.MinimumPurchase,
-                InitialDeposit = existingStock.InitialDeposit,
-                DateListed = existingStock.DateListed,
-                ListedBy = existingStock.ListedBy
-            };
-
-            resp.IsSuccessful = true;
-            resp.Value = updatedStockResponse;
-        }
-        catch (Exception ex)
-        {
-            resp.IsSuccessful = false;
-            resp.Error = "An error occurred while updating stock.";
-            resp.TechMessage = ex.Message;
         }
 
         return resp;
