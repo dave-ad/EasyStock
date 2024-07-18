@@ -1,55 +1,55 @@
-﻿namespace EasyStocks.Web.Controllers
+﻿namespace EasyStocks.Web.Controllers;
+
+public class AuthController : Controller
 {
-    public class AuthController : Controller
+    private readonly IAuthService _authService;
+    private readonly ILogger<BrokerController> _logger;
+
+    public AuthController(IAuthService authService, ILogger<BrokerController> logger)
     {
-        private readonly IAuthService _authService;
+        _authService = authService;
+        _logger = logger;
+    }
 
-        public AuthController(IAuthService authService)
+    [HttpGet]
+    public IActionResult Login()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Login([FromForm] LoginModel model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        try
         {
-            _authService = authService;
-        }
-
-        // GET: /Auth/Login
-        [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-
-        // POST: /Auth/Login
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login([FromForm] LoginModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                //return BadRequest(ModelState);
-                return View(model);
-            }
-
             var result = await _authService.LoginUserAsync(model.Email, model.Password);
+
             if (result.Succeeded)
-            {
-                //return Ok("Login successful");
                 return RedirectToAction("Index", "Home");
-            }
             else
             {
-                //return Unauthorized("Invalid login attempt");
+                _logger.LogError("Invalid login attempt.");
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 return View(model);
             }
         }
-
-        // POST: /Auth/Logout
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout()
+        catch (Exception ex)
         {
-            await _authService.LogoutAsync();
-            //return Ok(new { message = "Logout successful" });
-            return RedirectToAction("Index", "Home");
+            _logger.LogError(ex, "An exception occurred while trying to log in.");
+            ModelState.AddModelError(string.Empty, "An error occurred while trying to log in.");
+            return View(model);
         }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Logout()
+    {
+        await _authService.LogoutAsync();
+        return RedirectToAction("Index", "Home");
     }
 }

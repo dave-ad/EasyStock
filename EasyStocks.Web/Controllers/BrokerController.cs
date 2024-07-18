@@ -17,15 +17,13 @@ public class BrokerController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        var response = await _brokerService.GetAllBrokers();
+        var resp = await _brokerService.GetAllBrokers();
 
-        if (response.IsSuccessful)
-        {
-            return View(response.Value);
-        }
+        if (resp.IsSuccessful)
+            return View(resp.Value);
         else
         {
-            _logger.LogError("Failed to retrieve brokers: {Error}", response.Error);
+            _logger.LogError("Failed to retrieve brokers: {Error}", resp.Error);
             ModelState.AddModelError(string.Empty, "Failed to retrieve brokers");
             return View();
         }
@@ -37,9 +35,8 @@ public class BrokerController : Controller
         var response = await _brokerService.GetBrokerById(id);
 
         if (response.IsSuccessful)
-        {
             return View(response.Value);
-        }
+        
         else
         {
             _logger.LogError("Failed to retrieve broker: {Error}", response.Error);
@@ -69,7 +66,7 @@ public class BrokerController : Controller
                     _logger.LogError("Invalid broker type: {BrokerType}", brokerType);
                     ModelState.AddModelError(string.Empty, "Invalid broker type");
                     return View();
-            } // Pass BrokerListResponse directly to the corresponding view
+            }
         }
         else
         {
@@ -84,12 +81,9 @@ public class BrokerController : Controller
         var response = await _brokerService.GetBrokersByType(BrokerType.Corporate);
 
         if (!response.IsSuccessful)
-        {
-            // Handle error, maybe return a NotFound view or redirect
             return NotFound();
-        }
 
-        return View(response.Value); // Assuming you have a view named CorporateBrokers.cshtml
+        return View(response.Value);
     }
 
     public async Task<IActionResult> IndividualBrokers()
@@ -97,12 +91,9 @@ public class BrokerController : Controller
         var response = await _brokerService.GetBrokersByType(BrokerType.Individual);
 
         if (!response.IsSuccessful)
-        {
-            // Handle error, maybe return a NotFound view or redirect
             return NotFound();
-        }
 
-        return View(response.Value); // Assuming you have a view named IndividualBrokers.cshtml
+        return View(response.Value);
     }
 
     public async Task<IActionResult> FreelanceBrokers()
@@ -110,12 +101,9 @@ public class BrokerController : Controller
         var response = await _brokerService.GetBrokersByType(BrokerType.Freelance);
 
         if (!response.IsSuccessful)
-        {
-            // Handle error, maybe return a NotFound view or redirect
             return NotFound();
-        }
 
-        return View(response.Value); // Assuming you have a view named FreelanceBrokers.cshtml
+        return View(response.Value);
     }
 
     [HttpGet]
@@ -129,9 +117,8 @@ public class BrokerController : Controller
     public async Task<IActionResult> CreateCorporateBroker(CreateCorporateBrokerRequest request)
     {
         if (!ModelState.IsValid)
-        {
             return View(nameof(CreateCorporateBroker), request);
-        }
+        
 
         try
         {
@@ -168,9 +155,7 @@ public class BrokerController : Controller
     public async Task<IActionResult> CreateIndividualBroker(CreateIndividualBrokerRequest request)
     {
         if (!ModelState.IsValid)
-        {
             return View(nameof(CreateIndividualBroker), request);
-        }
 
         try
         {
@@ -207,9 +192,7 @@ public class BrokerController : Controller
     public async Task<IActionResult> CreateFreelanceBroker(CreateFreelanceBrokerRequest request)
     {
         if (!ModelState.IsValid)
-        {
             return View(nameof(CreateFreelanceBroker), request);
-        }
 
         try
         {
@@ -288,9 +271,7 @@ public class BrokerController : Controller
     public async Task<IActionResult> UpdateCorporateBroker(UpdateCorporateBrokerRequest request)
     {
         if (!ModelState.IsValid)
-        {
             return View(request);
-        }
 
         try
         {
@@ -350,9 +331,7 @@ public class BrokerController : Controller
     public async Task<IActionResult> UpdateIndividualBroker(UpdateIndividualBrokerRequest request)
     {
         if (!ModelState.IsValid)
-        {
             return View(request);
-        }
 
         try
         {
@@ -433,32 +412,4 @@ public class BrokerController : Controller
             return View(request);
         }
     }
-
-    //[HttpPost]
-    //[ValidateAntiForgeryToken]
-    //public async Task<IActionResult> DeleteBroker(int id)
-    //{
-    //    try
-    //    {
-    //        var response = await _brokerService.DeleteBroker(id);
-
-    //        if (response.IsSuccessful)
-    //        {
-    //            TempData["SuccessMessage"] = "Broker deleted successfully.";
-    //            return RedirectToAction(nameof(Index));
-    //        }
-    //        else
-    //        {
-    //            _logger.LogError("Failed to delete broker: {Error}", response.Error);
-    //            TempData["ErrorMessage"] = "Failed to delete broker.";
-    //            return RedirectToAction(nameof(Index));
-    //        }
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        _logger.LogError(ex, "An exception occurred while deleting broker.");
-    //        TempData["ErrorMessage"] = "An error occurred while deleting broker.";
-    //        return RedirectToAction(nameof(Index));
-    //    }
-    //}
 }
