@@ -3,7 +3,6 @@
 
 @{
     ViewData["Title"] = "Login";
-    // Layout = "~/Views/Shared/_Layout.cshtml"; // Replace with your layout path
 }
 
 <h2>@ViewData["Title"]</h2>
@@ -25,3 +24,5 @@
 
     <button type="submit" class="btn btn-primary">Login</button>
 </form>
+
+<a asp-controller="Auth" asp-action="Register">Don't have an account? Register here.</a>
