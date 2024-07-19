@@ -4,7 +4,7 @@ public static class IdentityServicesConfigurator
 {
     public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
     {
-        services.AddIdentity<User, IdentityRole>()
+        services.AddIdentity<BrokerAdmin, IdentityRole>()
             .AddEntityFrameworkStores<EasyStockAppDbContext>()
             .AddDefaultTokenProviders();
 

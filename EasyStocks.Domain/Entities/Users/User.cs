@@ -1,29 +1,32 @@
 ﻿namespace EasyStocks.Domain.Entities;
 
-public class User : IdentityUser
+public class User : IdentityUser<int>
 {
     public FullName Name { get; private set; } = FullName.Default();
     public MobileNo MobileNumber { get; private set; } = MobileNo.Default();
     public Gender Gender { get; private set; }
-    public string? PositionInOrg { get; private set; } = default!;
-    public DateOnly? DateOfEmployment { get; private set; }
 
-    public int BrokerId { get; set; }
-    public Broker Broker { get; set; }
-
-    private User() { }
-    public User(FullName name, string email, MobileNo mobileNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment)
+    // User Specific Properties
+    protected User() { }
+    public User(FullName name, string email, MobileNo mobileNumber, Gender gender)
     {
         Name = name;
         Email = email;
         MobileNumber = mobileNumber;
         Gender = gender;
-        PositionInOrg = positionInOrg;
-        DateOfEmployment = dateOfEmployment;
     }
 
-    public static User Create(FullName name, string email, MobileNo mobileNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment)
+    // Methods for creating and updating a easyStock user
+    public static User Create(FullName name, string email, MobileNo mobileNumber, Gender gender)
     {
-        return new User(name, email, mobileNumber, gender, positionInOrg, dateOfEmployment);
+        return new User(name, email, mobileNumber, gender);
+    }
+
+    public void Update(FullName name, string email, MobileNo mobileNumber, Gender gender)
+    {
+        Name = name;
+        Email = email;
+        MobileNumber = mobileNumber;
+        Gender = gender;
     }
 }

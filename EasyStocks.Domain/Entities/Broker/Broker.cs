@@ -3,7 +3,7 @@
 public partial class Broker : Entity
 {
     public int BrokerId { get; set; }
-    public List<User> Users { get; private set; } = default!;
+    public List<BrokerAdmin> Users { get; private set; } = default!;
 
     // CorporateBroker
     public string? CompanyName { get; private set; } = default!;

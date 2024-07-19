@@ -6,7 +6,7 @@ public partial class Broker : IAggregateRoot
     //Corporate Broker
     private Broker(string companyName, Email companyEmail, MobileNo companyMobileNumber,
                     Address companyAddress, CAC cacRegistrationNumber,
-                    StockBrokerLicense stockBrokerLicense, DateOnly dateCertified, AccountStatus status, BrokerType brokerType, List<User> users)
+                    StockBrokerLicense stockBrokerLicense, DateOnly dateCertified, AccountStatus status, BrokerType brokerType, List<BrokerAdmin> users)
     {
         CompanyName = companyName;
         CompanyEmail = companyEmail;
@@ -21,7 +21,7 @@ public partial class Broker : IAggregateRoot
     }
 
     // Individual Broker
-    private Broker(List<User> users,
+    private Broker(List<BrokerAdmin> users,
                     StockBrokerLicense stockBrokerLicenseNumber, DateOnly dateCertified,
                     AccountStatus status, Address businessAddress,
                     string professionalQualification, BrokerType brokerType)
@@ -36,7 +36,7 @@ public partial class Broker : IAggregateRoot
     }
 
     // Freelance Broker
-    private Broker(List<User> users, AccountStatus status,
+    private Broker(List<BrokerAdmin> users, AccountStatus status,
                     string professionalQualification, BrokerType brokerType)
     {
         Users = users;
@@ -48,7 +48,7 @@ public partial class Broker : IAggregateRoot
     public static Broker CreateCorporate(string companyName, Email companyEmail, MobileNo companyMobileNumber,
                                             Address companyAddress, CAC cacRegistrationNumber,
                                             StockBrokerLicense stockBrokerLicense, DateOnly dateCertified,
-                                             List<User> users)
+                                             List<BrokerAdmin> users)
     {
 
         return new Broker(companyName, companyEmail, companyMobileNumber, companyAddress,
@@ -56,7 +56,7 @@ public partial class Broker : IAggregateRoot
                             AccountStatus.Pending, BrokerType.Corporate, users);
     }
 
-    public static Broker CreateIndividual(List<User> users,
+    public static Broker CreateIndividual(List<BrokerAdmin> users,
                                             StockBrokerLicense stockBrokerLicenseNumber,
                                             DateOnly dateCertified, Address businessAddress,
                                             string professionalQualification)
@@ -67,7 +67,7 @@ public partial class Broker : IAggregateRoot
                             businessAddress, professionalQualification, BrokerType.Individual);
     }
 
-    public static Broker CreateFreelance(List<User> users, string professionalQualification)
+    public static Broker CreateFreelance(List<BrokerAdmin> users, string professionalQualification)
     {
 
         return new Broker(users,

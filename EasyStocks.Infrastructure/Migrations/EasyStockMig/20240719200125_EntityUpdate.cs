@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class EntityUpdate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,7 +19,8 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                 schema: "ThriftSchema",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -51,11 +52,11 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                     StockBrokerLicense_Value = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: true),
                     StockBrokerLicense_Hash = table.Column<int>(type: "int", nullable: true),
                     DateCertified = table.Column<DateOnly>(type: "date", nullable: true),
-                    Business_Street_Number = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Business_Street_Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Business_City = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Business_State = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Business_ZipCode = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
+                    Business_Street_Number = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Business_Street_Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Business_City = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Business_State = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Business_ZipCode = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: true),
                     ProfessionalQualification = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BrokerType = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
@@ -69,13 +70,37 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                 });
 
             migrationBuilder.CreateTable(
+                name: "Stocks",
+                schema: "ThriftSchema",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StockTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StockType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TotalUnits = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PricePerUnit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OpeningDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ClosingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MinimumPurchase = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InitialDeposit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    DateListed = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ListedBy = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Stocks", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 schema: "ThriftSchema",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false),
                     ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -96,19 +121,32 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                 schema: "ThriftSchema",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name_Last = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Name_First = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Name_Others = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     MobileNumber_Value = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
                     MobileNumber_Hash = table.Column<int>(type: "int", nullable: false),
                     Gender = table.Column<int>(type: "int", maxLength: 10, nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
+                    SuperAdminLevel = table.Column<int>(type: "int", nullable: true),
+                    Permissions = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PositionInOrg = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DateOfEmployment = table.Column<DateOnly>(type: "date", nullable: true),
-                    BrokerId = table.Column<int>(type: "int", nullable: false),
+                    BrokerAdmin_Status = table.Column<int>(type: "int", nullable: true),
+                    BrokerId = table.Column<int>(type: "int", nullable: true),
+                    DateOfBirth = table.Column<DateOnly>(type: "date", nullable: true),
+                    Address_StreetNo = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Address_StreetName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Address_City = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Address_State = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Address_ZipCode = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    NIN_Value = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -140,7 +178,7 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -164,7 +202,7 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                     LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -183,8 +221,8 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                 schema: "ThriftSchema",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -210,7 +248,7 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                 schema: "ThriftSchema",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -221,6 +259,42 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                     table.ForeignKey(
                         name: "FK_AspNetUserTokens_User_UserId",
                         column: x => x.UserId,
+                        principalSchema: "ThriftSchema",
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Transactions",
+                schema: "ThriftSchema",
+                columns: table => new
+                {
+                    TransactionId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    StockId = table.Column<int>(type: "int", nullable: false),
+                    TransactionAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transactions", x => x.TransactionId);
+                    table.ForeignKey(
+                        name: "FK_Transactions_Stocks_StockId",
+                        column: x => x.StockId,
+                        principalSchema: "ThriftSchema",
+                        principalTable: "Stocks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Transactions_User_Id",
+                        column: x => x.Id,
                         principalSchema: "ThriftSchema",
                         principalTable: "User",
                         principalColumn: "Id",
@@ -258,6 +332,18 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                 schema: "ThriftSchema",
                 table: "AspNetUserRoles",
                 column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_Id",
+                schema: "ThriftSchema",
+                table: "Transactions",
+                column: "Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_StockId",
+                schema: "ThriftSchema",
+                table: "Transactions",
+                column: "StockId");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
@@ -304,7 +390,15 @@ namespace EasyStocks.Infrastructure.Migrations.EasyStockMig
                 schema: "ThriftSchema");
 
             migrationBuilder.DropTable(
+                name: "Transactions",
+                schema: "ThriftSchema");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles",
+                schema: "ThriftSchema");
+
+            migrationBuilder.DropTable(
+                name: "Stocks",
                 schema: "ThriftSchema");
 
             migrationBuilder.DropTable(

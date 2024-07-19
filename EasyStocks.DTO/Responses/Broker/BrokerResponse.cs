@@ -3,7 +3,7 @@
 public class BrokerResponse : IServiceResponse
 {
     public int BrokerId { get; set; }
-    public List<UserResponse> Users { get; set; } = new List<UserResponse>();
+    public List<BrokerAdminResponse> Users { get; set; } = new List<BrokerAdminResponse>();
     public string? CompanyName { get; set; }
     public string? CompanyEmail { get; set; }
     public string? CompanyMobileNumber { get; set; }

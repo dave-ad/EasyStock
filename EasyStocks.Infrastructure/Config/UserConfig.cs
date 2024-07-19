@@ -7,6 +7,8 @@ internal class UserConfig : IEntityTypeConfiguration<User>
         builder.ToTable(nameof(User));
         builder.HasKey(x => x.Id);
 
+        builder.Property(x => x.Id).ValueGeneratedOnAdd();
+
         // Configure Identity-related properties
         builder.Property(x => x.Email).HasMaxLength(256).IsRequired();
         builder.Property(x => x.UserName).HasMaxLength(256);
@@ -23,7 +25,6 @@ internal class UserConfig : IEntityTypeConfiguration<User>
         builder.Property(x => x.LockoutEnabled);
         builder.Property(x => x.AccessFailedCount);
 
-
         // value object configuration
         builder.OwnsOne(x => x.Name, y =>
         {
@@ -38,14 +39,14 @@ internal class UserConfig : IEntityTypeConfiguration<User>
             y.Property(z => z.Hash);
         });
 
+        // User - specific properties
         builder.Property(x => x.Gender).HasMaxLength(10);
-        builder.Property(x => x.PositionInOrg);
-        builder.Property(x => x.DateOfEmployment);
 
-        // Configure relationship to Broker
-        builder.HasOne(u => u.Broker) // User has one Broker
-               .WithMany(b => b.Users) // Broker has many Users
-               .HasForeignKey(u => u.BrokerId) // User.BrokerId is the foreign key
-               .IsRequired(); // Relationship is required
+        //Configure the discriminator column for inheritance
+        builder.HasDiscriminator<string>("Discriminator")
+            .HasValue<User>("User")
+            .HasValue<Admin>("Admin")
+            .HasValue<BrokerAdmin>("BrokerAdmin")
+            .HasValue<EasyStockUser>("EasyStockUser");
     }
 }

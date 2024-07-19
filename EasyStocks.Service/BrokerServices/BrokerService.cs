@@ -4,10 +4,10 @@ public sealed class BrokerService : IBrokerService
 {
     private readonly IEasyStockAppDbContext _easyStockAppDbContext;
     private readonly BrokerValidator _validator;
-    private readonly UserManager<User> _userManager;
+    private readonly UserManager<BrokerAdmin> _userManager;
     private readonly ILogger<BrokerService> _logger;
 
-    public BrokerService(UserManager<User> userManager, IEasyStockAppDbContext easyStockAppDbContext, BrokerValidator validator, ILogger<BrokerService> logger)
+    public BrokerService(UserManager<BrokerAdmin> userManager, IEasyStockAppDbContext easyStockAppDbContext, BrokerValidator validator, ILogger<BrokerService> logger)
     {
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _easyStockAppDbContext = easyStockAppDbContext ?? throw new ArgumentNullException(nameof(easyStockAppDbContext));
@@ -37,7 +37,7 @@ public sealed class BrokerService : IBrokerService
                 Brokers = brokers.Select(b => new BrokerResponse
                 {
                     BrokerId = b.BrokerId,
-                    Users = b.Users.Select(u => new UserResponse
+                    Users = b.Users.Select(u => new BrokerAdminResponse
                     {
                         //UserId = int.TryParse(u.Id, out int userId) ? userId : 0,
                         Id = u.Id,
@@ -108,7 +108,7 @@ public sealed class BrokerService : IBrokerService
                 BrokerId = broker.BrokerId,
                 BrokerType = broker.BrokerType,
                 StockBrokerLicense = broker.StockBrokerLicense?.Value,
-                Users = broker.Users.Select(u => new UserResponse
+                Users = broker.Users.Select(u => new BrokerAdminResponse
                 {
                     Id = u.Id,
                     Email = u.Email
@@ -591,47 +591,15 @@ public sealed class BrokerService : IBrokerService
         return resp;
     }
 
-    //public async Task<ServiceResponse> DeleteBroker(int brokerId)
-    //{
-    //    var resp = new ServiceResponse();
-
-    //    var existingBrokerResponse = await GetBrokerById(brokerId);
-
-    //    if (existingBrokerResponse == null || !existingBrokerResponse.IsSuccessful || existingBrokerResponse.Value == null)
-    //    {
-    //        resp.IsSuccessful = false;
-    //        resp.Error = "Broker not found.";
-    //        return resp;
-    //    }
-
-    //    var existingBroker = await _easyStockAppDbContext.Brokers
-    //        .FirstOrDefaultAsync(b => b.BrokerId == existingBrokerResponse.Value.BrokerId);
-
-    //    if (existingBroker == null)
-    //    {
-    //        resp.IsSuccessful = false;
-    //        resp.Error = "Broker not found.";
-    //        return resp;
-    //    }
-
-    //    existingBroker.Delete();
-
-    //    _easyStockAppDbContext.Brokers.Update(existingBroker);
-    //    await _easyStockAppDbContext.SaveChangesAsync();
-
-    //    resp.IsSuccessful = true;
-    //    return resp;
-    //}
-
     /// Helper Methods
 
-    private async Task<List<UserResponse>> GetUsersForBroker(List<User> users)
+    private async Task<List<BrokerAdminResponse>> GetUsersForBroker(List<BrokerAdmin> users)
     {
-        var userResponses = new List<UserResponse>();
+        var userResponses = new List<BrokerAdminResponse>();
 
         foreach (var user in users)
         {
-            var userResponse = new UserResponse
+            var userResponse = new BrokerAdminResponse
             {
                 Id = user.Id,
                 Email = user.Email
@@ -647,18 +615,27 @@ public sealed class BrokerService : IBrokerService
     {
         foreach (var userRequest in userRequests)
         {
-            var user = new User(
+            var user = new BrokerAdmin(
                 FullName.Create(userRequest.FirstName, userRequest.LastName, userRequest.OtherNames),
                 userRequest.Email,
                 MobileNo.Create(userRequest.MobileNumber),
                 userRequest.Gender,
                 userRequest.PositionInOrg,
-                userRequest.DateOfEmployment)
+                userRequest.DateOfEmployment,
+                AccountStatus.Pending)
             {
-                BrokerId = brokerId
+                BrokerId = brokerId,
             };
 
             user.UserName = user.Email;
+
+            // Check for existing user before creating
+            var existingUser = await _userManager.FindByEmailAsync(userRequest.Email);
+            if (existingUser != null)
+            {
+                _logger.LogWarning("User with email {Email} already exists.", userRequest.Email);
+                continue; // Skip creating user if it already exists
+            }
 
             var result = await _userManager.CreateAsync(user, userRequest.Password);
             if (!result.Succeeded)
@@ -687,7 +664,7 @@ public sealed class BrokerService : IBrokerService
             cac,
             stockBrokerLicense,
             request.DateCertified,
-            new List<User>() // Empty list for now
+            new List<BrokerAdmin>() // Empty list for now
             );
 
         return broker;
@@ -698,12 +675,12 @@ public sealed class BrokerService : IBrokerService
         var stockBrokerLicense = StockBrokerLicense.Create(request.StockBrokerLicenseNumber);
         var businessAddress = Address.Create(request.StreetNo, request.StreetName, request.City, request.State, request.ZipCode);
 
-        return Broker.CreateIndividual(new List<User>(), stockBrokerLicense, request.DateCertified, businessAddress, request.ProfessionalQualification);
+        return Broker.CreateIndividual(new List<BrokerAdmin>(), stockBrokerLicense, request.DateCertified, businessAddress, request.ProfessionalQualification);
     }
 
     private Broker CreateFreelanceBrokerEntity(CreateFreelanceBrokerRequest request)
     {
-        return Broker.CreateFreelance(new List<User>(), request.ProfessionalQualification);
+        return Broker.CreateFreelance(new List<BrokerAdmin>(), request.ProfessionalQualification);
     }
 
     private async Task UpdateCorporateBrokerEntity(Broker existingBroker, UpdateCorporateBrokerRequest request)
