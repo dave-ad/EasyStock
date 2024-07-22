@@ -16,11 +16,11 @@ public class User : IdentityUser<int>
         Gender = gender;
     }
 
-    // Methods for creating and updating a easyStock user
-    public static User Create(FullName name, string email, MobileNo mobileNumber, Gender gender)
-    {
-        return new User(name, email, mobileNumber, gender);
-    }
+    //// Methods for creating and updating a easyStock user
+    //public static User Create(FullName name, string email, MobileNo mobileNumber, Gender gender)
+    //{
+    //    return new User(name, email, mobileNumber, gender);
+    //}
 
     public void Update(FullName name, string email, MobileNo mobileNumber, Gender gender)
     {

@@ -2,75 +2,210 @@
 
 public sealed class AuthService : IAuthService
 {
-    //    private readonly SignInManager<User> _signInManager;
-    //    //private readonly SignInManager<BrokerAdmin> signInManager;
-    //    private readonly UserManager<User> _userManager;
-    //    private readonly ILogger<AuthService> _logger;
+    private readonly SignInManager<User> _signInManager;
+    private readonly UserManager<User> _userManager;
+    private readonly ILogger<AuthService> _logger;
 
-    //    public AuthService(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<AuthService> logger)
-    //    {
-    //        _signInManager = signInManager;
-    //        _userManager = userManager;
-    //        _logger = logger;
-    //    }
+    public AuthService(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<AuthService> logger)
+    {
+        _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
+        _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-    //    public async Task<IdentityResult> RegisterUserAsync(RegisterRequest request)
-    //    {
-    //        var user = await RegisterUserEntity(request);
+    public async Task<IdentityResult> CreateAdminAsync(CreateAdminRequest request)
+    {
+        var admin = Admin.Create(
+            FullName.Create(request.FirstName, request.LastName, request.OtherNames),
+            request.Email,
+            MobileNo.Create(request.MobileNumber),
+            request.Gender,
+            request.SuperAdminLevel,
+            request.Permissions
+        );
+        admin.UserName = admin.Email;
 
-    //        user.UserName = user.Email;
+        var existingAdmin = await _userManager.FindByEmailAsync(request.Email);
+        if (existingAdmin != null)
+        {
+            _logger.LogWarning("admin with email {Email} already exists.", request.Email);
+        }
 
-    //        var result = await _userManager.CreateAsync(user, request.Password);
+        var result = await _userManager.CreateAsync(admin, request.Password);
+        if (result.Succeeded)
+        {
+            _logger.LogInformation("Admin user {Email} created successfully.", request.Email);
 
-    //        if (result.Succeeded)
-    //            _logger.LogInformation($"User {request.Email} registered successfully.");
-    //        else
-    //        {
-    //            var errorMessage = string.Join(", ", result.Errors.Select(e => e.Description));
-    //            _logger.LogWarning($"Failed to register user {request.Email}. Errors: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-    //            throw new InvalidOperationException($"User registration failed for {request.Email}. Errors: {errorMessage}");
-    //        }
+            //await _userManager.AddToRoleAsync(admin, "Admin");
 
-    //        return result;
-    //    }
+            //var roleResult = await _userManager.AddToRoleAsync(admin, "Admin");
+            //if (roleResult.Succeeded)
+            //{
+            //    _logger.LogInformation("User {Email} assigned to Admin role successfully.", request.Email);
+            //}
+            //else
+            //{
+            //    _logger.LogError("Failed to assign Admin role to user {Email}.", request.Email);
+            //    return roleResult;
+            //}
+        }
+        else
+        {
+            _logger.LogError("Failed to create admin user {Email}.", request.Email);
+        }
 
-    //    public async Task<SignInResult> LoginUserAsync(string email, string password)
-    //    {
-    //        _logger.LogInformation("Attempting to log in user with email: {Email}", email);
+        return result;
+    }
 
-    //        var result = await _signInManager.PasswordSignInAsync(email, password, false, false);
+    public async Task<SignInResult> LoginAdminAsync(string email, string password)
+    {
+        _logger.LogInformation("Attempting to log in admin with email: {Email}", email);
 
-    //        if (result.Succeeded)
-    //        {
-    //            _logger.LogInformation("User {Email} logged in successfully.", email);
-    //        }
-    //        else
-    //        {
-    //            _logger.LogWarning("Failed to log in user {Email}.", email);
-    //        }
+        var admin = await _userManager.FindByEmailAsync(email);
+        if (admin == null)
+        {
+            _logger.LogWarning("Admin with email {Email} not found.", email);
+            return SignInResult.Failed;
+        }
 
-    //        return result;
-    //    }
+        //// Check if the user is a broker
+        //var isAdmin = await _userManager.IsInRoleAsync(admin, "Broker");
+        //if (!isAdmin)
+        //{
+        //    _logger.LogWarning("Login failed for email: {Email}. User is not a admin.", email);
+        //    return SignInResult.Failed;
+        //}
 
-    //    public async Task LogoutAsync()
-    //    {
-    //        await _signInManager.SignOutAsync();
-    //        _logger.LogInformation("User logged out successfully.");
-    //    }
+        var result = await _signInManager.PasswordSignInAsync(admin.UserName, password, false, false);
 
-    //    // Helper Methods
-    //    private async Task<User> RegisterUserEntity(RegisterRequest request)
-    //    {
-    //        var fullname = FullName.Create(request.FirstName, request.LastName, request.OtherNames);
-    //        var mobileNumber = MobileNo.Create(request.MobileNumber);
+        if (result.Succeeded)
+        {
+            _logger.LogInformation("Admin {Email} logged in successfully.", email);
+        }
+        else
+        {
+            _logger.LogWarning("Failed to log in admin {Email}.", email);
+        }
 
-    //        var user = User.Create(
-    //            name: fullname,
-    //            email: request.Email,
-    //            mobileNumber: mobileNumber,
-    //            gender: request.Gender
-    //            );
+        return result;
+    }
 
-    //        return user;
-    //    }
+    public async Task<SignInResult> LoginBrokerAdminAsync(string email, string password)
+    {
+        _logger.LogInformation("Attempting to log in broker with email: {Email}", email);
+
+        // Find user by email
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            _logger.LogWarning("Login failed for email: {Email}. User not found.", email);
+            return SignInResult.Failed;
+        }
+
+        //// Check if the user is a broker
+        //var isBroker = await _userManager.IsInRoleAsync(user, "Broker");
+        //if (!isBroker)
+        //{
+        //    _logger.LogWarning("Login failed for email: {Email}. User is not a broker.", email);
+        //    return SignInResult.Failed;
+        //}
+
+        var result = await _signInManager.PasswordSignInAsync(email, password, false, false);
+
+        if (result.Succeeded)
+        {
+            _logger.LogInformation("Broker {Email} logged in successfully.", email);
+        }
+        else
+        {
+            _logger.LogWarning("Failed to log in broker {Email} as admin.", email);
+        }
+
+        return result;
+    }
+
+    public async Task<IdentityResult> CreateEasyStockUserAsync(RegisterEasyStockUserRequest request)
+    {
+        var user = await RegisterUserEntity(request);
+        user.UserName = user.Email;
+
+        var existingUser = await _userManager.FindByEmailAsync(request.Email);
+        if (existingUser != null)
+        {
+            _logger.LogWarning("admin with email {Email} already exists.", request.Email);
+        }
+
+        var result = await _userManager.CreateAsync(user, request.Password);
+
+        if (result.Succeeded)
+        {
+            _logger.LogInformation("Easy Stock User {Email} registered successfully.", request.Email);
+        }
+        else
+        {
+            _logger.LogWarning("Failed to register Easy Stock User {Email}. Errors: {Errors}", request.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
+
+        return result;
+    }
+
+    public async Task<SignInResult> LoginEasyStockUserAsync(string email, string password)
+    {
+        _logger.LogInformation("Attempting to log in user with email: {Email}", email);
+
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            _logger.LogWarning("User with email {Email} not found.", email);
+            return SignInResult.Failed;
+        }
+
+        //// Check if the user is an Easy Stock User
+        //var isUser = await _userManager.IsInRoleAsync(user, "Broker");
+        //if (!isUser)
+        //{
+        //    _logger.LogWarning("Login failed for email: {Email}. User is not a user.", email);
+        //    return SignInResult.Failed;
+        //}
+
+        var result = await _signInManager.PasswordSignInAsync(user.UserName, password, false, false);
+
+        if (result.Succeeded)
+        {
+            _logger.LogInformation("User {Email} logged in successfully.", email);
+        }
+        else
+        {
+            _logger.LogWarning("Failed to log in user {Email}.", email);
+        }
+
+        return result;
+    }
+
+    public async Task LogoutAsync()
+    {
+        await _signInManager.SignOutAsync();
+        _logger.LogInformation("Logged out successfully.");
+    }
+
+    // Helper Methods
+    private async Task<EasyStockUser> RegisterUserEntity(RegisterEasyStockUserRequest request)
+    {
+        var fullname = FullName.Create(request.FirstName, request.LastName, request.OtherNames);
+        var mobileNumber = MobileNo.Create(request.MobileNumber);
+        var address = Address.Create(request.StreetNo, request.StreetName, request.City, request.State, request.ZipCode);
+        var nin = NIN.Create(request.NIN);
+
+        var user = EasyStockUser.Create(
+            name: fullname,
+            email: request.Email,
+            mobileNumber: mobileNumber,
+            gender: request.Gender,
+            dateOfBirth: request.DateOfBirth,
+            address: address,
+            nin: nin
+            );
+
+        return user;
+    }
 }

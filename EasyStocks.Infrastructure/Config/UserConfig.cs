@@ -9,7 +9,6 @@ internal class UserConfig : IEntityTypeConfiguration<User>
 
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
-        // Configure Identity-related properties
         builder.Property(x => x.Email).HasMaxLength(256).IsRequired();
         builder.Property(x => x.UserName).HasMaxLength(256);
         builder.Property(x => x.NormalizedUserName).HasMaxLength(256);
@@ -39,7 +38,6 @@ internal class UserConfig : IEntityTypeConfiguration<User>
             y.Property(z => z.Hash);
         });
 
-        // User - specific properties
         builder.Property(x => x.Gender).HasMaxLength(10);
 
         //Configure the discriminator column for inheritance

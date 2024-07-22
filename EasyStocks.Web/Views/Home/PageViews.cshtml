@@ -29,5 +29,36 @@
         <li class="nav-item">
             <a class="nav-link text-dark" asp-area="" asp-controller="Stock" asp-action="Index">Stocks</a>
         </li>
+
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="RegisterAdmin">Create Admin</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="LoginAdmin">Login as Admin</a>
+            
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="RegisterUser">Create User</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="LoginUser">Login as User</a>
+        </li>
+    </ul>
+    <ul class="navbar-nav float-right">
+        @if (User.Identity.IsAuthenticated)
+        {
+            <li class="nav-item">
+                <form class="form-inline" asp-controller="Auth" asp-action="LogoutBrokerAdmin" method="post">
+                    <button type="submit" class="btn btn-link nav-link text-dark" id="LogoutBrokerAdmin">Logout</button>
+                </form>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-controller="Auth" asp-action="LoginBroker">Login as a Broker</a>
+            </li>
+        }
     </ul>
 </div>

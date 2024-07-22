@@ -5,7 +5,6 @@ public class EasyStockUser : User
     public DateOnly? DateOfBirth { get; private set; }
     public Address? Address { get; private set; } = Address.Default();
     public NIN? NIN { get; private set; } = NIN.Default();
-
     public AccountStatus? Status { get; private set; }
     public List<Transactions>? Transactions { get; set; } = new List<Transactions>();
 

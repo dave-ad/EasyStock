@@ -2,14 +2,13 @@
 
 public class BrokerController : Controller
 {
-    //private readonly SignInManager<BrokerAdmin> _signInManager;
-    private readonly UserManager<BrokerAdmin> _userManager;
+    private readonly UserManager<User> _userManager;
     private readonly ILogger<BrokerController> _logger;
     private readonly IBrokerService _brokerService;
 
-    public BrokerController(SignInManager<BrokerAdmin> signInManager,UserManager<BrokerAdmin> userManager, ILogger<BrokerController> logger, IBrokerService brokerService)
+    public BrokerController(UserManager<User> userManager, ILogger<BrokerController> logger, IBrokerService brokerService)
     {
-        //_signInManager = signInManager;
+        _userManager = userManager;
         _brokerService = brokerService;
         _logger = logger;
     }

@@ -1,6 +1,6 @@
 ﻿namespace EasyStocks.DTO.Requests;
 
-public class UserRequest
+public class BrokerAdminRequest
 {
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
