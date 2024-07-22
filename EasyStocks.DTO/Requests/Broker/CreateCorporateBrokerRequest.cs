@@ -16,5 +16,5 @@ public class CreateCorporateBrokerRequest
     public string StockBrokerLicense { get; set; } = string.Empty;
     public DateOnly DateCertified { get; set; }
 
-    public List<BrokerAdminRequest> Users { get; set; } = new List<BrokerAdminRequest>();
+    public List<BrokerAdminRequest> BrokerAdmin { get; set; } = new List<BrokerAdminRequest>();
 }

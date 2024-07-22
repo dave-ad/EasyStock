@@ -29,5 +29,24 @@ public static class DIRegister
             config.Cookie.Name = "EastStockApp.Cookie";
             // Other cookie settings
         });
+
+        // Ensure roles are created at startup
+        var serviceProvider = services.BuildServiceProvider();
+        CreateRoles(serviceProvider).Wait();
+    }
+
+    private static async Task CreateRoles(IServiceProvider serviceProvider)
+    {
+        var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
+
+        string[] roleNames = { "Admin", "BrokerAdmin", "User" }; // Add your roles here
+        foreach (var roleName in roleNames)
+        {
+            var roleExist = await roleManager.RoleExistsAsync(roleName);
+            if (!roleExist)
+            {
+                await roleManager.CreateAsync(new IdentityRole<int>(roleName));
+            }
+        }
     }
 }

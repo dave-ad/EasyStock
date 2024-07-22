@@ -2,6 +2,6 @@
 
 public class CreateFreelanceBrokerRequest
 {
-    public List<BrokerAdminRequest> Users { get; set; }
+    public List<BrokerAdminRequest> BrokerAdmin { get; set; }
     public string ProfessionalQualification { get; set; } = string.Empty;
 }

@@ -28,7 +28,8 @@ public sealed class AuthService : IAuthService
         var existingAdmin = await _userManager.FindByEmailAsync(request.Email);
         if (existingAdmin != null)
         {
-            _logger.LogWarning("admin with email {Email} already exists.", request.Email);
+            _logger.LogWarning("Admin with email {Email} already exists.", request.Email);
+            return IdentityResult.Failed(new IdentityError { Description = "Admin already exists" });
         }
 
         var result = await _userManager.CreateAsync(admin, request.Password);
@@ -36,18 +37,17 @@ public sealed class AuthService : IAuthService
         {
             _logger.LogInformation("Admin user {Email} created successfully.", request.Email);
 
-            //await _userManager.AddToRoleAsync(admin, "Admin");
+            var roleResult = await _userManager.AddToRoleAsync(admin, "Admin");
 
-            //var roleResult = await _userManager.AddToRoleAsync(admin, "Admin");
-            //if (roleResult.Succeeded)
-            //{
-            //    _logger.LogInformation("User {Email} assigned to Admin role successfully.", request.Email);
-            //}
-            //else
-            //{
-            //    _logger.LogError("Failed to assign Admin role to user {Email}.", request.Email);
-            //    return roleResult;
-            //}
+            if (roleResult.Succeeded)
+            {
+                _logger.LogInformation("User {Email} assigned to Admin role successfully.", request.Email);
+            }
+            else
+            {
+                _logger.LogError("Failed to assign Admin role to user {Email}.", request.Email);
+                return roleResult;
+            }
         }
         else
         {
@@ -132,7 +132,8 @@ public sealed class AuthService : IAuthService
         var existingUser = await _userManager.FindByEmailAsync(request.Email);
         if (existingUser != null)
         {
-            _logger.LogWarning("admin with email {Email} already exists.", request.Email);
+            _logger.LogWarning("User with email {Email} already exists.", request.Email);
+            return IdentityResult.Failed(new IdentityError { Description = "User already exists" });
         }
 
         var result = await _userManager.CreateAsync(user, request.Password);
@@ -140,6 +141,17 @@ public sealed class AuthService : IAuthService
         if (result.Succeeded)
         {
             _logger.LogInformation("Easy Stock User {Email} registered successfully.", request.Email);
+            var roleResult = await _userManager.AddToRoleAsync(user, "User");
+
+            if (roleResult.Succeeded)
+            {
+                _logger.LogInformation("User {Email} assigned to User role successfully.", request.Email);
+            }
+            else
+            {
+                _logger.LogWarning("Failed to assign User role to {Email}.", request.Email);
+                return roleResult;
+            }
         }
         else
         {

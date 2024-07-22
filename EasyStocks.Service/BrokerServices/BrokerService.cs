@@ -1,4 +1,7 @@
-﻿namespace EasyStocks.Service.BrokerServices;
+﻿using Azure.Core;
+using EasyStocks.Domain.Entities;
+
+namespace EasyStocks.Service.BrokerServices;
 
 public sealed class BrokerService : IBrokerService
 {
@@ -227,7 +230,7 @@ public sealed class BrokerService : IBrokerService
                 if (existingCorporateBroker)
                     return CreateDuplicateErrorResponse(resp, "Corporate broker");
 
-                var duplicateStaff = request.Users.Count > 1 && request.Users[0].Email.Trim().ToUpper() == request.Users[1].Email.Trim().ToUpper();
+                var duplicateStaff = request.BrokerAdmin.Count > 1 && request.BrokerAdmin[0].Email.Trim().ToUpper() == request.BrokerAdmin[1].Email.Trim().ToUpper();
                 if (duplicateStaff)
                     return CreateDuplicateErrorResponse(resp, "Staff");
 
@@ -239,7 +242,7 @@ public sealed class BrokerService : IBrokerService
                 if (retCorporateBroker == null || retCorporateBroker.Entity.BrokerId < 1)
                     return CreateDatabaseErrorResponse(resp);
 
-                await CreateUsersAndAssignToBroker(request.Users, retCorporateBroker.Entity.BrokerId);
+                await CreateUsersAndAssignToBroker(request.BrokerAdmin, retCorporateBroker.Entity.BrokerId);
 
                 resp.Value = new BrokerIdResponse { BrokerId = retCorporateBroker.Entity.BrokerId };
                 resp.IsSuccessful = true;
@@ -273,7 +276,7 @@ public sealed class BrokerService : IBrokerService
         {
             try
             {
-                var existingBroker = await _userManager.FindByEmailAsync(request.Users[0].Email.Trim());
+                var existingBroker = await _userManager.FindByEmailAsync(request.BrokerAdmin[0].Email.Trim());
 
                 if (existingBroker != null)
                     return CreateDuplicateErrorResponse(resp, "broker");
@@ -286,7 +289,7 @@ public sealed class BrokerService : IBrokerService
                 if (retIndividualBroker == null || retIndividualBroker.Entity.BrokerId < 1)
                     return CreateDatabaseErrorResponse(resp);
 
-                await CreateUsersAndAssignToBroker(request.Users, retIndividualBroker.Entity.BrokerId);
+                await CreateUsersAndAssignToBroker(request.BrokerAdmin, retIndividualBroker.Entity.BrokerId);
 
 
                 resp.Value = new BrokerIdResponse { BrokerId = retIndividualBroker.Entity.BrokerId };
@@ -322,7 +325,7 @@ public sealed class BrokerService : IBrokerService
 
             try
             {
-                var existingBroker = await _userManager.FindByEmailAsync(request.Users[0].Email.Trim());
+                var existingBroker = await _userManager.FindByEmailAsync(request.BrokerAdmin[0].Email.Trim());
 
                 if (existingBroker != null)
                     return CreateDuplicateErrorResponse(resp, "broker");
@@ -335,7 +338,7 @@ public sealed class BrokerService : IBrokerService
                 if (retFreelanceBroker == null || retFreelanceBroker.Entity.BrokerId < 1)
                     return CreateDatabaseErrorResponse(resp);
 
-                await CreateUsersAndAssignToBroker(request.Users, retFreelanceBroker.Entity.BrokerId);
+                await CreateUsersAndAssignToBroker(request.BrokerAdmin, retFreelanceBroker.Entity.BrokerId);
 
                 resp.Value = new BrokerIdResponse { BrokerId = retFreelanceBroker.Entity.BrokerId };
                 resp.IsSuccessful = true;
@@ -619,7 +622,7 @@ public sealed class BrokerService : IBrokerService
             //};
             //user.UserName = user.Email;
 
-            var user = BrokerAdmin.Create(
+            var brokerAdmin = BrokerAdmin.Create(
                 FullName.Create(userRequest.FirstName, userRequest.LastName, userRequest.OtherNames),
                 userRequest.Email,
                 MobileNo.Create(userRequest.MobileNumber),
@@ -627,22 +630,31 @@ public sealed class BrokerService : IBrokerService
                 userRequest.PositionInOrg,
                 userRequest.DateOfEmployment
             );
-            user.BrokerId = brokerId;
-            user.UserName = user.Email;
+            brokerAdmin.BrokerId = brokerId;
+            brokerAdmin.UserName = brokerAdmin.Email;
 
-            var existingUser = await _userManager.FindByEmailAsync(userRequest.Email);
-            if (existingUser != null)
+            var existingBrokerAdmin = await _userManager.FindByEmailAsync(userRequest.Email);
+            if (existingBrokerAdmin != null)
             {
                 _logger.LogWarning("User with email {Email} already exists.", userRequest.Email);
                 continue; // Skip creating user if it already exists
             }
 
-            var result = await _userManager.CreateAsync(user, userRequest.Password);
+            var result = await _userManager.CreateAsync(brokerAdmin, userRequest.Password);
             if (!result.Succeeded)
             {
                 var errorMessage = string.Join(", ", result.Errors.Select(e => e.Description));
                 _logger.LogWarning("Failed to register user {Email}. Errors: {Errors}", userRequest.Email, errorMessage);
                 throw new InvalidOperationException($"User registration failed for {userRequest.Email}. Errors: {errorMessage}");
+            }
+
+            // Assign the BrokerAdmin role to the user
+            var roleResult = await _userManager.AddToRoleAsync(brokerAdmin, "BrokerAdmin");
+            if (!roleResult.Succeeded)
+            {
+                var roleErrorMessage = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                _logger.LogWarning("Failed to assign BrokerAdmin role to user {Email}. Errors: {Errors}", userRequest.Email, roleErrorMessage);
+                throw new InvalidOperationException($"Role assignment failed for {userRequest.Email}. Errors: {roleErrorMessage}");
             }
 
             _logger.LogInformation("User {Email} registered successfully.", userRequest.Email);

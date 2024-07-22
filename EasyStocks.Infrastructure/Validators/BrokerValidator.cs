@@ -112,7 +112,7 @@ public class BrokerValidator
             return resp;
         }
 
-        foreach (var user in request.Users)
+        foreach (var user in request.BrokerAdmin)
         {
             if (string.IsNullOrWhiteSpace(user.FirstName))
             {
@@ -170,7 +170,7 @@ public class BrokerValidator
     {
         var resp = new ServiceResponse<BrokerIdResponse>();
 
-        foreach (var user in request.Users)
+        foreach (var user in request.BrokerAdmin)
         {
             if (string.IsNullOrWhiteSpace(user.FirstName))
             {
@@ -286,7 +286,7 @@ public class BrokerValidator
     {
         var resp = new ServiceResponse<BrokerIdResponse>();
 
-        foreach (var user in request.Users)
+        foreach (var user in request.BrokerAdmin)
         {
             if (string.IsNullOrWhiteSpace(user.FirstName))
             {

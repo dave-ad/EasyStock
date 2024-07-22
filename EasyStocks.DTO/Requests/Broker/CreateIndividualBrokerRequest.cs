@@ -2,7 +2,7 @@
 
 public class CreateIndividualBrokerRequest
 {
-    public List<BrokerAdminRequest> Users { get; set; }
+    public List<BrokerAdminRequest> BrokerAdmin { get; set; }
 
     // Address Property
     public string StreetNo { get; set; } = string.Empty;
