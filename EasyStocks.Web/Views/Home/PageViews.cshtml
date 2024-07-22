@@ -29,6 +29,21 @@
         <li class="nav-item">
             <a class="nav-link text-dark" asp-area="" asp-controller="Stock" asp-action="Index">Stocks</a>
         </li>
+
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="RegisterAdmin">Create Admin</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="LoginAdmin">Login as Admin</a>
+            
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="RegisterUser">Create User</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="LoginUser">Login as User</a>
+        </li>
     </ul>
     <ul class="navbar-nav float-right">
         @if (User.Identity.IsAuthenticated)
