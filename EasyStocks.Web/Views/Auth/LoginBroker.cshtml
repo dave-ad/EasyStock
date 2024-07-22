@@ -2,12 +2,12 @@
 @* @model EasyStocks.DTO.Requests.LoginRequest *@
 
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Login as a Broker";
 }
 
 <h2>@ViewData["Title"]</h2>
 
-<form asp-action="Login" asp-controller="Auth" method="post">
+<form asp-action="LoginBroker" asp-controller="Auth" method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="form-group">
@@ -25,4 +25,6 @@
     <button type="submit" class="btn btn-primary">Login</button>
 </form>
 
-<a asp-controller="Auth" asp-action="Register">Don't have an account? Register here.</a>
+<a asp-controller="Broker" asp-action="CreateCorporateBroker">Not a Broker? Register as a Corporate broker.</a>
+<a asp-controller="Broker" asp-action="CreateIndividualBroker">Not a Broker? Register as an Individual broker.</a>
+<a asp-controller="Broker" asp-action="CreateFreelanceBroker">Not a Broker? Register as a Freelance broker.</a>

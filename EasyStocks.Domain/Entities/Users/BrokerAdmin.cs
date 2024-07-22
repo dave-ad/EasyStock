@@ -2,7 +2,6 @@
 
 public class BrokerAdmin : User
 {
-    // Broker Specific Properties
     public string? PositionInOrg { get; private set; } = default!;
     public DateOnly? DateOfEmployment { get; private set; }
     public AccountStatus? Status { get; private set; }

@@ -52,7 +52,7 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Login</a>
+                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="RegisterUser">Login</a>
                             </li>
                         }
                     </ul>
@@ -69,6 +69,22 @@
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2024 - EasyStocks.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+@*             <ul class="navbar-nav float-right">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li class="nav-item">
+                        <form class="form-inline" asp-controller="Auth" asp-action="LogoutBrokerAdmin" method="post">
+                            <button type="submit" class="btn btn-link nav-link text-dark" id="LogoutBrokerAdmin">Logout</button>
+                        </form>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-controller="Auth" asp-action="LoginBroker">Login as a Broker</a>
+                    </li>
+                }
+            </ul> *@
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

@@ -4,10 +4,10 @@ public sealed class BrokerService : IBrokerService
 {
     private readonly IEasyStockAppDbContext _easyStockAppDbContext;
     private readonly BrokerValidator _validator;
-    private readonly UserManager<BrokerAdmin> _userManager;
+    private readonly UserManager<User> _userManager;
     private readonly ILogger<BrokerService> _logger;
 
-    public BrokerService(UserManager<BrokerAdmin> userManager, IEasyStockAppDbContext easyStockAppDbContext, BrokerValidator validator, ILogger<BrokerService> logger)
+    public BrokerService(UserManager<User> userManager, IEasyStockAppDbContext easyStockAppDbContext, BrokerValidator validator, ILogger<BrokerService> logger)
     {
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _easyStockAppDbContext = easyStockAppDbContext ?? throw new ArgumentNullException(nameof(easyStockAppDbContext));
@@ -102,7 +102,6 @@ public sealed class BrokerService : IBrokerService
                 return resp;
             }
 
-
             var brokerResponse = new BrokerResponse
             {
                 BrokerId = broker.BrokerId,
@@ -174,12 +173,7 @@ public sealed class BrokerService : IBrokerService
 
             var brokerListResponse = new BrokerListResponse
             {
-                Brokers = new List<BrokerResponse>()
-            };
-
-            foreach (var broker in brokers)
-            {
-                var brokerResponse = new BrokerResponse
+                Brokers = brokers.Select(broker => new BrokerResponse
                 {
                     BrokerId = broker.BrokerId,
                     BrokerType = broker.BrokerType,
@@ -187,10 +181,13 @@ public sealed class BrokerService : IBrokerService
                     CompanyName = broker.CompanyName,
                     CompanyEmail = broker.CompanyEmail?.Value,
                     Status = broker.Status,
-                    Users = await GetUsersForBroker(broker.Users)
-                };
-                brokerListResponse.Brokers.Add(brokerResponse);
-            }
+                    Users = broker.Users.Select(user => new BrokerAdminResponse
+                    {
+                        Id = user.Id,
+                        Email = user.Email
+                    }).ToList()
+                }).ToList()
+            };
 
             resp.Value = brokerListResponse;
             resp.IsSuccessful = true;
@@ -227,14 +224,8 @@ public sealed class BrokerService : IBrokerService
             try
             {
                 var existingCorporateBroker = await _easyStockAppDbContext.Brokers.AnyAsync(b => b.CompanyEmail.Value.Trim().ToUpper() == request.CompanyEmail.Trim().ToUpper());
-
                 if (existingCorporateBroker)
                     return CreateDuplicateErrorResponse(resp, "Corporate broker");
-
-                //var existingStaff = await _easyStockAppDbContext.Brokers.AnyAsync(b => b.Email.Value.Trim().ToUpper() == request.Users[0].Email.Trim().ToUpper());
-
-                //if (existingStaff)
-                //    return CreateDuplicateErrorResponse(resp, "Staff");
 
                 var duplicateStaff = request.Users.Count > 1 && request.Users[0].Email.Trim().ToUpper() == request.Users[1].Email.Trim().ToUpper();
                 if (duplicateStaff)
@@ -611,25 +602,34 @@ public sealed class BrokerService : IBrokerService
         return userResponses;
     }
 
-    private async Task CreateUsersAndAssignToBroker(List<UserRequest> userRequests, int brokerId)
+    private async Task CreateUsersAndAssignToBroker(List<BrokerAdminRequest> userRequests, int brokerId)
     {
         foreach (var userRequest in userRequests)
         {
-            var user = new BrokerAdmin(
+            //var user = new BrokerAdmin(
+            //    FullName.Create(userRequest.FirstName, userRequest.LastName, userRequest.OtherNames),
+            //    userRequest.Email,
+            //    MobileNo.Create(userRequest.MobileNumber),
+            //    userRequest.Gender,
+            //    userRequest.PositionInOrg,
+            //    userRequest.DateOfEmployment,
+            //    AccountStatus.Pending)
+            //{
+            //    BrokerId = brokerId,
+            //};
+            //user.UserName = user.Email;
+
+            var user = BrokerAdmin.Create(
                 FullName.Create(userRequest.FirstName, userRequest.LastName, userRequest.OtherNames),
                 userRequest.Email,
                 MobileNo.Create(userRequest.MobileNumber),
                 userRequest.Gender,
                 userRequest.PositionInOrg,
-                userRequest.DateOfEmployment,
-                AccountStatus.Pending)
-            {
-                BrokerId = brokerId,
-            };
-
+                userRequest.DateOfEmployment
+            );
+            user.BrokerId = brokerId;
             user.UserName = user.Email;
 
-            // Check for existing user before creating
             var existingUser = await _userManager.FindByEmailAsync(userRequest.Email);
             if (existingUser != null)
             {

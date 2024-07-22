@@ -4,9 +4,6 @@ internal class EasyStockUserConfig : IEntityTypeConfiguration<EasyStockUser>
 {
     public void Configure(EntityTypeBuilder<EasyStockUser> builder)
     {
-        //builder.ToTable(nameof(EasyStockUser));
-        //builder.HasKey(x => x.Id);
-
         builder.HasBaseType<User>();
 
         builder.Property(x => x.DateOfBirth);
@@ -23,7 +20,6 @@ internal class EasyStockUserConfig : IEntityTypeConfiguration<EasyStockUser>
             y.Property(z => z.Value).HasMaxLength(20).IsRequired();
         });
 
-        // Configure relationship to Transactions
         builder.HasMany(u => u.Transactions)
                .WithOne(t => t.User)
                .HasForeignKey(t => t.Id);

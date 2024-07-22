@@ -13,7 +13,7 @@ public static class DIRegister
             options.UseSqlServer(configuration.GetConnectionString("DevConnection")));
 
         // Register Identity services
-        services.AddIdentity<BrokerAdmin, IdentityRole<int>>()
+        services.AddIdentity<User, IdentityRole<int>>()
             .AddEntityFrameworkStores<EasyStockAppDbContext>()
             .AddDefaultTokenProviders();
 
