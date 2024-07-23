@@ -44,65 +44,36 @@ public class BrokerController : Controller
         }
     }
 
-    [HttpGet("GetBrokersByType/{brokerType}")]
-    public async Task<IActionResult> GetBrokersByType(BrokerType brokerType)
+    [HttpGet]
+    public async Task<IActionResult> GetBrokersByType([FromQuery] BrokerType brokerType)
     {
         _logger.LogInformation("BrokerType: {BrokerType}", brokerType);
 
-        var response = await _brokerService.GetBrokersByType(brokerType);
-        if (response.IsSuccessful)
+        var resp = await _brokerService.GetBrokersByType(brokerType);
+
+        if (!resp.IsSuccessful)
         {
-            // Determine which view to render based on brokerType
-            switch (brokerType)
-            {
-                case BrokerType.Corporate:
-                    return View("GetCorporateBrokers", response.Value);
-                case BrokerType.Individual:
-                    return View("GetIndividualBrokers", response.Value);
-                case BrokerType.Freelance:
-                    return View("GetFreelanceBrokers", response.Value);
-                default:
-                    _logger.LogError("Invalid broker type: {BrokerType}", brokerType);
-                    ModelState.AddModelError(string.Empty, "Invalid broker type");
-                    return View();
-            }
+            ModelState.AddModelError(string.Empty, resp.Error);
+            return View("Error", resp.Error);
         }
-        else
+
+        switch (brokerType)
         {
-            _logger.LogError("Failed to retrieve broker: {Error}", response.Error);
-            ModelState.AddModelError(string.Empty, "Failed to retrieve broker");
-            return View(Index);
+            case BrokerType.Corporate:
+                ViewData["Title"] = "Corporate Brokers";
+                break;
+            case BrokerType.Individual:
+                ViewData["Title"] = "Individual Brokers";
+                break;
+            case BrokerType.Freelance:
+                ViewData["Title"] = "Freelance Brokers";
+                break;
+            default:
+                ViewData["Title"] = "All Brokers";
+                break;
         }
-    }
 
-    public async Task<IActionResult> CorporateBrokers()
-    {
-        var response = await _brokerService.GetBrokersByType(BrokerType.Corporate);
-
-        if (!response.IsSuccessful)
-            return NotFound();
-
-        return View(response.Value);
-    }
-
-    public async Task<IActionResult> IndividualBrokers()
-    {
-        var response = await _brokerService.GetBrokersByType(BrokerType.Individual);
-
-        if (!response.IsSuccessful)
-            return NotFound();
-
-        return View(response.Value);
-    }
-
-    public async Task<IActionResult> FreelanceBrokers()
-    {
-        var response = await _brokerService.GetBrokersByType(BrokerType.Freelance);
-
-        if (!response.IsSuccessful)
-            return NotFound();
-
-        return View(response.Value);
+        return View("Index", resp.Value);
     }
 
     [HttpGet]

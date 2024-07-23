@@ -1,7 +1,4 @@
-﻿using Azure.Core;
-using EasyStocks.Domain.Entities;
-
-namespace EasyStocks.Service.BrokerServices;
+﻿namespace EasyStocks.Service.BrokerServices;
 
 public sealed class BrokerService : IBrokerService
 {
@@ -20,72 +17,7 @@ public sealed class BrokerService : IBrokerService
 
     public async Task<ServiceResponse<BrokerListResponse>> GetAllBrokers()
     {
-        var resp = new ServiceResponse<BrokerListResponse>();
-
-        try
-        {
-            var brokers = await _easyStockAppDbContext.Brokers
-                .Include(b => b.Users)
-                .ToListAsync();
-
-            if (brokers == null || !brokers.Any())
-            {
-                resp.IsSuccessful = false;
-                resp.Error = "No brokers found.";
-                return resp;
-            }
-
-            var brokerListResponse = new BrokerListResponse
-            {
-                Brokers = brokers.Select(b => new BrokerResponse
-                {
-                    BrokerId = b.BrokerId,
-                    Users = b.Users.Select(u => new BrokerAdminResponse
-                    {
-                        //UserId = int.TryParse(u.Id, out int userId) ? userId : 0,
-                        Id = u.Id,
-                        Email = u.Email,
-                    }).ToList(),
-                    CompanyName = b.CompanyName,
-                    CompanyEmail = b.CompanyEmail?.Value,
-                    CompanyMobileNumber = b.CompanyMobileNumber?.Value,
-                    CompanyAddress = new AddressResponse
-                    {
-                        StreetNo = b.CompanyAddress?.StreetNo,
-                        StreetName = b.CompanyAddress?.StreetName,
-                        City = b.CompanyAddress?.City,
-                        State = b.CompanyAddress?.State,
-                        ZipCode = b.CompanyAddress?.ZipCode
-                    },
-                    CACRegistrationNumber = b.CACRegistrationNumber?.Value,
-                    StockBrokerLicense = b.StockBrokerLicense?.Value,
-                    DateCertified = b.DateCertified,
-                    BusinessAddress = new AddressResponse
-                    {
-                        StreetNo = b.BusinessAddress?.StreetNo,
-                        StreetName = b.BusinessAddress?.StreetName,
-                        City = b.BusinessAddress?.City,
-                        State = b.BusinessAddress?.State,
-                        ZipCode = b.BusinessAddress?.ZipCode
-                    },
-                    ProfessionalQualification = b.ProfessionalQualification,
-                    BrokerType = b.BrokerType,
-                    Status = b.Status
-                }).ToList()
-            };
-
-            resp.Value = brokerListResponse;
-            resp.IsSuccessful = true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An error occurred while fetching all brokers.");
-            resp.IsSuccessful = false;
-            resp.Error = "An error occurred while fetching stocks.";
-            resp.TechMessage = ex.Message;
-        }
-
-        return resp;
+        return await GetBrokersByType(null);
     }
 
     public async Task<ServiceResponse<BrokerResponse>> GetBrokerById(int brokerId)
@@ -158,13 +90,12 @@ public sealed class BrokerService : IBrokerService
 
         try
         {
-            var query = _easyStockAppDbContext.Brokers.AsQueryable();
+            IQueryable<Broker> query = _easyStockAppDbContext.Brokers.Include(b => b.Users);
 
             if (brokerType.HasValue)
                 query = query.Where(b => b.BrokerType == brokerType.Value);
 
             var brokers = await query
-                .Include(b => b.Users)
                 .ToListAsync();
 
             if (brokers == null || !brokers.Any())
@@ -183,6 +114,26 @@ public sealed class BrokerService : IBrokerService
                     StockBrokerLicense = broker.StockBrokerLicense?.Value,
                     CompanyName = broker.CompanyName,
                     CompanyEmail = broker.CompanyEmail?.Value,
+                    CompanyMobileNumber = broker.CompanyMobileNumber?.Value,
+                    CompanyAddress = new AddressResponse
+                    {
+                        StreetNo = broker.CompanyAddress?.StreetNo,
+                        StreetName = broker.CompanyAddress?.StreetName,
+                        City = broker.CompanyAddress?.City,
+                        State = broker.CompanyAddress?.State,
+                        ZipCode = broker.CompanyAddress?.ZipCode
+                    },
+                    CACRegistrationNumber = broker.CACRegistrationNumber?.Value,
+                    DateCertified = broker.DateCertified,
+                    BusinessAddress = new AddressResponse
+                    {
+                        StreetNo = broker.BusinessAddress?.StreetNo,
+                        StreetName = broker.BusinessAddress?.StreetName,
+                        City = broker.BusinessAddress?.City,
+                        State = broker.BusinessAddress?.State,
+                        ZipCode = broker.BusinessAddress?.ZipCode
+                    },
+                    ProfessionalQualification = broker.ProfessionalQualification,
                     Status = broker.Status,
                     Users = broker.Users.Select(user => new BrokerAdminResponse
                     {

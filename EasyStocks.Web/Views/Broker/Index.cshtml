@@ -2,24 +2,31 @@
 
 <h1>Brokers</h1>
 <div>
-    <h3>Filter Brokers By Type:</h3>
+    @* <h3>Filter Brokers By Type:</h3> *@
     <div>
-        <a asp-action="GetBrokersByType" asp-route-brokerType="BrokerType.0" class="btn btn-primary">Corporate Brokers</a>
-        <a asp-action="GetBrokersByType" asp-route-brokerType="BrokerType.1" class="btn btn-primary">Individual Brokers</a>
-        <a asp-action="GetBrokersByType" asp-route-brokerType="BrokerType.2" class="btn btn-primary">Freelance Brokers</a>
+        <a href="@Url.Action("GetBrokersByType", "Broker", new { brokerType = BrokerType.Corporate })" class="btn btn-primary">Corporate Brokers</a>
+        <a href="@Url.Action("GetBrokersByType", "Broker", new { brokerType = BrokerType.Individual })" class="btn btn-primary">Individual Brokers</a>
+        <a href="@Url.Action("GetBrokersByType", "Broker", new { brokerType = BrokerType.Freelance })" class="btn btn-primary">Freelance Brokers</a>
     </div>
 </div>
 
 @if (Model != null && Model.Brokers != null && Model.Brokers.Count > 0)
 {
+    var brokerType = Model.Brokers.FirstOrDefault()?.BrokerType;
     <table class="table">
         <thead>
             <tr>
                 <th>Type</th>
-                <th>Stock Broker License</th>
+                @if (brokerType == BrokerType.Corporate || brokerType == BrokerType.Individual)
+                {
+                    <th>Stock Broker License</th>
+                }
                 <th>Email</th>
-                <th>Company Name</th>
-                <th>Company Email</th>
+                @if (brokerType == BrokerType.Corporate)
+                {
+                    <th>Company Name</th>
+                    <th>Company Email</th>
+                }
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -29,7 +36,10 @@
             {
                 <tr>
                     <td>@broker.BrokerType</td>
-                    <td>@broker.StockBrokerLicense</td>
+                    @if (brokerType == BrokerType.Corporate || brokerType == BrokerType.Individual)
+                    {
+                        <td>@broker.StockBrokerLicense</td>
+                    }
                     <td>
                         @foreach (var user in broker.Users)
                         {
@@ -37,8 +47,11 @@
                             <br />
                         }
                     </td>
-                    <td>@broker.CompanyName</td>
-                    <td>@broker.CompanyEmail</td>
+                    @if (brokerType == BrokerType.Corporate)
+                    {
+                        <td>@broker.CompanyName</td>
+                        <td>@broker.CompanyEmail</td>
+                    }
                     <td>@broker.Status</td>
                     <td>
                         <a asp-action="BrokerDetails" asp-route-id="@broker.BrokerId" class="btn btn-primary">Details</a>
