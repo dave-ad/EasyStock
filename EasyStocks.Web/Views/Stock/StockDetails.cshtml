@@ -3,7 +3,7 @@
 <h1>Stock Details</h1>
 
 <a href="@Url.Action("Index", "Stock")" class="btn btn-primary">Back to List</a>
-<a href="@Url.Action("UpdateStock", "Stock", new {id = Model.Id})" class="btn btn-secondary">Edit</a>
+<a href="@Url.Action("UpdateStock", "Stock", new {id = Model.StockId})" class="btn btn-secondary">Edit</a>
 
 <table class="table">
     <tr>
@@ -52,7 +52,7 @@
     </tr>
 </table>
 
-<form asp-action="DeleteStock" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Are you sure you want to delete this stock?');">
+<form asp-action="DeleteStock" asp-route-id="@Model.StockId" method="post" onsubmit="return confirm('Are you sure you want to delete this stock?');">
     <button type="submit" class="btn btn-danger">Delete</button>
     @Html.AntiForgeryToken()
 </form>

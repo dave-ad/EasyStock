@@ -6,6 +6,8 @@ public class EasyStockUser : User
     public Address? Address { get; private set; } = Address.Default();
     public NIN? NIN { get; private set; } = NIN.Default();
     public AccountStatus? Status { get; private set; }
+
+    public List<StockWatchList> Watchlists { get; set; } = new List<StockWatchList>();
     public List<Transactions>? Transactions { get; set; } = new List<Transactions>();
 
     private EasyStockUser() { }

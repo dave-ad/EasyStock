@@ -33,4 +33,5 @@ internal sealed class EasyStockAppDbContext : IdentityDbContext<User, IdentityRo
     public DbSet<Admin> Admins { get; set; }
     public DbSet<BrokerAdmin> BrokerAdmins { get; set; }
     public DbSet<EasyStockUser> EasyStockUsers { get; set; }
+    public DbSet<StockWatchList> WatchLists { get; set; }
 }

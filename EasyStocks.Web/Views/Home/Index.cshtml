@@ -25,6 +25,7 @@
                 <th>Initial Deposit</th>
                 <th>Date Listed</th>
                 <th>Listed By</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -42,6 +43,13 @@
                     <td>@stock.InitialDeposit</td>
                     <td>@stock.DateListed.ToShortDateString()</td>
                     <td>@stock.ListedBy</td>
+                    <td>
+                        <form asp-action="AddToWatchlist" asp-controller="Stock" method="post">
+                            <input type="hidden" name="userId" value="@User.Identity.Name" />
+                            <input type="hidden" name="stockId" value="@stock.StockId" />
+                            <button type="submit" class="btn btn-primary">Add to Watchlist</button>
+                        </form>
+                    </td>
                 </tr>
             }
         </tbody>

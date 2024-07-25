@@ -2,7 +2,7 @@
 
 public class Stocks
 {
-    public int Id { get; private set; }
+    public int StockId { get; private set; }
     public string StockTitle { get; private set; }
     public string CompanyName { get; private set; }
     //public StockType StockType { get; private set; }
@@ -16,7 +16,9 @@ public class Stocks
     public DateTime DateListed { get; private set; }
     public string ListedBy { get; private set; }
 
-    internal Stocks() { }
+    public List<StockWatchList> Watchlists { get; private set; } = new List<StockWatchList>();
+
+    internal Stocks() {}
     internal Stocks(string stockTitle, string companyName,
                     string stockType, string totalUnits,
                     decimal pricePerUnit, DateTime openingDate,
@@ -34,6 +36,7 @@ public class Stocks
         InitialDeposit = CalculateInitialDeposit(pricePerUnit, minimumPurchase);
         DateListed = dateListed;
         ListedBy = listedBy;
+        Watchlists = new List<StockWatchList>();
     }
 
     private decimal CalculateInitialDeposit(decimal pricePerUnit, string minimumPurchase)

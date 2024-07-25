@@ -33,10 +33,10 @@ public class StockService : IStockService
                 var retStocks = _easyStockAppDbContext.Stocks.Add(stocks);
                 await _easyStockAppDbContext.SaveChangesAsync();
 
-                if (retStocks == null || retStocks.Entity.Id < 1)
+                if (retStocks == null || retStocks.Entity.StockId < 1)
                     return CreateDatabaseErrorResponse(resp);
 
-                resp.Value = new StockIdResponse { Id = retStocks.Entity.Id };
+                resp.Value = new StockIdResponse { Id = retStocks.Entity.StockId };
                 resp.IsSuccessful = true;
 
                 transaction.Complete();
@@ -66,7 +66,7 @@ public class StockService : IStockService
             var stocks = await _easyStockAppDbContext.Stocks
                 .Select(s => new StockResponse
                 {
-                    Id = s.Id,
+                    StockId = s.StockId,
                     StockTitle = s.StockTitle,
                     CompanyName = s.CompanyName,
                     StockType = s.StockType,
@@ -100,7 +100,7 @@ public class StockService : IStockService
         try
         {
             var stock = await _easyStockAppDbContext.Stocks
-                .FirstOrDefaultAsync(s => s.Id == stockId);
+                .FirstOrDefaultAsync(s => s.StockId == stockId);
 
             if (stock == null)
             {
@@ -111,7 +111,7 @@ public class StockService : IStockService
 
             var stockResponse = new StockResponse
             {
-                Id = stockId,
+                StockId = stockId,
                 StockTitle = stock.StockTitle,
                 CompanyName = stock.CompanyName,
                 StockType = stock.StockType,
@@ -155,10 +155,10 @@ public class StockService : IStockService
                 }
 
                 var existingStock = await _easyStockAppDbContext.Stocks
-                    .FirstOrDefaultAsync(b => b.Id == existingStockResponse.Value.Id);
+                    .FirstOrDefaultAsync(b => b.StockId == existingStockResponse.Value.StockId);
 
                 if (existingStock == null)
-                    throw new InvalidOperationException($"Stock with ID {existingStockResponse.Value.Id} not found.");
+                    throw new InvalidOperationException($"Stock with ID {existingStockResponse.Value.StockId} not found.");
 
                 await UpdateStockEntity(existingStock, request);
 
@@ -167,7 +167,7 @@ public class StockService : IStockService
 
                 var updatedStockResponse = new StockResponse
                 {
-                    Id = existingStock.Id,
+                    StockId = existingStock.StockId,
                     StockTitle = existingStock.StockTitle,
                     CompanyName = existingStock.CompanyName,
                     StockType = existingStock.StockType,
@@ -230,11 +230,148 @@ public class StockService : IStockService
                 resp.TechMessage = ex.Message;
             }
         }
+        return resp;
+    }
+
+    public async Task<ServiceResponse<StockWatchListResponse>> AddToWatchlist(int userId, int stockId)
+    {
+        var resp = new ServiceResponse<StockWatchListResponse>();
+
+        try
+        {
+            var existingEntry = await _easyStockAppDbContext.WatchLists
+                .AnyAsync(w => w.UserId == userId && w.StockId == stockId);
+
+            if (existingEntry)
+            {
+                resp.IsSuccessful = false;
+                resp.Error = "Stock is already in the watchlist.";
+                return resp;
+            }
+
+            var watchlistEntry = StockWatchList.Create(userId, stockId);
+            _easyStockAppDbContext.WatchLists.Add(watchlistEntry);
+            await _easyStockAppDbContext.SaveChangesAsync();
+
+            // Fetch the stock details
+            var stockDetails = await _easyStockAppDbContext.Stocks
+                .Where(s => s.StockId == stockId)
+                .Select(s => new
+                {
+                    s.StockTitle,
+                    s.TotalUnits,
+                    s.PricePerUnit,
+                    s.CompanyName
+                })
+                .FirstOrDefaultAsync();
+
+            if (stockDetails == null)
+            {
+                resp.IsSuccessful = false;
+                resp.Error = "Stock details not found.";
+                return resp;
+            }
+
+            resp.Value = new StockWatchListResponse
+            {
+                WatchlistId = watchlistEntry.WatchlistId,
+                UserId = watchlistEntry.UserId,
+                StockId = watchlistEntry.StockId,
+                StockTitle = stockDetails.StockTitle,
+                TotalUnits = stockDetails.TotalUnits.ToString(), // Assuming TotalUnits is numeric
+                PricePerUnit = stockDetails.PricePerUnit,
+                CompanyName = stockDetails.CompanyName
+            };
+            resp.IsSuccessful = true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while retrieving the watchlist.");
+            resp.IsSuccessful = false;
+            resp.Error = "An error occurred while retrieving the watchlist.";
+            resp.TechMessage = ex.Message;
+        }
+        return resp;
+    }
+
+    public async Task<ServiceResponse<StockWatchListResponse>> RemoveFromWatchList(int userId, int stockId)
+    {
+        var resp = new ServiceResponse<StockWatchListResponse>();
+
+        try
+        {
+            var watchlistEntry = await _easyStockAppDbContext.WatchLists
+                .FirstOrDefaultAsync(w => w.UserId == userId && w.StockId == stockId);
+
+            if (watchlistEntry == null)
+            {
+                resp.IsSuccessful = false;
+                resp.Error = "The stock is not in the watchlist.";
+                return resp;
+            }
+
+            _easyStockAppDbContext.WatchLists.Remove(watchlistEntry);
+            await _easyStockAppDbContext.SaveChangesAsync();
+
+            var stockDetails = await _easyStockAppDbContext.Stocks
+                .Where(s => s.StockId == stockId)
+                .Select(s => new
+                {
+                    s.StockTitle
+                })
+                .FirstOrDefaultAsync();
+
+            resp.IsSuccessful = true;
+            resp.Value = new StockWatchListResponse
+            {
+                WatchlistId = watchlistEntry.WatchlistId,
+                UserId = watchlistEntry.UserId,
+                StockId = watchlistEntry.StockId,
+                StockTitle = stockDetails?.StockTitle ?? "Unknown" // Handle case where stock details might not be available
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while removing from the watchlist.");
+            resp.IsSuccessful = false;
+            resp.Error = "An error occurred while removing from the watchlist.";
+            resp.TechMessage = ex.Message;
+        }
+        return resp;
+    }
+
+    public async Task<ServiceResponse<GetWatchList>> GetWatchlist(int userId)
+    {
+        var resp = new ServiceResponse<GetWatchList>();
+
+        try
+        {
+            var watchlist = await _easyStockAppDbContext.WatchLists
+                .Where(w => w.UserId == userId)
+                .Select(w => new StockWatchListResponse
+                {
+                    WatchlistId = w.WatchlistId,
+                    UserId = w.UserId,
+                    StockId = w.StockId,
+                    StockTitle = w.Stock.StockTitle,
+                    CompanyName = w.Stock.CompanyName
+                }).ToListAsync();
+
+            resp.Value = new GetWatchList { WatchLists = watchlist };
+            resp.IsSuccessful = true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while retrieving all stocks.");
+            resp.IsSuccessful = false;
+            resp.Error = "An error occurred while fetching stocks.";
+            resp.TechMessage = ex.Message;
+        }
 
         return resp;
     }
 
-    // Helper Methods
+    //Helper Methods
 
     private Stocks CreateStockEntity(CreateStockRequest request)
     {

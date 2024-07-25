@@ -7,4 +7,8 @@ public interface IStockService
     Task<ServiceResponse<StockResponse>> GetStockById(int stockId);
     Task<ServiceResponse<StockResponse>> UpdateStock(UpdateStockRequest request);
     Task<ServiceResponse<DeleteStockResponse>> DeleteStock(int stockId);
+
+    Task<ServiceResponse<StockWatchListResponse>> AddToWatchlist(int userId, int stockId);
+    Task<ServiceResponse<StockWatchListResponse>> RemoveFromWatchList(int userId, int stockId);
+    Task<ServiceResponse<GetWatchList>> GetWatchlist(int userId);
 }
