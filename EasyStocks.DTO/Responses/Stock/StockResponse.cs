@@ -2,7 +2,7 @@
 
 public class StockResponse : IServiceResponse
 {
-    public int Id { get; set; }
+    public int StockId { get; set; }
     public string StockTitle { get; set; }
     public string CompanyName { get; set; }
     public string StockType { get; set; }

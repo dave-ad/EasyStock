@@ -6,7 +6,7 @@ internal class StocksConfig : IEntityTypeConfiguration<Stocks>
     public void Configure(EntityTypeBuilder<Stocks> builder)
     {
         builder.ToTable(nameof(Stocks));
-        builder.HasKey(x => x.Id);
+        builder.HasKey(x => x.StockId);
 
         builder.Property(s => s.PricePerUnit)
                 .IsRequired()

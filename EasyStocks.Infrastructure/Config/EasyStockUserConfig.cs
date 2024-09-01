@@ -22,6 +22,6 @@ internal class EasyStockUserConfig : IEntityTypeConfiguration<EasyStockUser>
 
         builder.HasMany(u => u.Transactions)
                .WithOne(t => t.User)
-               .HasForeignKey(t => t.Id);
+               .HasForeignKey(t => t.UserId);
     }
 }

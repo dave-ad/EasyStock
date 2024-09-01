@@ -24,13 +24,16 @@ internal sealed class EasyStockAppDbContext : IdentityDbContext<User, IdentityRo
         builder.ApplyConfiguration(new IndividualBrokerConfig());
         builder.ApplyConfiguration(new FreelanceBrokerConfig());
         builder.ApplyConfiguration(new StocksConfig());
+        builder.ApplyConfiguration(new TransactionConfig());
     }
 
     public DbSet<Broker> Brokers { get; set; }
     public DbSet<Stocks> Stocks { get; set; }
-    public DbSet<Transactions> Transactions { get; set; }
+    public DbSet<Transaction> Transactions { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Admin> Admins { get; set; }
     public DbSet<BrokerAdmin> BrokerAdmins { get; set; }
     public DbSet<EasyStockUser> EasyStockUsers { get; set; }
+    public DbSet<StockWatchList> WatchLists { get; set; }
+    public DbSet<Invoice> Invoices { get; set; }
 }
