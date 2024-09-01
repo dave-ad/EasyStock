@@ -4,7 +4,7 @@ public class Payment : Entity
 {
     public int PaymentId { get; private set; }
     public int TransactionId { get; private set; }
-    public Transactions Transaction { get; private set; } = default!;
+    public Transaction Transaction { get; private set; } = default!;
     public decimal Amount { get; private set; }
     public DateTime PaymentDate { get; private set; }
     public PaymentStatus Status { get; private set; }

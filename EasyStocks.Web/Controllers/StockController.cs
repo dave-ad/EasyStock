@@ -1,4 +1,6 @@
-﻿namespace EasyStocks.Web.Controllers;
+﻿using EasyStocks.Domain.Entities;
+
+namespace EasyStocks.Web.Controllers;
 
 public class StockController : Controller
 {
@@ -292,4 +294,73 @@ public class StockController : Controller
 
     //    throw new UnauthorizedAccessException("User is not authenticated.");
     //}
+
+    [HttpGet]
+    public async Task<IActionResult> BuyStock(int stockId)
+    {
+        var stockResponse = await _stockService.GetStockById(stockId);
+
+        if (!stockResponse.IsSuccessful)
+        {
+            _logger.LogError("Failed to retrieve stock for purchase: {Error}", stockResponse.Error);
+            TempData["ErrorMessage"] = "Unable to retrieve stock details. Please try again.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var userId = GetCurrentUserId(); // Get the current user's ID
+
+        var viewModel = new BuyStockRequest
+        {
+            StockId = stockId,
+            UserId = userId,
+            StockTitle = stockResponse.Value.StockTitle,
+            CompanyName = stockResponse.Value.CompanyName,
+            PricePerUnit = stockResponse.Value.PricePerUnit,
+            TotalUnits = stockResponse.Value.TotalUnits
+        };
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> BuyStock(BuyStockRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(request); // Return the view with the model if validation fails
+        }
+
+        try
+        {
+            var userId = GetCurrentUserId(); // Get the current user's ID
+
+            var buyStockRequest = new BuyStockRequest
+            {
+                StockId = request.StockId,
+                UserId = userId,
+                UnitPurchase = request.UnitPurchase
+            };
+
+            var resp = await _stockService.BuyStock(buyStockRequest);
+
+            if (resp.IsSuccessful)
+            {
+                TempData["SuccessMessage"] = "Stock purchased successfully.";
+                return RedirectToAction(nameof(Index)); // Redirect to the stock list or another appropriate page
+            }
+            else
+            {
+                _logger.LogError("Failed to purchase stock: {Error}", resp.Error);
+                ModelState.AddModelError(string.Empty, resp.Error);
+                return View(request); // Return the view with error message
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred while purchasing stock.");
+            ModelState.AddModelError(string.Empty, "An error occurred while purchasing stock.");
+            return View(request); // Return the view with error message
+        }
+    }
+
 }

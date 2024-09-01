@@ -17,6 +17,7 @@ public class Stocks
     public string ListedBy { get; private set; }
 
     public List<StockWatchList> Watchlists { get; private set; } = new List<StockWatchList>();
+    public List<Transaction> Transactions { get; private set; } = new List<Transaction>();
 
     internal Stocks() {}
     internal Stocks(string stockTitle, string companyName,
@@ -77,5 +78,15 @@ public class Stocks
         MinimumPurchase = minimumPurchase;
         DateListed = dateListed;
         ListedBy = listedBy;
+    }
+
+    // Method to update TotalUnits
+    public void UpdateTotalUnits(decimal newTotalUnits)
+    {
+        if (newTotalUnits < 0)
+        {
+            throw new InvalidOperationException("Total units cannot be negative.");
+        }
+        TotalUnits = newTotalUnits.ToString();
     }
 }

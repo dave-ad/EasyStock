@@ -28,6 +28,11 @@
                             <input type="hidden" name="stockId" value="@item.StockId" />
                             <button type="submit" class="btn btn-danger">Remove</button>
                         </form>
+@*                         <form asp-action="BuyStock" asp-controller="Stock" method="post" style="display:inline;">
+                            <input type="hidden" name="stockId" value="@item.StockId" />
+                            <button type="submit" class="btn btn-success">Buy</button>
+                        </form> *@
+                        <a asp-action="BuyStock" asp-route-stockId="@item.StockId" class="btn btn-success" style="display:inline;">Buy</a>
                     </td>
                 </tr>
             }

@@ -371,6 +371,133 @@ public class StockService : IStockService
         return resp;
     }
 
+    public async Task<ServiceResponse<StockPurchaseResponse>> BuyStock(BuyStockRequest request)
+    {
+        var resp = new ServiceResponse<StockPurchaseResponse>();
+        try
+        {
+            // Fetch stock details
+            var stock = await _easyStockAppDbContext.Stocks
+                .FirstOrDefaultAsync(s => s.StockId == request.StockId);
+
+            if (stock == null)
+            {
+                _logger.LogWarning("Stock not found: {StockId}", request.StockId);
+                resp.IsSuccessful = false;
+                resp.Error = "Stock not found.";
+                return resp;
+            }
+
+            // Fetch user details along with their watchlists
+            var user = await _easyStockAppDbContext.EasyStockUsers
+                .Include(u => u.Watchlists) 
+                .FirstOrDefaultAsync(u => u.Id == request.UserId);
+
+            if (user == null)
+            {
+                _logger.LogWarning("User not found: {UserId}", request.UserId);
+                resp.IsSuccessful = false;
+                resp.Error = "User not found.";
+                return resp;
+            }
+
+            // Check if the stock is in the user's wishlist
+            if (!user.Watchlists.Any(w => w.StockId == request.StockId))
+            {
+                _logger.LogWarning("Stock not in user's watchlist: {StockId}, UserId: {UserId}", request.StockId, request.UserId);
+                resp.IsSuccessful = false;
+                resp.Error = "Stock is not in your wishlist.";
+                return resp;
+            }
+
+            // Parse and validate the unit purchase amount
+            if (!decimal.TryParse(request.UnitPurchase, out var unitPurchase) || unitPurchase <= 0)
+            {
+                _logger.LogWarning("Invalid unit purchase format: {UnitPurchase}", request.UnitPurchase);
+                resp.IsSuccessful = false;
+                resp.Error = "Invalid unit purchase format.";
+                return resp;
+            }
+
+            var transactionAmount = stock.PricePerUnit * unitPurchase;
+            if (transactionAmount < stock.InitialDeposit)
+            {
+                _logger.LogWarning("Insufficient deposit amount: {TransactionAmount}, InitialDeposit: {InitialDeposit}", transactionAmount, stock.InitialDeposit);
+                resp.IsSuccessful = false;
+                resp.Error = "Insufficient deposit amount.";
+                return resp;
+            }
+
+            // Check if there are enough units available
+            if ((!decimal.TryParse(stock.TotalUnits, out var totalUnits) || totalUnits < unitPurchase))
+            {
+                _logger.LogWarning("Not enough units available: {AvailableUnits}, RequestedUnits: {RequestedUnits}", stock.TotalUnits, unitPurchase);
+                resp.IsSuccessful = false;
+                resp.Error = "Not enough units available.";
+                return resp;
+            }
+
+            // Create a new transaction
+            var transaction = Domain.Entities.Transaction
+                .Create(request.StockId, 
+                        request.UserId, 
+                        stock.PricePerUnit, 
+                        request.UnitPurchase, 
+                        DateTime.Now
+                        );
+
+            // Deduct the purchased units from the stock using the method
+            stock.UpdateTotalUnits(totalUnits - unitPurchase);
+
+            // Create an invoice
+            var invoice = new Invoice
+            {
+                UserId = request.UserId,
+                StockId = request.StockId,
+                Quantity = unitPurchase,
+                PricePerUnit = stock.PricePerUnit,
+                TotalAmount = transactionAmount,
+                InvoiceDate = DateTime.Now,
+                Status = "Paid"
+            };
+
+            // Add the transaction to the context
+            _easyStockAppDbContext.Transactions.Add(transaction);
+            _easyStockAppDbContext.Invoices.Add(invoice);
+            user.AddTransaction(transaction);
+            stock.Transactions.Add(transaction);
+
+            // Save changes to the database
+            await _easyStockAppDbContext.SaveChangesAsync();
+
+            // Log the successful transaction
+            _logger.LogInformation("Transaction successful: {TransactionId}, UserId: {UserId}, StockId: {StockId}, Amount: {TotalAmount}", transaction.TransactionId, request.UserId, request.StockId, transactionAmount);
+
+            // Set the response value
+            resp.Value = new StockPurchaseResponse
+            {
+                TransactionId = transaction.TransactionId,
+                StockId = stock.StockId,
+                UnitPurchase = request.UnitPurchase,
+                PricePerUnit = stock.PricePerUnit,
+                TotalAmount = transactionAmount,
+                TransactionDate = transaction.TransactionDate,
+                Status = transaction.Status
+            };
+            resp.IsSuccessful = true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while processing the transaction for UserId: {UserId}, StockId: {StockId}", request.UserId, request.StockId);
+            resp.IsSuccessful = false;
+            resp.Error = "An error occurred while processing the transaction.";
+            resp.TechMessage = ex.Message;
+        }
+
+        return resp;
+    }
+
+
     //Helper Methods
 
     private Stocks CreateStockEntity(CreateStockRequest request)
