@@ -32,11 +32,11 @@ internal class UserConfig : IEntityTypeConfiguration<User>
             y.Property(z => z.Others).HasMaxLength(50);
         });
 
-        builder.OwnsOne(x => x.MobileNumber, y =>
-        {
-            y.Property(z => z.Value).HasMaxLength(11).IsRequired();
-            y.Property(z => z.Hash);
-        });
+        //builder.OwnsOne(x => x.MobileNumber, y =>
+        //{
+        //    y.Property(z => z.Value).HasMaxLength(11).IsRequired();
+        //    y.Property(z => z.Hash);
+        //});
 
         builder.Property(x => x.Gender).HasMaxLength(10);
 

@@ -10,8 +10,8 @@ public class BrokerAdmin : User
     public Broker Broker { get; set; }
 
     private BrokerAdmin() { }
-    public BrokerAdmin(FullName name, string email, MobileNo mobileNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment, AccountStatus status)
-        : base(name, email, mobileNumber, gender)
+    public BrokerAdmin(FullName name, string email, string phoneNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment, AccountStatus status)
+        : base(name, email, phoneNumber, gender)
     {
         PositionInOrg = positionInOrg;
         DateOfEmployment = dateOfEmployment;
@@ -19,14 +19,14 @@ public class BrokerAdmin : User
     }
 
     // Methods for creating and updating a broker user  
-    public static BrokerAdmin Create(FullName name, string email, MobileNo mobileNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment)
+    public static BrokerAdmin Create(FullName name, string email, string phoneNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment)
     {
-        return new BrokerAdmin(name, email, mobileNumber, gender, positionInOrg, dateOfEmployment, AccountStatus.Pending);
+        return new BrokerAdmin(name, email, phoneNumber, gender, positionInOrg, dateOfEmployment, AccountStatus.Pending);
     }
 
-    public void Update(FullName name, string email, MobileNo mobileNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment)
+    public void Update(FullName name, string email, string phoneNumber, Gender gender, string? positionInOrg, DateOnly? dateOfEmployment)
     {
-        base.Update(name, email, mobileNumber, gender);
+        base.Update(name, email, phoneNumber, gender);
         PositionInOrg = positionInOrg;
         DateOfEmployment = dateOfEmployment;
     }

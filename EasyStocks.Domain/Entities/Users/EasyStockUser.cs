@@ -12,8 +12,8 @@ public class EasyStockUser : User
 
     private EasyStockUser() { }
 
-    public EasyStockUser(FullName name, string email, MobileNo mobileNumber, Gender gender, DateOnly? dateOfBirth, Address? address, NIN? nin, AccountStatus? status)
-         : base(name, email, mobileNumber, gender)
+    public EasyStockUser(FullName name, string email, string phoneNumber, Gender gender, DateOnly? dateOfBirth, Address? address, NIN? nin, AccountStatus? status)
+         : base(name, email, phoneNumber, gender)
     {
         DateOfBirth = dateOfBirth;
         Address = address;
@@ -21,9 +21,9 @@ public class EasyStockUser : User
         Status = status;
     }
 
-    public static EasyStockUser Create(FullName name, string email, MobileNo mobileNumber, Gender gender, DateOnly? dateOfBirth, Address? address, NIN? nin)
+    public static EasyStockUser Create(FullName name, string email, string phoneNumber, Gender gender, DateOnly? dateOfBirth, Address? address, NIN? nin)
     {
-        return new EasyStockUser(name, email, mobileNumber, gender, dateOfBirth, address, nin, AccountStatus.Pending);
+        return new EasyStockUser(name, email, phoneNumber, gender, dateOfBirth, address, nin, AccountStatus.Pending);
     }
 
     public void AddTransaction(Transaction transaction)
