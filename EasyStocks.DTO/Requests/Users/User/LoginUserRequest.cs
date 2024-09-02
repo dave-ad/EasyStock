@@ -1,8 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace EasyStocks.DTO.Requests;
 
-namespace EasyStocks.DTO.Requests;
-
-public class LoginAdminRequest
+public class LoginUserRequest
 {
     [Required]
     public string Email { get; set; }

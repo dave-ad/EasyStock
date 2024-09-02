@@ -84,7 +84,7 @@ async Task CreateRoles(IServiceProvider serviceProvider)
         var roleExist = await roleManager.RoleExistsAsync(roleName);
         if (!roleExist)
         {
-            await roleManager.CreateAsync(new IdentityRole<int>(roleName));
+            await roleManager.CreateAsync(role: new IdentityRole<int>(roleName));
         }
     }
 }

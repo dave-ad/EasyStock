@@ -126,7 +126,7 @@ public sealed class AuthService : IAuthService
         return result;
     }
 
-    public async Task<IdentityResult> CreateEasyStockUserAsync(RegisterEasyStockUserRequest request)
+    public async Task<IdentityResult> CreateEasyStockUserAsync(RegisterUserRequest request)
     {
         var user = await RegisterUserEntity(request);
         user.UserName = user.Email;
@@ -203,7 +203,7 @@ public sealed class AuthService : IAuthService
     }
 
     // Helper Methods
-    private async Task<EasyStockUser> RegisterUserEntity(RegisterEasyStockUserRequest request)
+    private async Task<EasyStockUser> RegisterUserEntity(RegisterUserRequest request)
     {
         var fullname = FullName.Create(request.FirstName, request.LastName, request.OtherNames);
         var address = Address.Create(request.StreetNo, request.StreetName, request.City, request.State, request.ZipCode);

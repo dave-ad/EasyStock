@@ -1,5 +1,4 @@
-﻿
-namespace EasyStocks.Service.AdminServices;
+﻿namespace EasyStocks.Service.AdminAuthServices;
 
 public sealed class AdminAuthService : IAdminAuthService
 {
@@ -64,7 +63,7 @@ public sealed class AdminAuthService : IAdminAuthService
         }
         else
         {
-            _logger.LogError("Failed to create admin user {Email}.", request.Email);
+            _logger.LogError("Failed to create admin {Email}.", request.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
             return new RegisterResponse
             {
                 Success = false,
@@ -86,8 +85,6 @@ public sealed class AdminAuthService : IAdminAuthService
             };
         }
 
-
-        // Check if the user is a broker
         var isAdmin = await _userManager.IsInRoleAsync(admin, "Admin");
         if (!isAdmin)
         {
@@ -103,8 +100,7 @@ public sealed class AdminAuthService : IAdminAuthService
 
         if (result.Succeeded)
         {
-            // Generate a token
-            var token = _tokenService.CreateToken(admin); // Ensure this method is correctly defined in your TokenService
+            var token = _tokenService.CreateToken(admin); 
             _logger.LogInformation("Admin {Email} logged in successfully.", request.Email);
             return new LoginResponse
             {
