@@ -2,7 +2,8 @@
 
 namespace EasyStocks.API.Controllers;
 
-[Authorize(Roles = "Admin") ]
+//[Authorize(Roles = "Admin")]
+[Authorize(Policy = "AdminOnly")]
 [Route("api/[controller]")]
 [ApiController]
 public class AdminController : ControllerBase

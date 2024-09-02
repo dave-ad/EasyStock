@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-
-namespace EasyStocks.Infrastructure.Identity;
+﻿namespace EasyStocks.Infrastructure.Identity;
 
 public static class IdentityServicesConfigurator
 {
@@ -33,11 +29,17 @@ public static class IdentityServicesConfigurator
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
-                ValidIssuer = config["Jwt:Issuer"],
                 ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidIssuer = config["Jwt:Issuer"],
                 ValidAudience = config["JWT:Audience"],
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:SigningKey"]))
             };
+        });
+
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
         });
 
         //services.ConfigureApplicationCookie(config =>
