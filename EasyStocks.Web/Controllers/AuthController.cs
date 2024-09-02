@@ -1,6 +1,4 @@
-﻿using EasyStocks.DTO.Requests;
-
-namespace EasyStocks.Web.Controllers;
+﻿namespace EasyStocks.Web.Controllers;
 
 public class AuthController : Controller
 {
@@ -175,7 +173,7 @@ public class AuthController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> RegisterUser([FromForm] RegisterEasyStockUserRequest request)
+    public async Task<IActionResult> RegisterUser([FromForm] RegisterUserRequest request)
     {
         if (!ModelState.IsValid)
             return View(request);

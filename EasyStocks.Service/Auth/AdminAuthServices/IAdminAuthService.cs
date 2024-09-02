@@ -1,4 +1,4 @@
-﻿namespace EasyStocks.Service.AdminServices;
+﻿namespace EasyStocks.Service.AdminAuthServices;
 
 public interface IAdminAuthService
 {

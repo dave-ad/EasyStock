@@ -1,14 +1,12 @@
-﻿using EasyStocks.Service.AdminServices;
-using EasyStocks.Service.TokenServices;
-
-namespace EasyStocks.Service;
+﻿namespace EasyStocks.Service;
 
 public static class DIRegister
 {
     public static IServiceCollection AddEasyStockServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddInfrastructure(configuration);
-        services.AddScoped<IAdminService, AdminService>();
+        services.AddScoped<IAdminAuthService, AdminAuthService>();
+        services.AddScoped<IUserAuthService, UserAuthService>();
         services.AddScoped<IBrokerService, BrokerService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ITokenService, TokenService>();

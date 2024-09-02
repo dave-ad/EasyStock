@@ -1,18 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
-
-namespace EasyStocks.API.Controllers;
+﻿namespace EasyStocks.API.Controllers;
 
 [Authorize(Roles = "Admin") ]
 [Route("api/[controller]")]
 [ApiController]
-public class AdminController : ControllerBase
+public class AdminAuthenticationController : ControllerBase
 {
-    private readonly IAdminAuthService _adminService;
-    private readonly ILogger<AdminController> _logger;
+    private readonly IAdminAuthService _adminAuthService;
+    private readonly ILogger<AdminAuthenticationController> _logger;
 
-    public AdminController(IAdminAuthService adminService, ILogger<AdminController> logger)
+    public AdminAuthenticationController(IAdminAuthService adminAuthService, ILogger<AdminAuthenticationController> logger)
     {
-        _adminService = adminService ?? throw new ArgumentNullException(nameof(adminService));
+        _adminAuthService = adminAuthService ?? throw new ArgumentNullException(nameof(adminAuthService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -23,7 +21,7 @@ public class AdminController : ControllerBase
 
         try
         {
-            var response = await _adminService.RegisterAdminAsync(request);
+            var response = await _adminAuthService.RegisterAdminAsync(request);
 
             if (response.Success)
             {
@@ -38,7 +36,7 @@ public class AdminController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An exception occurred while creating admin account for email {Email}.", request.Email);
+            _logger.LogError(ex, "An exception occurred while creating admin account with email {Email}.", request.Email);
             return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while creating the admin account.");
         }
     }
@@ -50,7 +48,7 @@ public class AdminController : ControllerBase
 
         try
         {
-            var response = await _adminService.LoginAdminAsync(request);
+            var response = await _adminAuthService.LoginAdminAsync(request);
 
             if (response.Success)
             {
