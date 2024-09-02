@@ -576,7 +576,7 @@ public sealed class BrokerService : IBrokerService
             var brokerAdmin = BrokerAdmin.Create(
                 FullName.Create(userRequest.FirstName, userRequest.LastName, userRequest.OtherNames),
                 userRequest.Email,
-                MobileNo.Create(userRequest.MobileNumber),
+                userRequest.PhoneNumber,
                 userRequest.Gender,
                 userRequest.PositionInOrg,
                 userRequest.DateOfEmployment

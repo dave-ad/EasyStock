@@ -142,14 +142,14 @@ public class BrokerValidator
                 return resp;
             }
 
-            if (string.IsNullOrWhiteSpace(user.MobileNumber))
+            if (string.IsNullOrWhiteSpace(user.PhoneNumber))
             {
                 resp.Error = "Mobile Number is required.";
                 resp.IsSuccessful = false;
                 return resp;
             }
 
-            if (!IsValidPhoneNumber(user.MobileNumber) || user.MobileNumber.Length > 11)
+            if (!IsValidPhoneNumber(user.PhoneNumber) || user.PhoneNumber.Length > 11)
             {
                 resp.Error = "Invalid Mobile Number format.";
                 resp.IsSuccessful = false;
@@ -200,14 +200,14 @@ public class BrokerValidator
                 return resp;
             }
 
-            if (string.IsNullOrWhiteSpace(user.MobileNumber))
+            if (string.IsNullOrWhiteSpace(user.PhoneNumber))
             {
                 resp.Error = "Mobile Number is required.";
                 resp.IsSuccessful = false;
                 return resp;
             }
 
-            if (!IsValidPhoneNumber(user.MobileNumber) || user.MobileNumber.Length > 11)
+            if (!IsValidPhoneNumber(user.PhoneNumber) || user.PhoneNumber.Length > 11)
             {
                 resp.Error = "Invalid Mobile Number format.";
                 resp.IsSuccessful = false;
@@ -316,14 +316,14 @@ public class BrokerValidator
                 return resp;
             }
 
-            if (string.IsNullOrWhiteSpace(user.MobileNumber))
+            if (string.IsNullOrWhiteSpace(user.PhoneNumber))
             {
                 resp.Error = "Mobile Number is required.";
                 resp.IsSuccessful = false;
                 return resp;
             }
 
-            if (!IsValidPhoneNumber(user.MobileNumber) || user.MobileNumber.Length > 11)
+            if (!IsValidPhoneNumber(user.PhoneNumber) || user.PhoneNumber.Length > 11)
             {
                 resp.Error = "Invalid Mobile Number format.";
                 resp.IsSuccessful = false;

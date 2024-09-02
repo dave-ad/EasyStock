@@ -1,16 +1,26 @@
-﻿namespace EasyStocks.DTO.Requests;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
-public class CreateAdminRequest
+namespace EasyStocks.DTO.Requests;
+
+public class RegisterAdminRequest
 {
+    [Required]
     public string FirstName { get; set; } = string.Empty;
+    [Required]
     public string LastName { get; set; } = string.Empty;
+    [Required]
     public string OtherNames { get; set; } = string.Empty;
+    [Required]
+    [EmailAddress]
     public string Email { get; set; } = string.Empty;
-    public string MobileNumber { get; set; } = string.Empty;
+    [Required]
+    public string PhoneNumber { get; set; } = string.Empty;
+    [Required]
     public Gender Gender { get; set; }
-    public int SuperAdminLevel { get; set; }
-    public List<string>? Permissions { get; set; } = new List<string>();
-
+    [Required]
+    [PasswordPropertyText]
     public string Password { get; set; } = string.Empty;
+    [Required]
     public string ConfirmPassword { get; set; } = string.Empty;
 }

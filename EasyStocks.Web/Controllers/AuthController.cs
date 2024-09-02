@@ -1,4 +1,6 @@
-﻿namespace EasyStocks.Web.Controllers;
+﻿using EasyStocks.DTO.Requests;
+
+namespace EasyStocks.Web.Controllers;
 
 public class AuthController : Controller
 {
@@ -21,7 +23,7 @@ public class AuthController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> RegisterAdmin([FromForm] CreateAdminRequest request)
+    public async Task<IActionResult> RegisterAdmin([FromForm] RegisterAdminRequest request)
     {
         if (!ModelState.IsValid)
         {
