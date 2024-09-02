@@ -9,6 +9,7 @@ global using EasyStocks.Utils.Enums;
 global using EasyStocks.Service.AuthServices;
 global using EasyStocks.Service.BrokerServices;
 global using EasyStocks.Service.StocksServices;
+global using EasyStocks.Service.TokenServices;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Configuration;

@@ -1,4 +1,6 @@
-﻿namespace EasyStocks.Service.AuthServices;
+﻿using EasyStocks.DTO.Requests;
+
+namespace EasyStocks.Service.AuthServices;
 
 public sealed class AuthService : IAuthService
 {
@@ -13,15 +15,15 @@ public sealed class AuthService : IAuthService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<IdentityResult> CreateAdminAsync(CreateAdminRequest request)
+    public async Task<IdentityResult> CreateAdminAsync(RegisterAdminRequest request)
     {
         var admin = Admin.Create(
             FullName.Create(request.FirstName, request.LastName, request.OtherNames),
             request.Email,
-            MobileNo.Create(request.MobileNumber),
-            request.Gender,
-            request.SuperAdminLevel,
-            request.Permissions
+            request.PhoneNumber,
+            request.Gender
+            //request.SuperAdminLevel,
+            //request.Permissions
         );
         admin.UserName = admin.Email;
 
@@ -204,14 +206,13 @@ public sealed class AuthService : IAuthService
     private async Task<EasyStockUser> RegisterUserEntity(RegisterEasyStockUserRequest request)
     {
         var fullname = FullName.Create(request.FirstName, request.LastName, request.OtherNames);
-        var mobileNumber = MobileNo.Create(request.MobileNumber);
         var address = Address.Create(request.StreetNo, request.StreetName, request.City, request.State, request.ZipCode);
         var nin = NIN.Create(request.NIN);
 
         var user = EasyStockUser.Create(
             name: fullname,
             email: request.Email,
-            mobileNumber: mobileNumber,
+            phoneNumber: request.PhoneNumber,
             gender: request.Gender,
             dateOfBirth: request.DateOfBirth,
             address: address,

@@ -1,43 +1,49 @@
-﻿namespace EasyStocks.Infrastructure.Identity;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
+namespace EasyStocks.Infrastructure.Identity;
 
 public static class IdentityServicesConfigurator
 {
     public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
     {
-        services.AddIdentity<User, IdentityRole>()
-            .AddEntityFrameworkStores<EasyStockAppDbContext>()
-            .AddDefaultTokenProviders();
-
-        //services.AddAuthorization(options =>
-        //{
-        //    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole(Roles.Admin));
-        //});
-
-        services.Configure<IdentityOptions>(options =>
+        services.AddIdentity<User, IdentityRole<int>>(options =>
         {
-            // Password settings
             options.Password.RequireDigit = true;
-            options.Password.RequiredLength = 8;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequireUppercase = true;
             options.Password.RequireLowercase = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequiredLength = 8;
+        })
+        .AddEntityFrameworkStores<EasyStockAppDbContext>()
+        .AddDefaultTokenProviders();
 
-            // Lockout settings
-
-            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
-            options.Lockout.MaxFailedAccessAttempts = 5;
-            options.Lockout.AllowedForNewUsers = true;
-
-            // User settings
-            options.User.RequireUniqueEmail = true;
-        });
-
-        services.ConfigureApplicationCookie(config =>
+        services.AddAuthentication(options =>
         {
-            // Configure cookie settings
-            config.Cookie.Name = "EastStockApp.Cookie";
-            // Other cookie settings
+            options.DefaultAuthenticateScheme =
+            options.DefaultChallengeScheme =
+            options.DefaultForbidScheme =
+            options.DefaultScheme =
+            options.DefaultSignInScheme =
+            options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = config["Jwt:Issuer"],
+                ValidateAudience = true,
+                ValidAudience = config["JWT:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:SigningKey"]))
+            };
         });
+
+        //services.ConfigureApplicationCookie(config =>
+        //{
+        //    config.Cookie.Name = "EastStockApp.Cookie";
+        //});
 
         return services;
     }

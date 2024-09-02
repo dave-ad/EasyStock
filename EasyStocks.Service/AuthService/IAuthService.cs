@@ -1,8 +1,10 @@
-﻿namespace EasyStocks.Service.AuthServices;
+﻿using EasyStocks.DTO.Requests;
+
+namespace EasyStocks.Service.AuthServices;
 
 public interface IAuthService
 {
-    Task<IdentityResult> CreateAdminAsync(CreateAdminRequest request);
+    Task<IdentityResult> CreateAdminAsync(RegisterAdminRequest request);
     Task<SignInResult> LoginAdminAsync(string email, string password);
     Task<SignInResult> LoginBrokerAdminAsync(string email, string password);
     Task<IdentityResult> CreateEasyStockUserAsync(RegisterEasyStockUserRequest request);
