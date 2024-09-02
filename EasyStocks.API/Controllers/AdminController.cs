@@ -2,16 +2,15 @@
 
 namespace EasyStocks.API.Controllers;
 
-//[Authorize(Roles = "Admin")]
-[Authorize(Policy = "AdminOnly")]
+[Authorize(Roles = "Admin") ]
 [Route("api/[controller]")]
 [ApiController]
 public class AdminController : ControllerBase
 {
-    private readonly IAdminService _adminService;
+    private readonly IAdminAuthService _adminService;
     private readonly ILogger<AdminController> _logger;
 
-    public AdminController(IAdminService adminService, ILogger<AdminController> logger)
+    public AdminController(IAdminAuthService adminService, ILogger<AdminController> logger)
     {
         _adminService = adminService ?? throw new ArgumentNullException(nameof(adminService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));

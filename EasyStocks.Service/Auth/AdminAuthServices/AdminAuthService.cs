@@ -1,13 +1,14 @@
-﻿namespace EasyStocks.Service.AdminServices;
+﻿
+namespace EasyStocks.Service.AdminServices;
 
-public sealed class AdminService : IAdminService
+public sealed class AdminAuthService : IAdminAuthService
 {
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
     private readonly ITokenService _tokenService;
-    private readonly ILogger<AdminService> _logger;
+    private readonly ILogger<AdminAuthService> _logger;
 
-    public AdminService(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<AdminService> logger, ITokenService tokenService)
+    public AdminAuthService(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<AdminAuthService> logger, ITokenService tokenService)
     {
         _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
