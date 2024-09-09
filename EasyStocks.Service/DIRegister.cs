@@ -1,4 +1,6 @@
-﻿namespace EasyStocks.Service;
+﻿using EasyStocks.Service.BrokerAuthServices;
+
+namespace EasyStocks.Service;
 
 public static class DIRegister
 {
@@ -6,6 +8,7 @@ public static class DIRegister
     {
         services.AddInfrastructure(configuration);
         services.AddScoped<IAdminAuthService, AdminAuthService>();
+        services.AddScoped<IBrokerAuthService, BrokerAuthService>();
         services.AddScoped<IUserAuthService, UserAuthService>();
         services.AddScoped<IBrokerService, BrokerService>();
         services.AddScoped<IAuthService, AuthService>();

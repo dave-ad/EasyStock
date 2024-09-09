@@ -53,7 +53,7 @@ public sealed class UserAuthService : IUserAuthService
             }
             else
             {
-                _logger.LogWarning("Failed to assign User role to {Email}.", request.Email);
+                _logger.LogWarning("Failed to assign user role to {Email}.", request.Email);
                 return new RegisterResponse
                 {
                     Success = false,
@@ -136,7 +136,7 @@ public sealed class UserAuthService : IUserAuthService
             dateOfBirth: request.DateOfBirth,
             address: address,
             nin: nin
-            );
+        );
 
         return user;
     }

@@ -8,3 +8,4 @@ global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.OpenApi.Models;
+global using EasyStocks.Service.BrokerAuthServices;
