@@ -41,7 +41,9 @@ public static class IdentityServicesConfigurator
         {
             options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
             options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
-            options.AddPolicy("BrokerOnly", policy => policy.RequireRole("Broker"));
+            options.AddPolicy("CorporateBrokerOnly", policy => policy.RequireRole("CorporateBroker"));
+            options.AddPolicy("IndividualBrokerOnly", policy => policy.RequireRole("IndividualBroker"));
+            options.AddPolicy("FreelanceBrokerOnly", policy => policy.RequireRole("FreelanceBroker"));
         });
 
         //services.ConfigureApplicationCookie(config =>

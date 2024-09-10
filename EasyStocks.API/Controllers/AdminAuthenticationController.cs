@@ -67,4 +67,27 @@ public class AdminAuthenticationController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
         }
     }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        if (string.IsNullOrEmpty(request.Token))
+        {
+            _logger.LogWarning("Logout request failed. Token is missing.");
+            return BadRequest(new { Success = false, Errors = new[] { "Token is required." } });
+        }
+
+        var response = await _adminAuthService.LogoutAdminAsync(request.Token);
+
+        if (!response.Success)
+        {
+            _logger.LogWarning("Logout failed.");
+            return BadRequest(response);
+        }
+
+        _logger.LogInformation("Logout successful.");
+        return Ok(response);
+    }
 }
