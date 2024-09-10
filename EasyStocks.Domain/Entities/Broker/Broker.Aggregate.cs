@@ -6,7 +6,7 @@ public partial class Broker : IAggregateRoot
     //Corporate Broker
     private Broker(string companyName, Email companyEmail, MobileNo companyMobileNumber,
                     Address companyAddress, CAC cacRegistrationNumber,
-                    StockBrokerLicense stockBrokerLicense, DateOnly dateCertified, AccountStatus status, BrokerType brokerType, List<BrokerAdmin> users)
+                    StockBrokerLicense stockBrokerLicense, DateOnly dateCertified, AccountStatus status, BrokerRole brokerType, List<BrokerAdmin> users)
     {
         CompanyName = companyName;
         CompanyEmail = companyEmail;
@@ -24,7 +24,7 @@ public partial class Broker : IAggregateRoot
     private Broker(List<BrokerAdmin> users,
                     StockBrokerLicense stockBrokerLicenseNumber, DateOnly dateCertified,
                     AccountStatus status, Address businessAddress,
-                    string professionalQualification, BrokerType brokerType)
+                    string professionalQualification, BrokerRole brokerType)
     {
         Users = users;
         StockBrokerLicense = stockBrokerLicenseNumber;
@@ -37,7 +37,7 @@ public partial class Broker : IAggregateRoot
 
     // Freelance Broker
     private Broker(List<BrokerAdmin> users, AccountStatus status,
-                    string professionalQualification, BrokerType brokerType)
+                    string professionalQualification, BrokerRole brokerType)
     {
         Users = users;
         Status = status;
@@ -53,7 +53,7 @@ public partial class Broker : IAggregateRoot
 
         return new Broker(companyName, companyEmail, companyMobileNumber, companyAddress,
                             cacRegistrationNumber, stockBrokerLicense, dateCertified,
-                            AccountStatus.Pending, BrokerType.Corporate, users);
+                            AccountStatus.Pending, BrokerRole.CorporateBroker, users);
     }
 
     public static Broker CreateIndividual(List<BrokerAdmin> users,
@@ -64,14 +64,14 @@ public partial class Broker : IAggregateRoot
 
         return new Broker(users,
                             stockBrokerLicenseNumber, dateCertified, AccountStatus.Pending,
-                            businessAddress, professionalQualification, BrokerType.Individual);
+                            businessAddress, professionalQualification, BrokerRole.IndividualBroker);
     }
 
     public static Broker CreateFreelance(List<BrokerAdmin> users, string professionalQualification)
     {
 
         return new Broker(users,
-                            AccountStatus.Pending, professionalQualification, BrokerType.Freelance);
+                            AccountStatus.Pending, professionalQualification, BrokerRole.FreelanceBroker);
     }
 
     public void UpdateCorporate(string companyName, Email companyEmail, MobileNo companyMobileNumber,

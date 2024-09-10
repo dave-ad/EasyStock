@@ -135,7 +135,9 @@ public class BrokerAuthenticationController : ControllerBase
 
         try
         {
-            var response = await _brokerAuthService.LoginCorporateBrokerAsync(request);
+            //var response = await _brokerAuthService.LoginCorporateBrokerAsync(request);
+            var response = await _brokerAuthService.LoginBrokerAsync(request, BrokerRole.CorporateBroker);
+
 
             if (response.Success)
             {
@@ -162,7 +164,8 @@ public class BrokerAuthenticationController : ControllerBase
 
         try
         {
-            var response = await _brokerAuthService.LoginIndividualBrokerAsync(request);
+            //var response = await _brokerAuthService.LoginIndividualBrokerAsync(request);
+            var response = await _brokerAuthService.LoginBrokerAsync(request, BrokerRole.FreelanceBroker);
 
             if (response.Success)
             {
@@ -189,7 +192,8 @@ public class BrokerAuthenticationController : ControllerBase
 
         try
         {
-            var response = await _brokerAuthService.LoginFreelanceBrokerAsync(request);
+            //var response = await _brokerAuthService.LoginFreelanceBrokerAsync(request);
+            var response = await _brokerAuthService.LoginBrokerAsync(request, BrokerRole.FreelanceBroker);
 
             if (response.Success)
             {
@@ -207,5 +211,32 @@ public class BrokerAuthenticationController : ControllerBase
             _logger.LogError(ex, "An exception occurred while logging in broker with email {Email}.", request.Email);
             return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
         }
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        if (string.IsNullOrEmpty(request.Token))
+        {
+            _logger.LogWarning("Logout request failed. Token is missing.");
+            return BadRequest(new 
+            { 
+                Success = false, 
+                Errors = new[] { "Token is required." } 
+            });
+        }
+
+        var response = await _brokerAuthService.LogoutBrokerAsync(request);
+
+        if (!response.Success)
+        {
+            _logger.LogWarning("Logout failed. Errors: {Errors}", string.Join(", ", response.Errors));
+            return BadRequest(response);
+        }
+
+        _logger.LogInformation("Logout successful.");
+        return Ok(response);
     }
 }

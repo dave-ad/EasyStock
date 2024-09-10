@@ -1,6 +1,4 @@
-﻿using EasyStocks.Service.BrokerAuthServices;
-
-namespace EasyStocks.Service;
+﻿namespace EasyStocks.Service;
 
 public static class DIRegister
 {

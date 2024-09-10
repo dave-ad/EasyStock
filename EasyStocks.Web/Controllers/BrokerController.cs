@@ -45,7 +45,7 @@ public class BrokerController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetBrokersByType([FromQuery] BrokerType brokerType)
+    public async Task<IActionResult> GetBrokersByType([FromQuery] BrokerRole brokerType)
     {
         _logger.LogInformation("BrokerType: {BrokerType}", brokerType);
 
@@ -59,13 +59,13 @@ public class BrokerController : Controller
 
         switch (brokerType)
         {
-            case BrokerType.Corporate:
+            case BrokerRole.CorporateBroker:
                 ViewData["Title"] = "Corporate Brokers";
                 break;
-            case BrokerType.Individual:
+            case BrokerRole.IndividualBroker:
                 ViewData["Title"] = "Individual Brokers";
                 break;
-            case BrokerType.Freelance:
+            case BrokerRole.FreelanceBroker:
                 ViewData["Title"] = "Freelance Brokers";
                 break;
             default:

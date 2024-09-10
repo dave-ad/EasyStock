@@ -76,14 +76,18 @@ public class AdminAuthenticationController : ControllerBase
         if (string.IsNullOrEmpty(request.Token))
         {
             _logger.LogWarning("Logout request failed. Token is missing.");
-            return BadRequest(new { Success = false, Errors = new[] { "Token is required." } });
+            return BadRequest(new 
+            { 
+                Success = false, 
+                Errors = new[] { "Token is required." } 
+            });
         }
 
-        var response = await _adminAuthService.LogoutAdminAsync(request.Token);
+        var response = await _adminAuthService.LogoutAdminAsync(request);
 
         if (!response.Success)
         {
-            _logger.LogWarning("Logout failed.");
+            _logger.LogWarning("Logout failed. Errors: {Errors}", string.Join(", ", response.Errors));
             return BadRequest(response);
         }
 

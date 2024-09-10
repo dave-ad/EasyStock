@@ -123,9 +123,9 @@ public sealed class AdminAuthService : IAdminAuthService
         }
     }
 
-    public async Task<LogoutResponse> LogoutAdminAsync(string token)
+    public async Task<LogoutResponse> LogoutAdminAsync(LogoutRequest request)
     {
-        var isTokenBlacklisted = await _tokenBlacklistService.IsTokenBlacklistedAsync(token);
+        var isTokenBlacklisted = await _tokenBlacklistService.IsTokenBlacklistedAsync(request.Token);
         if (isTokenBlacklisted)
         {
             _logger.LogWarning("Token already blacklisted.");
@@ -137,7 +137,7 @@ public sealed class AdminAuthService : IAdminAuthService
         }
 
         // Invalidate the JWT token by adding it to the blacklist repository
-        var blacklistingResult = await _tokenBlacklistService.BlacklistTokenAsync(token);
+        var blacklistingResult = await _tokenBlacklistService.BlacklistTokenAsync(request.Token);
         if (!blacklistingResult)
         {
             _logger.LogError("Failed to blacklist token.");
