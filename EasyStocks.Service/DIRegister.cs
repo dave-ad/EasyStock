@@ -1,6 +1,4 @@
-﻿using EasyStocks.Service.BrokerAuthServices;
-
-namespace EasyStocks.Service;
+﻿namespace EasyStocks.Service;
 
 public static class DIRegister
 {
@@ -13,6 +11,7 @@ public static class DIRegister
         services.AddScoped<IBrokerService, BrokerService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<ITokenBlacklistService, TokenBlacklistService>();
         services.AddScoped<IStockService, StockService>();
         return services;
     }

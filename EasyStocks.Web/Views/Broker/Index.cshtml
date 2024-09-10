@@ -4,9 +4,9 @@
 <div>
     @* <h3>Filter Brokers By Type:</h3> *@
     <div>
-        <a href="@Url.Action("GetBrokersByType", "Broker", new { brokerType = BrokerType.Corporate })" class="btn btn-primary">Corporate Brokers</a>
-        <a href="@Url.Action("GetBrokersByType", "Broker", new { brokerType = BrokerType.Individual })" class="btn btn-primary">Individual Brokers</a>
-        <a href="@Url.Action("GetBrokersByType", "Broker", new { brokerType = BrokerType.Freelance })" class="btn btn-primary">Freelance Brokers</a>
+        <a href="@Url.Action("GetBrokersByType", "Broker", new { brokerType = BrokerRole.CorporateBroker })" class="btn btn-primary">Corporate Brokers</a>
+        <a href="@Url.Action("GetBrokersByType", "Broker", new { brokerType = BrokerRole.IndividualBroker })" class="btn btn-primary">Individual Brokers</a>
+        <a href="@Url.Action("GetBrokersByType", "Broker", new { brokerType = BrokerRole.FreelanceBroker })" class="btn btn-primary">Freelance Brokers</a>
     </div>
 </div>
 
@@ -17,12 +17,12 @@
         <thead>
             <tr>
                 <th>Type</th>
-                @if (brokerType == BrokerType.Corporate || brokerType == BrokerType.Individual)
+                @if (brokerType == BrokerRole.CorporateBroker || brokerType == BrokerRole.IndividualBroker)
                 {
                     <th>Stock Broker License</th>
                 }
                 <th>Email</th>
-                @if (brokerType == BrokerType.Corporate)
+                @if (brokerType == BrokerRole.CorporateBroker)
                 {
                     <th>Company Name</th>
                     <th>Company Email</th>
@@ -36,7 +36,7 @@
             {
                 <tr>
                     <td>@broker.BrokerType</td>
-                    @if (brokerType == BrokerType.Corporate || brokerType == BrokerType.Individual)
+                    @if (brokerType == BrokerRole.CorporateBroker || brokerType == BrokerRole.IndividualBroker)
                     {
                         <td>@broker.StockBrokerLicense</td>
                     }
@@ -47,7 +47,7 @@
                             <br />
                         }
                     </td>
-                    @if (brokerType == BrokerType.Corporate)
+                    @if (brokerType == BrokerRole.CorporateBroker)
                     {
                         <td>@broker.CompanyName</td>
                         <td>@broker.CompanyEmail</td>

@@ -84,7 +84,7 @@ public sealed class BrokerService : IBrokerService
         return resp;
     }
 
-    public async Task<ServiceResponse<BrokerListResponse>> GetBrokersByType(BrokerType? brokerType = null)
+    public async Task<ServiceResponse<BrokerListResponse>> GetBrokersByType(BrokerRole? brokerType = null)
     {
         var resp = new ServiceResponse<BrokerListResponse>();
 

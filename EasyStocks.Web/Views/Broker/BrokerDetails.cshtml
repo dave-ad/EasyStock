@@ -24,20 +24,20 @@
     <button type="submit" name="newStatus" value="Suspended" class="btn btn-warning" @(Model.Status == EasyStocks.Utils.Enums.AccountStatus.Approved ? "" : "hidden")>Suspend</button>
 </form>
 
-@if (Model.BrokerType == BrokerType.Corporate)
+@if (Model.BrokerType == BrokerRole.CorporateBroker)
 {
     <a href="@Url.Action("UpdateCorporateBroker", "Broker", new { id = Model.BrokerId })" class="btn btn-secondary">Edit</a>
 }
-else if (Model.BrokerType == BrokerType.Individual)
+else if (Model.BrokerType == BrokerRole.IndividualBroker)
 {
     <a href="@Url.Action("UpdateIndividualBroker", "Broker", new { id = Model.BrokerId })" class="btn btn-secondary">Edit</a>
 }
-else if (Model.BrokerType == BrokerType.Freelance)
+else if (Model.BrokerType == BrokerRole.FreelanceBroker)
 {
     <a href="@Url.Action("UpdateFreelanceBroker", "Broker", new { id = Model.BrokerId })" class="btn btn-secondary">Edit</a>
 }
 
-@if (Model.BrokerType == BrokerType.Corporate)
+@if (Model.BrokerType == BrokerRole.CorporateBroker)
 {
     <table class="table">
         <tr>
@@ -106,7 +106,7 @@ else if (Model.BrokerType == BrokerType.Freelance)
         </tr>
     </table>
 }
-else if (Model.BrokerType == BrokerType.Individual)
+else if (Model.BrokerType == BrokerRole.IndividualBroker)
 {
     <table class="table">
         <tr>
@@ -163,7 +163,7 @@ else if (Model.BrokerType == BrokerType.Individual)
         </tr>
     </table>
 }
-else if (Model.BrokerType == BrokerType.Freelance)
+else if (Model.BrokerType == BrokerRole.FreelanceBroker)
 {
     <table class="table">
         <tr>

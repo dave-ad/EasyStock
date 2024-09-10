@@ -20,6 +20,6 @@ public partial class Broker : Entity
     // Freelance Brokers
     public string? ProfessionalQualification { get; private set; } = default!;
 
-    public BrokerType BrokerType { get; private set; }
+    public BrokerRole BrokerType { get; private set; }
     public AccountStatus Status { get; private set; }
 }

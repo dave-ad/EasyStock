@@ -1,5 +1,4 @@
-﻿
-namespace EasyStocks.Service.BrokerAuthServices;
+﻿namespace EasyStocks.Service.BrokerAuthServices;
 
 public sealed class BrokerAuthService : IBrokerAuthService
 {
@@ -8,9 +7,10 @@ public sealed class BrokerAuthService : IBrokerAuthService
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
     private readonly ITokenService _tokenService;
+    private readonly ITokenBlacklistService _tokenBlacklistService;
     private readonly ILogger<BrokerAuthService> _logger;
 
-    public BrokerAuthService(IEasyStockAppDbContext easyStockAppDbContext, BrokerValidator validator, SignInManager<User> signInManager, UserManager<User> userManager, ILogger<BrokerAuthService> logger, ITokenService tokenService)
+    public BrokerAuthService(IEasyStockAppDbContext easyStockAppDbContext, BrokerValidator validator, SignInManager<User> signInManager, UserManager<User> userManager, ILogger<BrokerAuthService> logger, ITokenService tokenService, ITokenBlacklistService tokenBlacklistService)
     {
         _easyStockAppDbContext = easyStockAppDbContext ?? throw new ArgumentNullException(nameof(easyStockAppDbContext));
         _validator = validator ?? throw new ArgumentNullException(nameof(validator));
@@ -18,6 +18,7 @@ public sealed class BrokerAuthService : IBrokerAuthService
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _tokenService = tokenService;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _tokenBlacklistService = tokenBlacklistService;
     }
 
     public async Task<ServiceResponse<BrokerIdResponse>> CreateCorporateBroker(CreateCorporateBrokerRequest request)
@@ -199,8 +200,7 @@ public sealed class BrokerAuthService : IBrokerAuthService
         return resp;
     }
 
-
-    public async Task<LoginResponse> LoginCorporateBrokerAsync(BrokerLoginRequest request)
+    public async Task<LoginResponse> LoginBrokerAsync(BrokerLoginRequest request, BrokerRole brokerRole)
     {
         var broker = await _userManager.FindByEmailAsync(request.Email);
         if (broker == null)
@@ -213,14 +213,15 @@ public sealed class BrokerAuthService : IBrokerAuthService
             };
         }
 
-        var isBroker = await _userManager.IsInRoleAsync(broker, "CorporateBroker");
+        var roleName = brokerRole.ToString();
+        var isBroker = await _userManager.IsInRoleAsync(broker, roleName);
         if (!isBroker)
         {
-            _logger.LogWarning("Login failed for email: {Email}. User is not a broker.", request.Email);
+            _logger.LogWarning("Login failed for email: {Email}. User is not a {Role}.", request.Email, roleName);
             return new LoginResponse
             {
                 Success = false,
-                Errors = new List<string> { "User is not an broker" }
+                Errors = new List<string> { $"User is not a {roleName}" }
             };
         }
 
@@ -229,56 +230,7 @@ public sealed class BrokerAuthService : IBrokerAuthService
         if (result.Succeeded)
         {
             var token = _tokenService.CreateToken(broker);
-            _logger.LogInformation("Broker {Email} logged in successfully.", request.Email);
-            return new LoginResponse
-            {
-                Success = true,
-                Email = broker.Email,
-                Token = token,
-                Errors = null
-            };
-        }
-        else
-        {
-            _logger.LogWarning("Failed to log in broker {Email}.", request.Email);
-            return new LoginResponse
-            {
-                Success = false,
-                Errors = new List<string> { "Incorrect password or login failure" }
-            };
-        }
-    }
-    
-    public async Task<LoginResponse> LoginIndividualBrokerAsync(BrokerLoginRequest request)
-    {
-        var broker = await _userManager.FindByEmailAsync(request.Email);
-        if (broker == null)
-        {
-            _logger.LogWarning("Broker with email {Email} not found.", request.Email);
-            return new LoginResponse
-            {
-                Success = false,
-                Errors = new List<string> { "Broker not found" }
-            };
-        }
-
-        var isBroker = await _userManager.IsInRoleAsync(broker, "IndividualBroker");
-        if (!isBroker)
-        {
-            _logger.LogWarning("Login failed for email: {Email}. User is not a broker.", request.Email);
-            return new LoginResponse
-            {
-                Success = false,
-                Errors = new List<string> { "User is not an broker" }
-            };
-        }
-
-        var result = await _signInManager.PasswordSignInAsync(broker.UserName, request.Password, false, false);
-
-        if (result.Succeeded)
-        {
-            var token = _tokenService.CreateToken(broker);
-            _logger.LogInformation("Broker {Email} logged in successfully.", request.Email);
+            _logger.LogInformation("Broker {Email} logged in successfully as {Role}.", request.Email, roleName);
             return new LoginResponse
             {
                 Success = true,
@@ -298,53 +250,36 @@ public sealed class BrokerAuthService : IBrokerAuthService
         }
     }
 
-    public async Task<LoginResponse> LoginFreelanceBrokerAsync(BrokerLoginRequest request)
+    public async Task<LogoutResponse> LogoutBrokerAsync(LogoutRequest request)
     {
-        var broker = await _userManager.FindByEmailAsync(request.Email);
-        if (broker == null)
+        var isTokenBlacklisted = await _tokenBlacklistService.IsTokenBlacklistedAsync(request.Token);
+        if (isTokenBlacklisted)
         {
-            _logger.LogWarning("Broker with email {Email} not found.", request.Email);
-            return new LoginResponse
+            _logger.LogWarning("Token already blacklisted.");
+            return new LogoutResponse
             {
                 Success = false,
-                Errors = new List<string> { "Broker not found" }
+                Errors = new List<string> { "Token already invalidated" }
             };
         }
 
-        var isBroker = await _userManager.IsInRoleAsync(broker, "FreelanceBroker");
-        if (!isBroker)
+        var blacklistingResult = await _tokenBlacklistService.BlacklistTokenAsync(request.Token);
+        if (!blacklistingResult)
         {
-            _logger.LogWarning("Login failed for email: {Email}. User is not a broker.", request.Email);
-            return new LoginResponse
+            _logger.LogError("Failed to blacklist token.");
+            return new LogoutResponse
             {
                 Success = false,
-                Errors = new List<string> { "User is not an broker" }
+                Errors = new List<string> { "Failed to logout. Try again." }
             };
         }
 
-        var result = await _signInManager.PasswordSignInAsync(broker.UserName, request.Password, false, false);
-
-        if (result.Succeeded)
+        _logger.LogInformation("User logged out successfully.");
+        return new LogoutResponse
         {
-            var token = _tokenService.CreateToken(broker);
-            _logger.LogInformation("Broker {Email} logged in successfully.", request.Email);
-            return new LoginResponse
-            {
-                Success = true,
-                Email = broker.Email,
-                Token = token,
-                Errors = null
-            };
-        }
-        else
-        {
-            _logger.LogWarning("Failed to log in broker {Email}.", request.Email);
-            return new LoginResponse
-            {
-                Success = false,
-                Errors = new List<string> { "Incorrect password or login failure" }
-            };
-        }
+            Success = true,
+            Message = "Logout successful."
+        };
     }
 
     // Helper Methods

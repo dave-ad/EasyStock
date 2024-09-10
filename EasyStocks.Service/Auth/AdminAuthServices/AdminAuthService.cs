@@ -5,13 +5,15 @@ public sealed class AdminAuthService : IAdminAuthService
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
     private readonly ITokenService _tokenService;
+    private readonly ITokenBlacklistService _tokenBlacklistService;
     private readonly ILogger<AdminAuthService> _logger;
 
-    public AdminAuthService(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<AdminAuthService> logger, ITokenService tokenService)
+    public AdminAuthService(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<AdminAuthService> logger, ITokenService tokenService, ITokenBlacklistService tokenBlacklistService)
     {
         _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _tokenService = tokenService;
+        _tokenBlacklistService = tokenBlacklistService;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -119,6 +121,42 @@ public sealed class AdminAuthService : IAdminAuthService
                 Errors = new List<string> { "Incorrect password or login failure" }
             };
         }
+    }
+
+    public async Task<LogoutResponse> LogoutAdminAsync(LogoutRequest request)
+    {
+        var isTokenBlacklisted = await _tokenBlacklistService.IsTokenBlacklistedAsync(request.Token);
+        if (isTokenBlacklisted)
+        {
+            _logger.LogWarning("Token already blacklisted.");
+            return new LogoutResponse
+            {
+                Success = false,
+                Errors = new List<string> { "Token already invalidated"}
+            };
+        }
+
+        // Invalidate the JWT token by adding it to the blacklist repository
+        var blacklistingResult = await _tokenBlacklistService.BlacklistTokenAsync(request.Token);
+        if (!blacklistingResult)
+        {
+            _logger.LogError("Failed to blacklist token.");
+            return new LogoutResponse
+            {
+                Success = false,
+                Errors = new List<string> { "Failed to logout. Try again." }
+            };
+        }
+
+        // Sign out the user (if using cookie-based authentication, you can call _signInManager.SignOutAsync())
+        //await _signInManager.SignOutAsync();
+
+        _logger.LogInformation("Admin logged out successfully.");
+        return new LogoutResponse
+        {
+            Success = true,
+            Message = "Logout successful."
+        };
     }
 
     // Helper Methods

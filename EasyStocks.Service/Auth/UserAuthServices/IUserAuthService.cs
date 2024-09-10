@@ -4,4 +4,5 @@ public interface IUserAuthService
 {
     Task<RegisterResponse> RegisterUserAsync(RegisterUserRequest request);
     Task<LoginResponse> LoginUserAsync(LoginUserRequest request);
+    Task<LogoutResponse> LogoutUserAsync(LogoutRequest request);
 }
