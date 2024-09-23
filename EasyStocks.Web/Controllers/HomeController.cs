@@ -16,21 +16,21 @@ namespace EasyStocks.Web.Controllers
         //    return View();
         //}
 
-        public async Task<IActionResult> Index()
-        {
-            var response = await _stockService.GetAllStocks();
+        //public async Task<IActionResult> Index()
+        //{
+        //    var response = await _stockService.GetAll();
 
-            if (response.IsSuccessful)
-            {
-                return View(response.Value); // Assuming you have a view to display stocks
-            }
-            else
-            {
-                _logger.LogError("Failed to retrieve stocks: {Error}", response.Error);
-                ModelState.AddModelError(string.Empty, "Failed to retrieve stocks");
-                return View(); // Handle error scenario in the view
-            }
-        }
+        //    if (response.IsSuccessful)
+        //    {
+        //        return View(response.Value); // Assuming you have a view to display stocks
+        //    }
+        //    else
+        //    {
+        //        _logger.LogError("Failed to retrieve stocks: {Error}", response.Error);
+        //        ModelState.AddModelError(string.Empty, "Failed to retrieve stocks");
+        //        return View(); // Handle error scenario in the view
+        //    }
+        //}
 
         public IActionResult PageViews()
         {

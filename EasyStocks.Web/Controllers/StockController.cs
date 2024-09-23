@@ -15,21 +15,21 @@ public class StockController : Controller
         //_userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
     }
 
-    public async Task<IActionResult> Index()
-    {
-        var response = await _stockService.GetAllStocks();
+    //public async Task<IActionResult> Index()
+    //{
+    //    var response = await _stockService.GetAll();
 
-        if (response.IsSuccessful)
-        {
-            return View(response.Value); // Assuming you have a view to display stocks
-        }
-        else
-        {
-            _logger.LogError("Failed to retrieve stocks: {Error}", response.Error);
-            ModelState.AddModelError(string.Empty, "Failed to retrieve stocks");
-            return View(); // Handle error scenario in the view
-        }
-    }
+    //    if (response.IsSuccessful)
+    //    {
+    //        return View(response.Value); // Assuming you have a view to display stocks
+    //    }
+    //    else
+    //    {
+    //        _logger.LogError("Failed to retrieve stocks: {Error}", response.Error);
+    //        ModelState.AddModelError(string.Empty, "Failed to retrieve stocks");
+    //        return View(); // Handle error scenario in the view
+    //    }
+    //}
 
     [HttpGet]
     public ActionResult AddStock()
@@ -47,7 +47,7 @@ public class StockController : Controller
 
         try
         {
-            ServiceResponse<StockResponse> resp = await _stockService.CreateStock(request);
+            ServiceResponse<StockResponse> resp = await _stockService.Create(request);
 
             if (resp.IsSuccessful)
             {

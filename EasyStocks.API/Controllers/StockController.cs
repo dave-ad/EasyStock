@@ -16,26 +16,29 @@ public class StockController : ControllerBase
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    [HttpPost("create")]
+    //[HttpPost("create")]
+    [HttpPost]
     public async Task<IActionResult> CreateStock([FromBody] CreateStockRequest request)
     {
         if (!ModelState.IsValid)
         {
-            _logger.LogWarning("Invalid model state for stock request.");
+            _logger.LogWarning("Invalid model state for stock request: {ModelState}", ModelState);
             return BadRequest(ModelState);
         }
 
         try
         {
-            var response = await _stockService.CreateStock(request);
+            var response = await _stockService.Create(request);
 
             if (response.IsSuccessful)
             {
-                _logger.LogInformation("Stock created successfully.");
-                return Ok(response);
+                //_logger.LogInformation("Stock created successfully.");
+                //return Ok(response);
+                _logger.LogInformation("Stock created successfully with ID: {StockId}", response.Value.StockId);
+                return CreatedAtAction(nameof(GetStockById), new { stockId = response.Value.StockId }, response);
             }
 
-            _logger.LogWarning("Failed to stock: {Error}", response.Error);
+            _logger.LogWarning("Failed to create stock: {Error}", response.Error);
             return BadRequest(new
             {
                 Error = response.Error,
@@ -50,11 +53,11 @@ public class StockController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllStocks()
+    public async Task<IActionResult> GetAllStocks([FromQuery] QueryObject query)
     {
         try
         {
-            var response = await _stockService.GetAllStocks();
+            var response = await _stockService.GetAll(query);
 
             if (response.IsSuccessful)
             {

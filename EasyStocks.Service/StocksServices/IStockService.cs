@@ -2,8 +2,8 @@
 
 public interface IStockService
 {
-    Task<ServiceResponse<StockListResponse>> GetAllStocks();
-    Task<ServiceResponse<StockResponse>> CreateStock(CreateStockRequest request);
+    Task<ServiceResponse<StockListResponse>> GetAll(QueryObject query);
+    Task<ServiceResponse<StockResponse>> Create(CreateStockRequest request);
     Task<ServiceResponse<StockResponse>> GetStockById(int stockId);
     Task<ServiceResponse<StockResponse>> UpdateStock(UpdateStockRequest request);
     Task<ServiceResponse<DeleteStockResponse>> DeleteStock(int stockId);

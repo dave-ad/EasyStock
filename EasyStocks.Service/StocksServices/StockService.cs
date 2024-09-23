@@ -12,36 +12,39 @@ public class StockService : IStockService
         _validator = validator ?? throw new ArgumentNullException(nameof(validator));
     }
 
-    public async Task<ServiceResponse<StockResponse>> CreateStock(CreateStockRequest request)
+    public async Task<ServiceResponse<StockResponse>> Create(CreateStockRequest request)
     {
         var resp = new ServiceResponse<StockResponse>();
 
+        // Validate the request
         var validationResponse = _validator.ValidateStock(request);
         if (!validationResponse.IsSuccessful) return validationResponse;
 
+        // Use a transaction to ensure atomicity
         using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
             try
             {
+                // Check for existing stock title in a case-insensitive manner
                 var existingStock = await _easyStockAppDbContext.Stocks.AnyAsync(s => s.StockTitle.Trim().ToUpper() == request.StockTitle.ToUpper());
 
                 if (existingStock)
                     return CreateDuplicateErrorResponse(resp, "Stocks");
 
-                var stocks = CreateStockEntity(request);
-
-                var retStocks = _easyStockAppDbContext.Stocks.Add(stocks);
+                var stockEntity = CreateStockEntity(request);
+                var addedStock = await _easyStockAppDbContext.Stocks.AddAsync(stockEntity);
                 await _easyStockAppDbContext.SaveChangesAsync();
 
-                if (retStocks == null || retStocks.Entity.StockId < 1)
+                // Check if the stock was successfully added
+                if (addedStock == null || addedStock?.Entity.StockId < 1)
                     return CreateDatabaseErrorResponse(resp);
 
                 resp.Value = new StockResponse 
                 { 
-                    StockId = retStocks.Entity.StockId,
-                    StockTitle = retStocks.Entity.StockTitle,
+                    StockId = addedStock.Entity.StockId,
+                    StockTitle = addedStock.Entity.StockTitle,
                     CompanyName = request.CompanyName,
-                    StockType = retStocks.Entity.StockType,
+                    StockType = addedStock.Entity.StockType,
                     TotalUnits = request.TotalUnits,
                     PricePerUnit = request.PricePerUnit,
                     OpeningDate = request.OpeningDate,
@@ -55,11 +58,7 @@ public class StockService : IStockService
 
                 transaction.Complete();
             }
-            catch (ArgumentException ex)
-            {
-                return CreateExceptionResponse(resp, ex);
-            }
-            catch (InvalidOperationException ex)
+            catch (Exception ex) when (ex is ArgumentException || ex is InvalidOperationException)
             {
                 return CreateExceptionResponse(resp, ex);
             }
@@ -71,13 +70,13 @@ public class StockService : IStockService
         return resp;
     }
 
-    public async Task<ServiceResponse<StockListResponse>> GetAllStocks()
+    public async Task<ServiceResponse<StockListResponse>> GetAll(QueryObject query)
     {
         var resp = new ServiceResponse<StockListResponse>();
 
         try
         {
-            var stocks = await _easyStockAppDbContext.Stocks
+            var stocksQuery =  _easyStockAppDbContext.Stocks
                 .Select(s => new StockResponse
                 {
                     StockId = s.StockId,
@@ -92,9 +91,41 @@ public class StockService : IStockService
                     InitialDeposit = s.InitialDeposit,
                     DateListed = s.DateListed,
                     ListedBy = s.ListedBy
-                }).ToListAsync();
+                });
 
-            resp.Value = new StockListResponse { Stocks = stocks };
+            // Filtering
+            if (!string.IsNullOrWhiteSpace(query.StockTitle))
+            {
+                stocksQuery = stocksQuery.Where(s => s.StockTitle.Contains(query.StockTitle));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.CompanyName))
+            {
+                stocksQuery = stocksQuery.Where(s => s.CompanyName.Contains(query.CompanyName));
+            }
+
+            // Sorting
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                stocksQuery = query.IsDescending
+                ? stocksQuery.OrderByDescending(s => EF.Property<object>(s, query.SortBy))
+                : stocksQuery.OrderBy(s => EF.Property<object>(s, query.SortBy));
+
+                //if (query.SortBy.Equals("StockTitle", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    stocksQuery = query.IsDescending ? stocksQuery.OrderByDescending(s => s.StockTitle) : stocksQuery.OrderBy(s => s.StockTitle);
+                //}
+                //else if (query.SortBy.Equals("CompanyName", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    stocksQuery = query.IsDescending ? stocksQuery.OrderByDescending(s => s.CompanyName) : stocksQuery.OrderBy(s => s.CompanyName);
+                //}
+            }
+
+            // Pagination
+            var skipNumber = (query.PageNumber - 1) * query.PageSize;
+            var stocks = await stocksQuery.Skip(skipNumber).Take(query.PageSize).ToListAsync();
+
+            resp.Value = new StockListResponse { Stocks = stocks.ToList() };
             resp.IsSuccessful = true;
         }
         catch (Exception ex)
