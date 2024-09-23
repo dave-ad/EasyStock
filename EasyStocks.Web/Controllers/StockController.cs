@@ -38,7 +38,6 @@ public class StockController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddStock(CreateStockRequest request)
     {
         if (!ModelState.IsValid)
@@ -48,7 +47,7 @@ public class StockController : Controller
 
         try
         {
-            ServiceResponse<StockIdResponse> resp = await _stockService.CreateStock(request);
+            ServiceResponse<StockResponse> resp = await _stockService.CreateStock(request);
 
             if (resp.IsSuccessful)
             {

@@ -2,9 +2,9 @@
 
 public class StockValidator
 {
-    public ServiceResponse<StockIdResponse> ValidateStock(CreateStockRequest request)
+    public ServiceResponse<StockResponse> ValidateStock(CreateStockRequest request)
     {
-        var resp = new ServiceResponse<StockIdResponse>();
+        var resp = new ServiceResponse<StockResponse>();
 
         if (string.IsNullOrWhiteSpace(request.StockTitle))
         {
@@ -106,6 +106,6 @@ public class StockValidator
             return resp;
         }
 
-        return new ServiceResponse<StockIdResponse> { IsSuccessful = true};
+        return new ServiceResponse<StockResponse> { IsSuccessful = true};
     }
 }

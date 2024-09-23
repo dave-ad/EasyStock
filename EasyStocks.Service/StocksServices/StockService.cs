@@ -5,16 +5,16 @@ public class StockService : IStockService
     private readonly IEasyStockAppDbContext _easyStockAppDbContext;
     private readonly StockValidator _validator;
     private readonly ILogger<StockService> _logger;
-    public StockService(IEasyStockAppDbContext easyStockAppDbContext, StockValidator validator, ILogger<StockService> logger)
+    public StockService(IEasyStockAppDbContext easyStockAppDbContext, ILogger<StockService> logger, StockValidator validator)
     {
         _easyStockAppDbContext = easyStockAppDbContext ?? throw new ArgumentNullException(nameof(easyStockAppDbContext));
-        _validator = validator ?? throw new ArgumentNullException(nameof(validator));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _validator = validator ?? throw new ArgumentNullException(nameof(validator));
     }
 
-    public async Task<ServiceResponse<StockIdResponse>> CreateStock(CreateStockRequest request)
+    public async Task<ServiceResponse<StockResponse>> CreateStock(CreateStockRequest request)
     {
-        var resp = new ServiceResponse<StockIdResponse>();
+        var resp = new ServiceResponse<StockResponse>();
 
         var validationResponse = _validator.ValidateStock(request);
         if (!validationResponse.IsSuccessful) return validationResponse;
@@ -36,7 +36,21 @@ public class StockService : IStockService
                 if (retStocks == null || retStocks.Entity.StockId < 1)
                     return CreateDatabaseErrorResponse(resp);
 
-                resp.Value = new StockIdResponse { Id = retStocks.Entity.StockId };
+                resp.Value = new StockResponse 
+                { 
+                    StockId = retStocks.Entity.StockId,
+                    StockTitle = retStocks.Entity.StockTitle,
+                    CompanyName = request.CompanyName,
+                    StockType = retStocks.Entity.StockType,
+                    TotalUnits = request.TotalUnits,
+                    PricePerUnit = request.PricePerUnit,
+                    OpeningDate = request.OpeningDate,
+                    ClosingDate = request.ClosingDate,
+                    MinimumPurchase = request.MinimumPurchase,
+                    //InitialDeposit = request.InitialDeposit,
+                    DateListed = request.DateListed,
+                    ListedBy = request.ListedBy,
+                };
                 resp.IsSuccessful = true;
 
                 transaction.Complete();
@@ -497,7 +511,6 @@ public class StockService : IStockService
         return resp;
     }
 
-
     //Helper Methods
 
     private Stocks CreateStockEntity(CreateStockRequest request)
@@ -534,7 +547,7 @@ public class StockService : IStockService
         );
     }
 
-    private static ServiceResponse<StockIdResponse> CreateDuplicateErrorResponse(ServiceResponse<StockIdResponse> resp, string entityType)
+    private static ServiceResponse<StockResponse> CreateDuplicateErrorResponse(ServiceResponse<StockResponse> resp, string entityType)
     {
         resp.Error = $"{entityType} with the provided details already exists.";
         resp.TechMessage = $"Duplicate Error. A {entityType} with the provided details already exists in the database.";
@@ -542,7 +555,7 @@ public class StockService : IStockService
         return resp;
     }
 
-    private static ServiceResponse<StockIdResponse> CreateDatabaseErrorResponse(ServiceResponse<StockIdResponse> resp, Exception ex = null)
+    private static ServiceResponse<StockResponse> CreateDatabaseErrorResponse(ServiceResponse<StockResponse> resp, Exception ex = null)
     {
         resp.Error = "An unexpected error occurred while processing your request.";
         resp.TechMessage = ex == null ? "Unknown Database Error" : $"Database Error: {ex.GetBaseException().Message}";
@@ -550,7 +563,7 @@ public class StockService : IStockService
         return resp;
     }
 
-    private static ServiceResponse<StockIdResponse> CreateExceptionResponse(ServiceResponse<StockIdResponse> resp, Exception ex)
+    private static ServiceResponse<StockResponse> CreateExceptionResponse(ServiceResponse<StockResponse> resp, Exception ex)
     {
         resp.Error = "An unexpected error occurred. Please try again later.";
         resp.TechMessage = $"Exception: {ex.GetBaseException().Message}";
