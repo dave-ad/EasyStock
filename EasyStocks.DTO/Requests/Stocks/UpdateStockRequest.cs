@@ -2,15 +2,20 @@
 
 public class UpdateStockRequest
 {
-    public int Id { get; set; }
-    public string StockTitle { get; set; } = string.Empty;
+    public int StockId { get; set; }
+    public string TickerSymbol { get; set; } = string.Empty;
     public string CompanyName { get; set; } = string.Empty;
-    public string StockType { get; set; } = string.Empty;
-    public string TotalUnits { get; set; } = string.Empty;
-    public decimal PricePerUnit { get; set; }
-    public DateTime OpeningDate { get; set; }
-    public DateTime ClosingDate { get; set; }
-    public string MinimumPurchase { get; set; } = string.Empty;
-    public DateTime DateListed { get; set; }
-    public string ListedBy { get; set; } = string.Empty;
+    public string Exchange { get; set; } = string.Empty;
+    public decimal OpeningPrice { get; set; }
+    public decimal ClosingPrice { get; set; }
+    public decimal CurrentPrice { get; set; }
+    public decimal DayHigh { get; set; }
+    public decimal DayLow { get; set; }
+    public decimal YearHigh { get; set; }
+    public decimal YearLow { get; set; }
+    public int OutstandingShares { get; set; }
+    public decimal DividendYield { get; set; }
+    public decimal EarningsPerShare { get; set; }
+    public int Volume { get; set; }
+    public decimal Beta { get; set; }
 }

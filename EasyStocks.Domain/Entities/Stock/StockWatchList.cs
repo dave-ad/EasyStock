@@ -6,7 +6,7 @@ public class StockWatchList
     public int UserId { get; set; }
     public int StockId { get; set; }
     public EasyStockUser User { get; set; }
-    public Stocks Stock { get; set; }
+    public Stock Stock { get; set; }
 
     private StockWatchList() {}
     public StockWatchList(/*int watchlistId,*/ int userId, int stockId/*, EasyStockUser user, Stocks stock*/) 

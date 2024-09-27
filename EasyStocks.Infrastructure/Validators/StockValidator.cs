@@ -6,106 +6,111 @@ public class StockValidator
     {
         var resp = new ServiceResponse<StockResponse>();
 
-        if (string.IsNullOrWhiteSpace(request.StockTitle))
+        if (string.IsNullOrWhiteSpace(request.TickerSymbol))
         {
-            resp.Error = "Stock Title is required.";
+            resp.Error = "Ticker Symbol is required.";
             resp.IsSuccessful = false;
             return resp;
         }
-        
+
         if (string.IsNullOrWhiteSpace(request.CompanyName))
         {
             resp.Error = "Company Name is required.";
             resp.IsSuccessful = false;
             return resp;
         }
-        
-        if (string.IsNullOrWhiteSpace(request.StockType))
+
+        if (string.IsNullOrWhiteSpace(request.Exchange))
         {
-            resp.Error = "Stock Type is required.";
+            resp.Error = "Exchange platform is required.";
             resp.IsSuccessful = false;
             return resp;
         }
 
-        var validStockTypes = new List<string> { "Common", "Preferred" };
-        if (!validStockTypes.Contains(request.StockType))
+        if (request.OpeningPrice <= 0)
         {
-            resp.Error = "Invalid Stock Type. Stock type can only be 'Common' or 'Preferred'.";
+            resp.Error = "Opening Price must be greater than zero.";
             resp.IsSuccessful = false;
             return resp;
         }
 
-
-        if (string.IsNullOrWhiteSpace(request.TotalUnits))
+        if (request.ClosingPrice <= 0)
         {
-            resp.Error = "Total Units is required.";
+            resp.Error = "Opening Price must be greater than zero.";
             resp.IsSuccessful = false;
             return resp;
         }
 
-        if (request.TotalUnits.Length <= 0 || !request.TotalUnits.All(char.IsDigit))
+        if (request.CurrentPrice <= 0)
         {
-            resp.Error = "Total Units must be greater than zero.";
+            resp.Error = "Current Price must be a positive value.";
             resp.IsSuccessful = false;
             return resp;
         }
 
-        if (request.PricePerUnit <= 0)
+        if (request.DayHigh < 0)
         {
-            resp.Error = "Price Per Unit must be a positive value.";
+            resp.Error = "Day High must be a non-negative value.";
             resp.IsSuccessful = false;
             return resp;
         }
 
-        if (request.OpeningDate == default)
+        if (request.DayLow < 0)
         {
-            resp.Error = "Opening Date is required.";
+            resp.Error = "Day Low must be a non-negative value.";
             resp.IsSuccessful = false;
             return resp;
         }
 
-        if (request.ClosingDate == default)
+        if (request.YearHigh < 0)
         {
-            resp.Error = "Closing Date is required.";
+            resp.Error = "Year High must be a non-negative value.";
             resp.IsSuccessful = false;
             return resp;
         }
 
-        if (request.OpeningDate >= request.ClosingDate)
+        if (request.YearLow < 0)
         {
-            resp.Error = "Opening Date must be before Closing Date.";
+            resp.Error = "Year Low must be a non-negative value.";
             resp.IsSuccessful = false;
             return resp;
         }
 
-        if (string.IsNullOrWhiteSpace(request.MinimumPurchase))
+        if (request.OutstandingShares <= 0)
         {
-            resp.Error = "Total Units is required.";
+            resp.Error = "Outstanding Shares must be greater than zero.";
             resp.IsSuccessful = false;
             return resp;
         }
 
-        if (!request.MinimumPurchase.All(char.IsDigit))
+        if (request.DividendYield < 0)
         {
-            resp.Error = "Minimum purchase is 10 units.";
+            resp.Error = "Dividend Yield must be a non-negative value.";
             resp.IsSuccessful = false;
             return resp;
         }
 
-        if (request.DateListed == default)
+        if (request.EarningsPerShare < 0)
         {
-            resp.Error = "Date Listed is required.";
+            resp.Error = "Earnings Per Share must be a non-negative value.";
             resp.IsSuccessful = false;
             return resp;
         }
 
-        if (string.IsNullOrWhiteSpace(request.ListedBy))
+        if (request.Volume < 0)
         {
-            resp.Error = "Listed By is required.";
+            resp.Error = "Volume must be a non-negative value.";
             resp.IsSuccessful = false;
             return resp;
         }
 
-        return new ServiceResponse<StockResponse> { IsSuccessful = true};
-    }
+        if (request.Beta < 0)
+        {
+            resp.Error = "Beta must be a non-negative value.";
+            resp.IsSuccessful = false;
+            return resp;
+        }
+
+        return new ServiceResponse<StockResponse> { IsSuccessful = true };
+    }   
 }
