@@ -34,9 +34,9 @@ internal class TransactionConfig : IEntityTypeConfiguration<Transaction>
                .HasForeignKey(t => t.UserId)
                .IsRequired();
 
-        builder.HasOne(t => t.Stock)
-               .WithMany(s => s.Transactions)
-               .HasForeignKey(t => t.StockId)
-               .IsRequired();
+        //builder.HasOne(t => t.Stock)
+        //       .WithMany(s => s.Transactions)
+        //       .HasForeignKey(t => t.StockId)
+        //       .IsRequired();
     }
 }

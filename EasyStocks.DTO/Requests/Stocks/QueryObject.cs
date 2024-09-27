@@ -2,7 +2,7 @@
 
 public class QueryObject
 {
-    public string? StockTitle { get; set; }
+    public string? TickerSymbol { get; set; }
     public string? CompanyName { get; set; }
     //public string StockType { get; set; }
     //public string TotalUnits { get; set; }

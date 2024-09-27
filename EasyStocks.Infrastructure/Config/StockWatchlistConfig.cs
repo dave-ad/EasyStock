@@ -11,8 +11,8 @@ internal class StockWatchListConfig : IEntityTypeConfiguration<StockWatchList>
             .WithMany(u => u.Watchlists)
             .HasForeignKey(w => w.UserId);
 
-        builder.HasOne(w => w.Stock)
-            .WithMany(s => s.Watchlists)
-            .HasForeignKey(w => w.StockId);
+        //builder.HasOne(w => w.Stock)
+        //    .WithMany(s => s.Watchlists)
+        //    .HasForeignKey(w => w.StockId);
     }
 }
