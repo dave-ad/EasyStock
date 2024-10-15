@@ -15,4 +15,8 @@
     <ProjectReference Include="..\EasyStocks.Infrastructure\EasyStocks.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="AdminService\" />
+  </ItemGroup>
+
 </Project>
