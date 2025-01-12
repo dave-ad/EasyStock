@@ -7,7 +7,7 @@ public class Transaction : Entity
     public int StockId { get; private set; }
     public Stock Stock { get; private set; } = default!;
     public int UserId { get; private set; }
-    public EasyStockUser User { get; private set; } = default!;
+    public AppUser User { get; private set; } = default!;
     public decimal PricePerUnit { get; private set; }
     public string UnitPurchase { get; private set; }
     public decimal TransactionAmount { get; private set; }

@@ -4,10 +4,10 @@
 [ApiController]
 public class UserAuthenticationController : ControllerBase
 {
-    private readonly IUserAuthService _userAuthService;
+    private readonly IAppUserAuthService _userAuthService;
     private readonly ILogger<UserAuthenticationController> _logger;
 
-    public UserAuthenticationController(IUserAuthService userAuthService, ILogger<UserAuthenticationController> logger)
+    public UserAuthenticationController(IAppUserAuthService userAuthService, ILogger<UserAuthenticationController> logger)
     {
         _userAuthService = userAuthService ?? throw new ArgumentNullException(nameof(userAuthService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));

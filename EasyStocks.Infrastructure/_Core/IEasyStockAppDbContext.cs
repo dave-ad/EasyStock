@@ -8,8 +8,7 @@ public interface IEasyStockAppDbContext
     DbSet<Transaction> Transactions { get; set; }
     //DbSet<User> Users { get; set; }
     DbSet<Admin> Admins { get; set; }
-    DbSet<BrokerAdmin> BrokerAdmins { get; set; }
-    DbSet<EasyStockUser> EasyStockUsers { get; set; }
+    DbSet<AppUser> AppUsers { get; set; }
     DbSet<Invoice> Invoices { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

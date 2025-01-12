@@ -1,6 +1,6 @@
 ﻿namespace EasyStocks.DTO.Responses;
 
-public class RegisterResponse
+public class RegisterResponse : IServiceResponse
 {
     public bool Success { get; set; }
     public string UserName { get; set; }

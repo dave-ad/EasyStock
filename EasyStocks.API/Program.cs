@@ -64,6 +64,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors(policy =>
+    policy.AllowAnyOrigin()
+          .AllowAnyMethod()
+          .AllowAnyHeader());
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
@@ -78,7 +83,7 @@ async Task CreateRoles(IServiceProvider serviceProvider)
 {
     var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
 
-    string[] roleNames = { "Admin", "CorporateBroker", "FreelanceBroker", "IndividualBroker", "User" }; // Add your roles here
+    string[] roleNames = { "Admin", "Broker", "AppUser" }; // Add your roles here
     foreach (var roleName in roleNames)
     {
         var roleExist = await roleManager.RoleExistsAsync(roleName);

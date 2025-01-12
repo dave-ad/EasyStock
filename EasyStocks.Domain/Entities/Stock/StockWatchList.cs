@@ -5,7 +5,7 @@ public class StockWatchList
     public int WatchlistId { get; set; }
     public int UserId { get; set; }
     public int StockId { get; set; }
-    public EasyStockUser User { get; set; }
+    public AppUser User { get; set; }
     public Stock Stock { get; set; }
 
     private StockWatchList() {}

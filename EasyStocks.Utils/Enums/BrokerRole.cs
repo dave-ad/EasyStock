@@ -2,7 +2,5 @@
 
 public enum BrokerRole
 {
-    CorporateBroker,
-    IndividualBroker,
-    FreelanceBroker
+    Default,
 }

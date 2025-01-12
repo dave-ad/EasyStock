@@ -2,31 +2,29 @@
 
 public class User : IdentityUser<int>
 {
-    public FullName Name { get; private set; } = FullName.Default();
-    //public MobileNo MobileNumber { get; private set; } = MobileNo.Default();
-    public Gender Gender { get; private set; }
+    public FullName Name { get; protected set; } = FullName.Default();
+    public Gender Gender { get; protected set; }
+    public Address? Address { get; protected set; } = Address.Default();
+    public NIN? NIN { get; protected set; } = NIN.Default();
 
-    // User Specific Properties
     protected User() { }
-    public User(FullName name, string email, string phoneNumber, Gender gender)
+    public User(FullName name, string email, string phoneNumber, Gender gender, Address address, NIN nin)
     {
         Name = name;
         Email = email;
         PhoneNumber = phoneNumber;
         Gender = gender;
+        Address = address;
+        NIN = nin;
     }
 
-    //// Methods for creating and updating a easyStock user
-    //public static User Create(FullName name, string email, MobileNo mobileNumber, Gender gender)
-    //{
-    //    return new User(name, email, mobileNumber, gender);
-    //}
-
-    public void Update(FullName name, string email, string phoneNumber, Gender gender)
+    public void Update(FullName name, string email, string phoneNumber, Gender gender, Address address, NIN nin)
     {
         Name = name;
         Email = email;
         PhoneNumber = phoneNumber;
         Gender = gender;
+        Address = address;
+        NIN = nin;
     }
 }

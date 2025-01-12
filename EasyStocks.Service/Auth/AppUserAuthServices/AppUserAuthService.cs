@@ -1,14 +1,14 @@
-﻿namespace EasyStocks.Service.AdminAuthServices;
+﻿namespace EasyStocks.Service.UserAuthServices;
 
-public sealed class AdminAuthService : IAdminAuthService
+public sealed class AppUserAuthService : IAppUserAuthService
 {
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
     private readonly ITokenService _tokenService;
     private readonly ITokenBlacklistService _tokenBlacklistService;
-    private readonly ILogger<AdminAuthService> _logger;
+    private readonly ILogger<AppUserAuthService> _logger;
 
-    public AdminAuthService(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<AdminAuthService> logger, ITokenService tokenService, ITokenBlacklistService tokenBlacklistService)
+    public AppUserAuthService(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<AppUserAuthService> logger, ITokenService tokenService, ITokenBlacklistService tokenBlacklistService)
     {
         _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
@@ -17,45 +17,45 @@ public sealed class AdminAuthService : IAdminAuthService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<RegisterResponse> CreateAdminAsync(CreateAdminRequest request)
+    public async Task<RegisterResponse> RegisterUserAsync(RegisterUserRequest request)
     {
-        var admin = await CreateAdminEntity(request);
-        admin.UserName = admin.Email;
+        var user = await CreateUserEntity(request);
+        user.UserName = user.Email;
 
-        var existingAdmin = await _userManager.FindByEmailAsync(request.Email);
-        if (existingAdmin != null)
+        var existingUser = await _userManager.FindByEmailAsync(request.Email);
+        if (existingUser != null)
         {
-            _logger.LogWarning("Admin with email {Email} already exists.", request.Email);
+            _logger.LogWarning("User with email {Email} already exists.", request.Email);
             return new RegisterResponse
             {
                 Success = false,
-                Errors = new List<string> { "Admin already exists" }
+                Errors = new List<string> { "User already exists" }
             };
         }
 
-        var result = await _userManager.CreateAsync(admin, request.Password);
+        var result = await _userManager.CreateAsync(user, request.Password);
         if (result.Succeeded)
         {
-            _logger.LogInformation("Admin user {Email} created successfully.", request.Email);
-            var roleResult = await _userManager.AddToRoleAsync(admin, "Admin");
+            _logger.LogInformation("User account {Email} registered successfully.", request.Email);
+            var roleResult = await _userManager.AddToRoleAsync(user, "AppUser");
 
             if (roleResult.Succeeded)
             {
-                _logger.LogInformation("User {Email} assigned to Admin role successfully.", request.Email);
-                var token = _tokenService.CreateToken(admin);
+                _logger.LogInformation("User {Email} assigned to User role successfully.", request.Email);
+                var token = _tokenService.CreateToken(user);
 
                 return new RegisterResponse
                 {
                     Success = true,
-                    UserName = admin.UserName,
-                    Email = admin.Email,
+                    UserName = user.UserName,
+                    Email = user.Email,
                     Token = token,
                     Errors = null
                 };
             }
             else
             {
-                _logger.LogError("Failed to assign Admin role to user {Email}.", request.Email);
+                _logger.LogWarning("Failed to assign user role to {Email}.", request.Email);
                 return new RegisterResponse
                 {
                     Success = false,
@@ -65,7 +65,7 @@ public sealed class AdminAuthService : IAdminAuthService
         }
         else
         {
-            _logger.LogError("Failed to create admin {Email}.", request.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
+            _logger.LogWarning("Failed to register user {Email}. Errors: {Errors}", request.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
             return new RegisterResponse
             {
                 Success = false,
@@ -74,12 +74,12 @@ public sealed class AdminAuthService : IAdminAuthService
         }
     }
 
-    public async Task<LoginResponse> LoginAdminAsync(LoginAdminRequest request)
+    public async Task<LoginResponse> LoginUserAsync(LoginUserRequest request)
     {
-        var admin = await _userManager.FindByEmailAsync(request.Email);
-        if (admin == null)
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user == null)
         {
-            _logger.LogWarning("Admin with email {Email} not found.", request.Email);
+            _logger.LogWarning("User with email {Email} not found.", request.Email);
             return new LoginResponse
             {
                 Success = false,
@@ -87,34 +87,34 @@ public sealed class AdminAuthService : IAdminAuthService
             };
         }
 
-        var isAdmin = await _userManager.IsInRoleAsync(admin, "Admin");
-        if (!isAdmin)
+        var isUser = await _userManager.IsInRoleAsync(user, "User");
+        if (!isUser)
         {
-            _logger.LogWarning("Login failed for email: {Email}. User is not a admin.", request.Email);
+            _logger.LogWarning("Login failed for email: {Email}. User is not a registered.", request.Email);
             return new LoginResponse
             {
                 Success = false,
-                Errors = new List<string> { "User is not an admin" }
+                Errors = new List<string> { "User is not registered" }
             };
         }
 
-        var result = await _signInManager.PasswordSignInAsync(admin.UserName, request.Password, false, false);
+        var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, false);
 
         if (result.Succeeded)
         {
-            var token = _tokenService.CreateToken(admin); 
-            _logger.LogInformation("Admin {Email} logged in successfully.", request.Email);
+            var token = _tokenService.CreateToken(user);
+            _logger.LogInformation("User {Email} logged in successfully.", request.Email);
             return new LoginResponse
             {
                 Success = true,
-                Email = admin.Email,
+                Email = user.Email,
                 Token = token,
                 Errors = null
             };
         }
         else
         {
-            _logger.LogWarning("Failed to log in admin {Email}.", request.Email);
+            _logger.LogWarning("Failed to log in User {Email}.", request.Email);
             return new LoginResponse
             {
                 Success = false,
@@ -123,7 +123,7 @@ public sealed class AdminAuthService : IAdminAuthService
         }
     }
 
-    public async Task<LogoutResponse> LogoutAdminAsync(LogoutRequest request)
+    public async Task<LogoutResponse> LogoutUserAsync(LogoutRequest request)
     {
         var isTokenBlacklisted = await _tokenBlacklistService.IsTokenBlacklistedAsync(request.Token);
         if (isTokenBlacklisted)
@@ -132,11 +132,10 @@ public sealed class AdminAuthService : IAdminAuthService
             return new LogoutResponse
             {
                 Success = false,
-                Errors = new List<string> { "Token already invalidated"}
+                Errors = new List<string> { "Token already invalidated" }
             };
         }
 
-        // Invalidate the JWT token by adding it to the blacklist repository
         var blacklistingResult = await _tokenBlacklistService.BlacklistTokenAsync(request.Token);
         if (!blacklistingResult)
         {
@@ -148,10 +147,7 @@ public sealed class AdminAuthService : IAdminAuthService
             };
         }
 
-        // Sign out the user (if using cookie-based authentication, you can call _signInManager.SignOutAsync())
-        //await _signInManager.SignOutAsync();
-
-        _logger.LogInformation("Admin logged out successfully.");
+        _logger.LogInformation("User logged out successfully.");
         return new LogoutResponse
         {
             Success = true,
@@ -160,21 +156,22 @@ public sealed class AdminAuthService : IAdminAuthService
     }
 
     // Helper Methods
-    private async Task<Admin> CreateAdminEntity(CreateAdminRequest request)
+    private async Task<AppUser> CreateUserEntity(RegisterUserRequest request)
     {
         var fullname = FullName.Create(request.FirstName, request.LastName, request.OtherNames);
         var address = Address.Create(request.StreetNo, request.StreetName, request.City, request.State, request.ZipCode);
         var nin = NIN.Create(request.NIN);
 
-        var admin = Admin.Create(
+        var user = AppUser.Create(
             name: fullname,
             email: request.Email,
             phoneNumber: request.PhoneNumber,
             gender: request.Gender,
-            address,
-            nin
-            );
+            dateOfBirth: request.DateOfBirth,
+            address: address,
+            nin: nin
+        );
 
-        return admin;
+        return user;
     }
 }

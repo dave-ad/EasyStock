@@ -15,49 +15,49 @@ public sealed class AuthService : IAuthService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<IdentityResult> CreateAdminAsync(RegisterAdminRequest request)
-    {
-        var admin = Admin.Create(
-            FullName.Create(request.FirstName, request.LastName, request.OtherNames),
-            request.Email,
-            request.PhoneNumber,
-            request.Gender
-            //request.SuperAdminLevel,
-            //request.Permissions
-        );
-        admin.UserName = admin.Email;
+    //public async Task<IdentityResult> CreateAdminAsync(RegisterAdminRequest request)
+    //{
+    //    var admin = Admin.Create(
+    //        FullName.Create(request.FirstName, request.LastName, request.OtherNames),
+    //        request.Email,
+    //        request.PhoneNumber,
+    //        request.Gender
+    //        //request.SuperAdminLevel,
+    //        //request.Permissions
+    //    );
+    //    admin.UserName = admin.Email;
 
-        var existingAdmin = await _userManager.FindByEmailAsync(request.Email);
-        if (existingAdmin != null)
-        {
-            _logger.LogWarning("Admin with email {Email} already exists.", request.Email);
-            return IdentityResult.Failed(new IdentityError { Description = "Admin already exists" });
-        }
+    //    var existingAdmin = await _userManager.FindByEmailAsync(request.Email);
+    //    if (existingAdmin != null)
+    //    {
+    //        _logger.LogWarning("Admin with email {Email} already exists.", request.Email);
+    //        return IdentityResult.Failed(new IdentityError { Description = "Admin already exists" });
+    //    }
 
-        var result = await _userManager.CreateAsync(admin, request.Password);
-        if (result.Succeeded)
-        {
-            _logger.LogInformation("Admin user {Email} created successfully.", request.Email);
+    //    var result = await _userManager.CreateAsync(admin, request.Password);
+    //    if (result.Succeeded)
+    //    {
+    //        _logger.LogInformation("Admin user {Email} created successfully.", request.Email);
 
-            var roleResult = await _userManager.AddToRoleAsync(admin, "Admin");
+    //        var roleResult = await _userManager.AddToRoleAsync(admin, "Admin");
 
-            if (roleResult.Succeeded)
-            {
-                _logger.LogInformation("User {Email} assigned to Admin role successfully.", request.Email);
-            }
-            else
-            {
-                _logger.LogError("Failed to assign Admin role to user {Email}.", request.Email);
-                return roleResult;
-            }
-        }
-        else
-        {
-            _logger.LogError("Failed to create admin user {Email}.", request.Email);
-        }
+    //        if (roleResult.Succeeded)
+    //        {
+    //            _logger.LogInformation("User {Email} assigned to Admin role successfully.", request.Email);
+    //        }
+    //        else
+    //        {
+    //            _logger.LogError("Failed to assign Admin role to user {Email}.", request.Email);
+    //            return roleResult;
+    //        }
+    //    }
+    //    else
+    //    {
+    //        _logger.LogError("Failed to create admin user {Email}.", request.Email);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<SignInResult> LoginAdminAsync(string email, string password)
     {
@@ -203,13 +203,13 @@ public sealed class AuthService : IAuthService
     }
 
     // Helper Methods
-    private async Task<EasyStockUser> RegisterUserEntity(RegisterUserRequest request)
+    private async Task<AppUser> RegisterUserEntity(RegisterUserRequest request)
     {
         var fullname = FullName.Create(request.FirstName, request.LastName, request.OtherNames);
         var address = Address.Create(request.StreetNo, request.StreetName, request.City, request.State, request.ZipCode);
         var nin = NIN.Create(request.NIN);
 
-        var user = EasyStockUser.Create(
+        var user = AppUser.Create(
             name: fullname,
             email: request.Email,
             phoneNumber: request.PhoneNumber,
