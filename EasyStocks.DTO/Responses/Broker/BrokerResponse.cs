@@ -13,6 +13,5 @@ public class BrokerResponse : IServiceResponse
     public DateOnly? DateCertified { get; set; }
     public AddressResponse? BusinessAddress { get; set; }
     public string? ProfessionalQualification { get; set; }
-    public BrokerRole BrokerType { get; set; }
     public AccountStatus Status { get; set; }
 }

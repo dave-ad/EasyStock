@@ -2,12 +2,12 @@
 
 [Route("api/[controller]")]
 [ApiController]
-public class UserAuthenticationController : ControllerBase
+public class UserAuthController : ControllerBase
 {
     private readonly IAppUserAuthService _userAuthService;
-    private readonly ILogger<UserAuthenticationController> _logger;
+    private readonly ILogger<UserAuthController> _logger;
 
-    public UserAuthenticationController(IAppUserAuthService userAuthService, ILogger<UserAuthenticationController> logger)
+    public UserAuthController(IAppUserAuthService userAuthService, ILogger<UserAuthController> logger)
     {
         _userAuthService = userAuthService ?? throw new ArgumentNullException(nameof(userAuthService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -20,16 +20,16 @@ public class UserAuthenticationController : ControllerBase
 
         try
         {
-            var response = await _userAuthService.RegisterUserAsync(request);
+            var response = await _userAuthService.RegisterAppUserAsync(request);
 
-            if (response.Success)
+            if (response.IsSuccessful)
             {
-                _logger.LogInformation("User {Email} created successfully.", response.Email);
+                _logger.LogInformation("User {Email} created successfully.", request.Email);
                 return Ok(response);
             }
             else
             {
-                _logger.LogWarning("Failed to create user: {Errors}", string.Join(", ", response.Errors));
+                _logger.LogWarning("Failed to create user: {Errors}", string.Join(", ", response.Error));
                 return BadRequest(response);
             }
         }
@@ -47,16 +47,16 @@ public class UserAuthenticationController : ControllerBase
 
         try
         {
-            var response = await _userAuthService.LoginUserAsync(request);
+            var response = await _userAuthService.LoginAppUserAsync(request);
 
-            if (response.Success)
+            if (response.IsSuccessful)
             {
                 _logger.LogInformation("User {Email} logged in successfully.", request.Email);
                 return Ok(response);
             }
             else
             {
-                _logger.LogWarning("Failed to log in user: {Errors}", string.Join(", ", response.Errors));
+                _logger.LogWarning("Failed to log in user: {Errors}", string.Join(", ", response.Error));
                 return BadRequest(response);
             }
         }
@@ -78,9 +78,9 @@ public class UserAuthenticationController : ControllerBase
             return BadRequest(new { Success = false, Errors = new[] { "Token is required." } });
         }
 
-        var response = await _userAuthService.LogoutUserAsync(request);
+        var response = await _userAuthService.LogoutAppUserAsync(request);
 
-        if (!response.Success)
+        if (!response.IsSuccessful)
         {
             _logger.LogWarning("Logout failed.");
             return BadRequest(response);

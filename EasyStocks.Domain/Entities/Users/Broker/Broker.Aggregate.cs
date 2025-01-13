@@ -7,25 +7,24 @@ public partial class Broker : IAggregateRoot
     private Broker(FullName name, string email, string phoneNumber, 
                     Gender gender, Address address, NIN nin, 
                     BrokerLicense brokerLicense, DateOnly? dateCertified, 
-                    string professionalQualification, BrokerRole brokerType, AccountStatus status)
+                    string professionalQualification, AccountStatus status)
                     : base(name, email, phoneNumber, gender, address, nin)
     {
         BrokerLicense = brokerLicense;
         DateCertified = dateCertified;
         ProfessionalQualification = professionalQualification;
-        BrokerType = brokerType;
         Status = status;
     }
 
     public static Broker Create(FullName name, string email, string phoneNumber, 
                                 Gender gender, Address address, NIN nin,
                                 BrokerLicense brokerLicense, DateOnly? dateCertified,
-                                string professionalQualification, BrokerRole brokerType, AccountStatus status) 
+                                string professionalQualification, AccountStatus status) 
     {
 
         return new Broker(name, email, phoneNumber, gender, 
                             address, nin, brokerLicense, dateCertified, 
-                            professionalQualification, BrokerRole.Default, AccountStatus.Pending);
+                            professionalQualification, AccountStatus.Pending);
     }
 
     public void Update(FullName name, string email, string phoneNumber,

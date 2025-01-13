@@ -14,7 +14,7 @@ public class BrokerAuthController : ControllerBase
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    [HttpPost("create")]
+    [HttpPost("register")]
     public async Task<IActionResult> RegisterBroker([FromBody] CreateBrokerRequest request)
     {
         if (!ModelState.IsValid)
@@ -51,7 +51,6 @@ public class BrokerAuthController : ControllerBase
         }
     }
 
-
     [HttpPost("login")]
     public async Task<IActionResult> LoginBroker([FromBody] BrokerLoginRequest request)
     {
@@ -59,17 +58,17 @@ public class BrokerAuthController : ControllerBase
 
         try
         {
-            var response = await _brokerAuthService.LoginBrokerAsync(request, BrokerRole.Default);
+            var response = await _brokerAuthService.LoginBrokerAsync(request);
 
 
-            if (response.Success)
+            if (response.IsSuccessful)
             {
                 _logger.LogInformation("Broker {Email} logged in successfully.", request.Email);
                 return Ok(response);
             }
             else
             {
-                _logger.LogWarning("Failed to log in broker: {Errors}", string.Join(", ", response.Errors));
+                _logger.LogWarning("Failed to log in broker: {Errors}", string.Join(", ", response.Error));
                 return BadRequest(response);
             }
         }
@@ -97,9 +96,9 @@ public class BrokerAuthController : ControllerBase
 
         var response = await _brokerAuthService.LogoutBrokerAsync(request);
 
-        if (!response.Success)
+        if (!response.IsSuccessful)
         {
-            _logger.LogWarning("Logout failed. Errors: {Errors}", string.Join(", ", response.Errors));
+            _logger.LogWarning("Logout failed. Errors: {Errors}", string.Join(", ", response.Error));
             return BadRequest(response);
         }
 

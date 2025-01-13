@@ -23,14 +23,14 @@ public class AdminAuthController : ControllerBase
         {
             var response = await _adminAuthService.CreateAdminAsync(request);
 
-            if (response.Success)
+            if (response.IsSuccessful)
             {
-                _logger.LogInformation("Admin user {Email} created successfully.", response.Email);
+                _logger.LogInformation("Admin user {Email} created successfully.", request.Email);
                 return Ok(response);
             }
             else
             {
-                _logger.LogWarning("Failed to create admin user: {Errors}", string.Join(", ", response.Errors));
+                _logger.LogWarning("Failed to create admin user: {Errors}", string.Join(", ", response.Error));
                 return BadRequest(response);
             }
         }
@@ -50,14 +50,14 @@ public class AdminAuthController : ControllerBase
         {
             var response = await _adminAuthService.LoginAdminAsync(request);
 
-            if (response.Success)
+            if (response.IsSuccessful)
             {
                 _logger.LogInformation("Admin {Email} logged in successfully.", request.Email);
                 return Ok(response);
             }
             else
             {
-                _logger.LogWarning("Failed to log in admin: {Errors}", string.Join(", ", response.Errors));
+                _logger.LogWarning("Failed to log in admin: {Errors}", string.Join(", ", response.Error));
                 return BadRequest(response);
             }
         }
@@ -85,9 +85,9 @@ public class AdminAuthController : ControllerBase
 
         var response = await _adminAuthService.LogoutAdminAsync(request);
 
-        if (!response.Success)
+        if (!response.IsSuccessful)
         {
-            _logger.LogWarning("Logout failed. Errors: {Errors}", string.Join(", ", response.Errors));
+            _logger.LogWarning("Logout failed. Errors: {Errors}", string.Join(", ", response.Error));
             return BadRequest(response);
         }
 

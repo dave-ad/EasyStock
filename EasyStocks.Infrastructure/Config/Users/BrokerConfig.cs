@@ -57,6 +57,5 @@ internal class BrokerConfig : IEntityTypeConfiguration<Broker>
         builder.Property(x => x.DateCertified).HasColumnType("date");
         builder.Property(x => x.ProfessionalQualification).HasMaxLength(200);
         builder.Property(x => x.Status).IsRequired();
-        builder.Property(x => x.BrokerType).IsRequired();
     }
 }

@@ -213,7 +213,6 @@ public sealed class BrokerAuthService : IBrokerAuthService
         return serviceResponse;
     }
 
-
     // Helper Methods
     private async Task<Broker> CreateBrokerEntity(CreateBrokerRequest request)
     {
@@ -232,7 +231,7 @@ public sealed class BrokerAuthService : IBrokerAuthService
             brokerLicense, 
             dateCertified: request.DateCertified,
             professionalQualification: request.ProfessionalQualification, 
-            BrokerRole.Default, AccountStatus.Pending
+            AccountStatus.Pending
             );
 
         return broker;
