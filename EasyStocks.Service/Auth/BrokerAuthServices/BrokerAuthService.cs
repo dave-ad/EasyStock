@@ -21,91 +21,17 @@ public sealed class BrokerAuthService : IBrokerAuthService
         _tokenBlacklistService = tokenBlacklistService;
     }
 
-    //public async Task<ServiceResponse<RegisterResponse>> CreateBrokerAsync(CreateBrokerRequest request)
-    //{
-    //    var serviceResponse = new ServiceResponse<RegisterResponse>();
-
-    //    using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-    //    {
-    //        try
-    //        {
-    //            var broker = await CreateBrokerEntity(request);
-    //            broker.UserName = broker.Email;
-
-    //            var existingBroker = await _userManager.FindByEmailAsync(request.Email);
-    //            if (existingBroker != null)
-    //            {
-    //                _logger.LogWarning("Broker with email {Email} already exists.", request.Email);
-    //                serviceResponse.IsSuccessful = false;
-    //                serviceResponse.Error = "Broker already exists";
-    //                serviceResponse.TechMessage = "Broker with the provided email already exists in the system.";
-    //                return serviceResponse;
-    //            }
-
-    //            var result = await _userManager.CreateAsync(broker, request.Password);
-    //            if (!result.Succeeded)
-    //            {
-    //                _logger.LogWarning("Failed to register broker {Email}. Errors: {Errors}",
-    //                    request.Email,
-    //                    string.Join(", ", result.Errors.Select(e => e.Description)));
-    //                serviceResponse.IsSuccessful = false;
-    //                serviceResponse.Error = "Broker registration failed.";
-    //                serviceResponse.TechMessage = string.Join(", ", result.Errors.Select(e => e.Description));
-    //                return serviceResponse;
-    //            }
-
-    //            _logger.LogInformation("Broker account {Email} registered successfully.", request.Email);
-    //            var roleResult = await _userManager.AddToRoleAsync(broker, "Broker");
-    //            if (!roleResult.Succeeded)
-    //            {
-    //                _logger.LogWarning("Failed to assign broker role to {Email}.", request.Email);
-    //                serviceResponse.IsSuccessful = false;
-    //                serviceResponse.Error = "Failed to assign role.";
-    //                serviceResponse.TechMessage = string.Join(", ", roleResult.Errors.Select(e => e.Description));
-    //                return serviceResponse;
-    //            }
-
-    //            _logger.LogInformation("Broker {Email} assigned to User role successfully.", request.Email);
-    //            var token = _tokenService.CreateToken(broker);
-
-    //            serviceResponse.IsSuccessful = true;
-    //            serviceResponse.Value = new RegisterResponse
-    //            {
-    //                Success = true,
-    //                UserName = broker.UserName,
-    //                Email = broker.Email,
-    //                Token = token,
-    //                Errors = null
-    //            };
-
-    //            transaction.Complete();
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            _logger.LogError(ex, "An error occurred while creating broker {Email}.", request.Email);
-    //            serviceResponse.IsSuccessful = false;
-    //            serviceResponse.Error = "An unexpected error occurred.";
-    //            serviceResponse.TechMessage = ex.Message;
-    //        }
-    //    }
-
-    //    return serviceResponse;
-    //}
-
     public async Task<ServiceResponse<RegisterResponse>> CreateBrokerAsync(CreateBrokerRequest request)
     {
         var serviceResponse = new ServiceResponse<RegisterResponse>();
 
-        // Ensure transaction scope is used correctly
         using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
             try
             {
-                // Create broker entity from request
                 var broker = await CreateBrokerEntity(request);
                 broker.UserName = broker.Email;
 
-                // Check if broker already exists
                 var existingBroker = await _userManager.FindByEmailAsync(request.Email);
                 if (existingBroker != null)
                 {
@@ -116,7 +42,6 @@ public sealed class BrokerAuthService : IBrokerAuthService
                     return serviceResponse;
                 }
 
-                // Attempt to create broker
                 var result = await _userManager.CreateAsync(broker, request.Password);
                 if (!result.Succeeded)
                 {
@@ -131,7 +56,6 @@ public sealed class BrokerAuthService : IBrokerAuthService
 
                 _logger.LogInformation("Broker account {Email} registered successfully.", request.Email);
 
-                // Assign Broker role
                 var roleResult = await _userManager.AddToRoleAsync(broker, "Broker");
                 if (!roleResult.Succeeded)
                 {
@@ -144,7 +68,6 @@ public sealed class BrokerAuthService : IBrokerAuthService
 
                 _logger.LogInformation("Broker {Email} assigned to Broker role successfully.", request.Email);
 
-                // Generate token
                 var token = _tokenService.CreateToken(broker);
                 if (string.IsNullOrEmpty(token))
                 {
@@ -154,7 +77,6 @@ public sealed class BrokerAuthService : IBrokerAuthService
                     return serviceResponse;
                 }
 
-                // Set success response
                 serviceResponse.IsSuccessful = true;
                 serviceResponse.Value = new RegisterResponse
                 {
@@ -165,7 +87,6 @@ public sealed class BrokerAuthService : IBrokerAuthService
                     Errors = null
                 };
 
-                // Commit transaction
                 transaction.Complete();
             }
             catch (Exception ex)
@@ -180,89 +101,118 @@ public sealed class BrokerAuthService : IBrokerAuthService
         return serviceResponse;
     }
 
-
-
-    public async Task<LoginResponse> LoginBrokerAsync(BrokerLoginRequest request, BrokerRole brokerRole)
+    public async Task<ServiceResponse<LoginResponse>> LoginBrokerAsync(BrokerLoginRequest request)
     {
-        var broker = await _userManager.FindByEmailAsync(request.Email);
-        if (broker == null)
+        var serviceResponse = new ServiceResponse<LoginResponse>();
+
+        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            _logger.LogWarning("Broker with email {Email} not found.", request.Email);
-            return new LoginResponse
+            try
             {
-                Success = false,
-                Errors = new List<string> { "Broker not found" }
-            };
+                var broker = await _userManager.FindByEmailAsync(request.Email);
+                if (broker == null)
+                {
+                    _logger.LogWarning("Broker with email {Email} not found.", request.Email);
+                    serviceResponse.IsSuccessful = false;
+                    serviceResponse.Error = "Broker not found";
+                    serviceResponse.TechMessage = "No broker found with the provided email.";
+                    return serviceResponse;
+                }
+
+                var isBroker = await _userManager.IsInRoleAsync(broker, "Broker");
+                if (!isBroker)
+                {
+                    _logger.LogWarning("Login failed for email: {Email}. User is not a {Role}.", request.Email);
+                    serviceResponse.IsSuccessful = false;
+                    serviceResponse.Error = $"User is not a broker";
+                    serviceResponse.TechMessage = $"Broker with email {request.Email} is not assigned to the broker role.";
+                    return serviceResponse;
+                }
+
+                var result = await _signInManager.PasswordSignInAsync(broker.UserName, request.Password, false, false);
+
+                if (result.Succeeded)
+                {
+                    var token = _tokenService.CreateToken(broker);
+                    _logger.LogInformation("Broker {Email} logged in successfully as {Role}.", request.Email);
+
+                    serviceResponse.IsSuccessful = true;
+                    serviceResponse.Value = new LoginResponse
+                    {
+                        Success = true,
+                        Email = broker.Email,
+                        Token = token,
+                        Errors = null
+                    };
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to log in broker {Email}.", request.Email);
+                    serviceResponse.IsSuccessful = false;
+                    serviceResponse.Error = "Incorrect password or login failure";
+                    serviceResponse.TechMessage = "Password sign-in failed.";
+                }
+
+                transaction.Complete();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while logging in broker {Email}.", request.Email);
+                serviceResponse.IsSuccessful = false;
+                serviceResponse.Error = "An unexpected error occurred.";
+                serviceResponse.TechMessage = ex.Message;
+            }
         }
 
-        var roleName = brokerRole.ToString();
-        var isBroker = await _userManager.IsInRoleAsync(broker, roleName);
-        if (!isBroker)
+        return serviceResponse;
+    }
+
+    public async Task<ServiceResponse<LogoutResponse>> LogoutBrokerAsync(LogoutRequest request)
+    {
+        var serviceResponse = new ServiceResponse<LogoutResponse>();
+
+        try
         {
-            _logger.LogWarning("Login failed for email: {Email}. User is not a {Role}.", request.Email, roleName);
-            return new LoginResponse
+            var isTokenBlacklisted = await _tokenBlacklistService.IsTokenBlacklistedAsync(request.Token);
+            if (isTokenBlacklisted)
             {
-                Success = false,
-                Errors = new List<string> { $"User is not a {roleName}" }
-            };
-        }
+                _logger.LogWarning("Token already blacklisted.");
+                serviceResponse.IsSuccessful = false;
+                serviceResponse.Error = "Token already invalidated";
+                serviceResponse.TechMessage = "The provided token has already been blacklisted.";
+                return serviceResponse;
+            }
 
-        var result = await _signInManager.PasswordSignInAsync(broker.UserName, request.Password, false, false);
+            var blacklistingResult = await _tokenBlacklistService.BlacklistTokenAsync(request.Token);
+            if (!blacklistingResult)
+            {
+                _logger.LogError("Failed to blacklist token.");
+                serviceResponse.IsSuccessful = false;
+                serviceResponse.Error = "Failed to logout. Try again.";
+                serviceResponse.TechMessage = "An error occurred while attempting to blacklist the token.";
+                return serviceResponse;
+            }
 
-        if (result.Succeeded)
-        {
-            var token = _tokenService.CreateToken(broker);
-            _logger.LogInformation("Broker {Email} logged in successfully as {Role}.", request.Email, roleName);
-            return new LoginResponse
+            _logger.LogInformation("User logged out successfully.");
+
+            serviceResponse.IsSuccessful = true;
+            serviceResponse.Value = new LogoutResponse
             {
                 Success = true,
-                Email = broker.Email,
-                Token = token,
-                Errors = null
+                Message = "Logout successful."
             };
         }
-        else
+        catch (Exception ex)
         {
-            _logger.LogWarning("Failed to log in broker {Email}.", request.Email);
-            return new LoginResponse
-            {
-                Success = false,
-                Errors = new List<string> { "Incorrect password or login failure" }
-            };
+            _logger.LogError(ex, "An error occurred while logging out.");
+            serviceResponse.IsSuccessful = false;
+            serviceResponse.Error = "An unexpected error occurred.";
+            serviceResponse.TechMessage = ex.Message;
         }
+
+        return serviceResponse;
     }
 
-    public async Task<LogoutResponse> LogoutBrokerAsync(LogoutRequest request)
-    {
-        var isTokenBlacklisted = await _tokenBlacklistService.IsTokenBlacklistedAsync(request.Token);
-        if (isTokenBlacklisted)
-        {
-            _logger.LogWarning("Token already blacklisted.");
-            return new LogoutResponse
-            {
-                Success = false,
-                Errors = new List<string> { "Token already invalidated" }
-            };
-        }
-
-        var blacklistingResult = await _tokenBlacklistService.BlacklistTokenAsync(request.Token);
-        if (!blacklistingResult)
-        {
-            _logger.LogError("Failed to blacklist token.");
-            return new LogoutResponse
-            {
-                Success = false,
-                Errors = new List<string> { "Failed to logout. Try again." }
-            };
-        }
-
-        _logger.LogInformation("User logged out successfully.");
-        return new LogoutResponse
-        {
-            Success = true,
-            Message = "Logout successful."
-        };
-    }
 
     // Helper Methods
     private async Task<Broker> CreateBrokerEntity(CreateBrokerRequest request)

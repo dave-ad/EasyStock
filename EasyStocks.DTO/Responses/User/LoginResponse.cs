@@ -1,6 +1,7 @@
 ﻿namespace EasyStocks.DTO.Responses;
 
-public class LoginResponse
+public class LoginResponse : IServiceResponse
+{
 {
     public bool Success { get; set; }
     public string Email { get; set; }

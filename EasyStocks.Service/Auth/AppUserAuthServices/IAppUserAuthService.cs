@@ -2,7 +2,7 @@
 
 public interface IAppUserAuthService
 {
-    Task<RegisterResponse> RegisterUserAsync(RegisterUserRequest request);
-    Task<LoginResponse> LoginUserAsync(LoginUserRequest request);
-    Task<LogoutResponse> LogoutUserAsync(LogoutRequest request);
+    Task<ServiceResponse<RegisterResponse>> RegisterAppUserAsync(RegisterUserRequest request);
+    Task<ServiceResponse<LoginResponse>> LoginAppUserAsync(LoginUserRequest request);
+    Task<ServiceResponse<LogoutResponse>> LogoutAppUserAsync(LogoutRequest request);
 }
