@@ -17,37 +17,116 @@ public sealed class AppUserAuthService : IAppUserAuthService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<RegisterResponse> RegisterUserAsync(RegisterUserRequest request)
+    public async Task<ServiceResponse<RegisterResponse>> RegisterAppUserAsync(RegisterUserRequest request)
     {
-        var user = await CreateUserEntity(request);
-        user.UserName = user.Email;
+        var serviceResponse = new ServiceResponse<RegisterResponse>();
 
-        var existingUser = await _userManager.FindByEmailAsync(request.Email);
-        if (existingUser != null)
+        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            _logger.LogWarning("User with email {Email} already exists.", request.Email);
-            return new RegisterResponse
+            try
             {
-                Success = false,
-                Errors = new List<string> { "User already exists" }
-            };
+                var user = await CreateUserEntity(request);
+                user.UserName = user.Email;
+
+                var existingUser = await _userManager.FindByEmailAsync(request.Email);
+                if (existingUser != null)
+                {
+                    _logger.LogWarning("User with email {Email} already exists.", request.Email);
+                    serviceResponse.IsSuccessful = false;
+                    serviceResponse.Error = "User already exists";
+                    serviceResponse.TechMessage = "A user with the provided email already exists.";
+                    return serviceResponse;
+                }
+
+                var result = await _userManager.CreateAsync(user, request.Password);
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation("User account {Email} registered successfully.", request.Email);
+
+                    var roleResult = await _userManager.AddToRoleAsync(user, "AppUser");
+
+                    if (roleResult.Succeeded)
+                    {
+                        _logger.LogInformation("User {Email} assigned to User role successfully.", request.Email);
+                        var token = _tokenService.CreateToken(user);
+
+                        serviceResponse.IsSuccessful = true;
+                        serviceResponse.Value = new RegisterResponse
+                        {
+                            Success = true,
+                            UserName = user.UserName,
+                            Email = user.Email,
+                            Token = token,
+                            Errors = null
+                        };
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Failed to assign user role to {Email}.", request.Email);
+                        serviceResponse.IsSuccessful = false;
+                        serviceResponse.Error = "Failed to assign user role.";
+                        serviceResponse.TechMessage = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to register user {Email}. Errors: {Errors}", request.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
+                    serviceResponse.IsSuccessful = false;
+                    serviceResponse.Error = "User registration failed.";
+                    serviceResponse.TechMessage = string.Join(", ", result.Errors.Select(e => e.Description));
+                }
+
+                transaction.Complete();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while registering user {Email}.", request.Email);
+                serviceResponse.IsSuccessful = false;
+                serviceResponse.Error = "An unexpected error occurred.";
+                serviceResponse.TechMessage = ex.Message;
+            }
         }
 
-        var result = await _userManager.CreateAsync(user, request.Password);
-        if (result.Succeeded)
+        return serviceResponse;
+    }
+
+    public async Task<ServiceResponse<LoginResponse>> LoginAppUserAsync(LoginUserRequest request)
+    {
+        var serviceResponse = new ServiceResponse<LoginResponse>();
+
+        try
         {
-            _logger.LogInformation("User account {Email} registered successfully.", request.Email);
-            var roleResult = await _userManager.AddToRoleAsync(user, "AppUser");
-
-            if (roleResult.Succeeded)
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
             {
-                _logger.LogInformation("User {Email} assigned to User role successfully.", request.Email);
-                var token = _tokenService.CreateToken(user);
+                _logger.LogWarning("User with email {Email} not found.", request.Email);
+                serviceResponse.IsSuccessful = false;
+                serviceResponse.Error = "User not found";
+                serviceResponse.TechMessage = "No user found with the provided email.";
+                return serviceResponse;
+            }
 
-                return new RegisterResponse
+            var isUser = await _userManager.IsInRoleAsync(user, "AppUser");
+            if (!isUser)
+            {
+                _logger.LogWarning("Login failed for email: {Email}. User is not registered.", request.Email);
+                serviceResponse.IsSuccessful = false;
+                serviceResponse.Error = "User is not registered";
+                serviceResponse.TechMessage = "User is not assigned to the 'AppUser' role.";
+                return serviceResponse;
+            }
+
+            var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, false);
+
+            if (result.Succeeded)
+            {
+                var token = _tokenService.CreateToken(user);
+                _logger.LogInformation("User {Email} logged in successfully.", request.Email);
+
+                serviceResponse.IsSuccessful = true;
+                serviceResponse.Value = new LoginResponse
                 {
                     Success = true,
-                    UserName = user.UserName,
                     Email = user.Email,
                     Token = token,
                     Errors = null
@@ -55,105 +134,69 @@ public sealed class AppUserAuthService : IAppUserAuthService
             }
             else
             {
-                _logger.LogWarning("Failed to assign user role to {Email}.", request.Email);
-                return new RegisterResponse
-                {
-                    Success = false,
-                    Errors = roleResult.Errors.Select(e => e.Description)
-                };
+                _logger.LogWarning("Failed to log in User {Email}.", request.Email);
+                serviceResponse.IsSuccessful = false;
+                serviceResponse.Error = "Incorrect password or login failure";
+                serviceResponse.TechMessage = "Password sign-in failed.";
             }
         }
-        else
+        catch (Exception ex)
         {
-            _logger.LogWarning("Failed to register user {Email}. Errors: {Errors}", request.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
-            return new RegisterResponse
-            {
-                Success = false,
-                Errors = result.Errors.Select(e => e.Description)
-            };
+            _logger.LogError(ex, "An error occurred while logging in user {Email}.", request.Email);
+            serviceResponse.IsSuccessful = false;
+            serviceResponse.Error = "An unexpected error occurred.";
+            serviceResponse.TechMessage = ex.Message;
         }
+
+        return serviceResponse;
     }
 
-    public async Task<LoginResponse> LoginUserAsync(LoginUserRequest request)
+    public async Task<ServiceResponse<LogoutResponse>> LogoutAppUserAsync(LogoutRequest request)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email);
-        if (user == null)
+        var serviceResponse = new ServiceResponse<LogoutResponse>();
+
+        try
         {
-            _logger.LogWarning("User with email {Email} not found.", request.Email);
-            return new LoginResponse
+            var isTokenBlacklisted = await _tokenBlacklistService.IsTokenBlacklistedAsync(request.Token);
+            if (isTokenBlacklisted)
             {
-                Success = false,
-                Errors = new List<string> { "Admin not found" }
-            };
-        }
+                _logger.LogWarning("Token already blacklisted.");
+                serviceResponse.IsSuccessful = false;
+                serviceResponse.Error = "Token already invalidated";
+                serviceResponse.TechMessage = "The provided token has already been blacklisted.";
+                return serviceResponse;
+            }
 
-        var isUser = await _userManager.IsInRoleAsync(user, "User");
-        if (!isUser)
-        {
-            _logger.LogWarning("Login failed for email: {Email}. User is not a registered.", request.Email);
-            return new LoginResponse
+            var blacklistingResult = await _tokenBlacklistService.BlacklistTokenAsync(request.Token);
+            if (!blacklistingResult)
             {
-                Success = false,
-                Errors = new List<string> { "User is not registered" }
-            };
-        }
+                _logger.LogError("Failed to blacklist token.");
+                serviceResponse.IsSuccessful = false;
+                serviceResponse.Error = "Failed to logout. Try again.";
+                serviceResponse.TechMessage = "An error occurred while attempting to blacklist the token.";
+                return serviceResponse;
+            }
 
-        var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, false);
+            _logger.LogInformation("User logged out successfully.");
 
-        if (result.Succeeded)
-        {
-            var token = _tokenService.CreateToken(user);
-            _logger.LogInformation("User {Email} logged in successfully.", request.Email);
-            return new LoginResponse
+            serviceResponse.IsSuccessful = true;
+            serviceResponse.Value = new LogoutResponse
             {
                 Success = true,
-                Email = user.Email,
-                Token = token,
-                Errors = null
+                Message = "Logout successful."
             };
         }
-        else
+        catch (Exception ex)
         {
-            _logger.LogWarning("Failed to log in User {Email}.", request.Email);
-            return new LoginResponse
-            {
-                Success = false,
-                Errors = new List<string> { "Incorrect password or login failure" }
-            };
+            _logger.LogError(ex, "An error occurred while logging out user.");
+            serviceResponse.IsSuccessful = false;
+            serviceResponse.Error = "An unexpected error occurred.";
+            serviceResponse.TechMessage = ex.Message;
         }
+
+        return serviceResponse;
     }
 
-    public async Task<LogoutResponse> LogoutUserAsync(LogoutRequest request)
-    {
-        var isTokenBlacklisted = await _tokenBlacklistService.IsTokenBlacklistedAsync(request.Token);
-        if (isTokenBlacklisted)
-        {
-            _logger.LogWarning("Token already blacklisted.");
-            return new LogoutResponse
-            {
-                Success = false,
-                Errors = new List<string> { "Token already invalidated" }
-            };
-        }
-
-        var blacklistingResult = await _tokenBlacklistService.BlacklistTokenAsync(request.Token);
-        if (!blacklistingResult)
-        {
-            _logger.LogError("Failed to blacklist token.");
-            return new LogoutResponse
-            {
-                Success = false,
-                Errors = new List<string> { "Failed to logout. Try again." }
-            };
-        }
-
-        _logger.LogInformation("User logged out successfully.");
-        return new LogoutResponse
-        {
-            Success = true,
-            Message = "Logout successful."
-        };
-    }
 
     // Helper Methods
     private async Task<AppUser> CreateUserEntity(RegisterUserRequest request)

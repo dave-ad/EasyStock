@@ -2,7 +2,7 @@
 
 public interface IAdminAuthService
 {
-    Task<RegisterResponse> CreateAdminAsync(CreateAdminRequest request);
-    Task<LoginResponse> LoginAdminAsync(LoginAdminRequest request);
-    Task<LogoutResponse> LogoutAdminAsync(LogoutRequest request);
+    Task<ServiceResponse<RegisterResponse>> CreateAdminAsync(CreateAdminRequest request);
+    Task<ServiceResponse<LoginResponse>> LoginAdminAsync(LoginAdminRequest request);
+    Task<ServiceResponse<LogoutResponse>> LogoutAdminAsync(LogoutRequest request);
 }

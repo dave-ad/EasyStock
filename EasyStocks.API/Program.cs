@@ -1,4 +1,6 @@
 
+using Microsoft.AspNetCore.Mvc.Versioning;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,6 +9,18 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add API versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new HeaderApiVersionReader("x-api-version"), // Optionally, you can use headers for versioning
+        new QueryStringApiVersionReader("api-version") // Optionally, query string versioning
+    );
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0); // Default version
+    options.ReportApiVersions = true;
+});
 
 builder.Services.AddSwaggerGen(option =>
 {
@@ -75,6 +89,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+//app.MapControllers().RequireAuthorization();
 
 app.Run();
 

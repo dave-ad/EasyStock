@@ -1,6 +1,6 @@
 ﻿namespace EasyStocks.DTO.Responses;
 
-public class LogoutResponse
+public class LogoutResponse : IServiceResponse
 {
     public bool Success { get; set; }
     public string Message { get; set; }
